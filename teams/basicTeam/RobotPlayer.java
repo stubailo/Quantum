@@ -1,4 +1,4 @@
-package team039;
+package basicTeam;
 
 import battlecode.common.*;
 import static battlecode.common.GameConstants.*;
@@ -36,9 +36,7 @@ public class RobotPlayer implements Runnable {
 
             }
             catch(Exception e) {
-                System.out.println("Robot " + myRC.getRobot().getID() + \
-                                   " during round " + Clock.getRoundNum() + \
-                                   " caught exception:");
+                System.out.println("Robot " + myRC.getRobot().getID() + " during round " + Clock.getRoundNum() + " caught exception:");
                 e.printStackTrace();
             }
         }
