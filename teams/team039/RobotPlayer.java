@@ -7,6 +7,8 @@ public class RobotPlayer implements Runnable {
    
     private final RobotController myRC;
 
+    public double previousFlux;
+
     public RobotPlayer(RobotController rc) {
         myRC = rc;
     }
@@ -38,6 +40,12 @@ public class RobotPlayer implements Runnable {
         }
         System.out.println(myRC.getChassis());
         chassisTypePlayer.run();
+    }
+
+    public double determineDeltaFlux() {
+        double deltaFlux = myRC.getTeamResources() - previousFlux;
+        previousFlux = deltaFlux + previousFlux;
+        return deltaFlux;
     }
 
     public void debug_printNewComponents() {
