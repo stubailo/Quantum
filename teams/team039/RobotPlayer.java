@@ -36,5 +36,21 @@ public class RobotPlayer implements Runnable {
                 chassisTypePlayer = new BuildingPlayer(myRC);
                 break;
         }
+        System.out.println(myRC.getChassis());
+        chassisTypePlayer.run();
     }
+
+    public void debug_printNewComponents() {
+        ComponentController[] newComps = myRC.newComponents();
+
+        if(newComps.length > 0) {
+            for(ComponentController newComp : newComps) {
+                System.out.println(newComp.type());
+            }
+        }
+    }
+
+    public void debug_setStrings() { 
+        myRC.setIndicatorString(0, String.valueOf(myRC.getTeamResources()));
+    }   
 }

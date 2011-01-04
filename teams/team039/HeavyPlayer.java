@@ -13,5 +13,14 @@ public class HeavyPlayer extends RobotPlayer {
     }
 
     public void run() {
+        while(true) {
+            try {
+
+            }
+            catch(Exception e) {
+                System.out.println("Robot " + myRC.getRobot().getID() + " during round number " + Clock.getRoundNum() + " caught exception:");
+                e.printStackTrace();
+            }
+        }
     }
 }

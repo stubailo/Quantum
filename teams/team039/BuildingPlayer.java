@@ -13,5 +13,17 @@ public class BuildingPlayer extends RobotPlayer {
     }
 
     public void run() {
+        while(true) {
+            try {
+
+                debug_printNewComponents();
+                debug_setStrings();
+                myRC.yield();
+            }
+            catch(Exception e) {
+                System.out.println("Robot " + myRC.getRobot().getID() + " during round number " + Clock.getRoundNum() + " caught exception:");
+                e.printStackTrace();
+            }
+        }
     }
 }
