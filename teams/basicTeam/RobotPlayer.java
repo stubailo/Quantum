@@ -20,24 +20,21 @@ public class RobotPlayer implements Runnable {
     }
 
     public void run() {
-    	knowledge.update();
-    	compHandler.updateComponents();
-    	doFirstRoundActions();
-    	
+    	doCommonActions();    	
+    	doCommonFirstRoundActions();
     	SpecificPlayer specificPlayer = determineSpecificPlayer();
+    	specificPlayer.doSpecificFirstRoundActions();
+    	specificPlayer.doSpecificActions();
         while(true) {
             try {
 
-                
-                
-                specificPlayer.runRound();
-                
-                
-                
                 debug_setStrings();
                 debug_printComponents();
                 myRC.yield();
+                
+                
                 doCommonActions();
+                specificPlayer.doSpecificActions();
             }
             catch(Exception e) {
                 System.out.println("Robot " + myRC.getRobot().getID() + 
@@ -49,13 +46,13 @@ public class RobotPlayer implements Runnable {
 
     }
 
-    public void doFirstRoundActions() {
+    public void doCommonFirstRoundActions() {
     	
     }
     
-    public void doCommonActions() {
-    	
-        
+    public ComponentType doCommonActions() {
+    	knowledge.update();
+        return compHandler.updateComponents();
     }
 
     

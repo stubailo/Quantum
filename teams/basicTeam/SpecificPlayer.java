@@ -3,7 +3,9 @@ package basicTeam;
 import battlecode.common.*;
 
 public interface SpecificPlayer {
+		
+	public void doSpecificActions();
 	
-	public void runRound();
+	public void doSpecificFirstRoundActions();
 
 }

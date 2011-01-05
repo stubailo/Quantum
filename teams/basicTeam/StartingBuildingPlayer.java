@@ -17,9 +17,5 @@ public class StartingBuildingPlayer extends BuildingPlayer {
 		knowledge = know;
 		compHandler = compHand;
 	}
-	
-	public void runRound() {
-		
-	}
 
 }

@@ -59,6 +59,12 @@ public class RobotPlayer implements Runnable {
     }
 
     public void debug_setStrings() { 
-        myRC.setIndicatorString(0, String.valueOf(myRC.getTeamResources()));
+        String displayString = myRC.getLocation().toString() + " ";
+        displayString += String.valueOf((int)myRC.getTeamResources()) + " ";
+        displayString += String.valueOf(myRC.components()[2].type().cosHalfAngle) + " ";
+        for(ComponentController comp : myRC.components()) {
+            displayString += comp.type().toString() + " ";
+        }
+        myRC.setIndicatorString(0, displayString);
     }   
 }

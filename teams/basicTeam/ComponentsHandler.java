@@ -23,12 +23,12 @@ public class ComponentsHandler {
 		myRC = rc;
 	}
 	
-	public int updateComponents() {
+	public ComponentType updateComponents() {
         ComponentController[] newComps = myRC.newComponents();
         
-        if(newComps.length == 0) return 0;
+        if(newComps.length == 0) return null;
         
-        int result = 0;
+        ComponentType result = null;
         
         for(ComponentController newComp: newComps) {
         	switch(newComp.type()) { // TODO: handle IRON, JUMP, DROPSHIP, BUG, DUMMY
@@ -69,22 +69,22 @@ public class ComponentsHandler {
         		break;
         		
         	case CONSTRUCTOR:
-        		result = 1;
+        		result = ComponentType.CONSTRUCTOR;
         		myBC = (BuilderController) newComp;
         		break;
         		
         	case RECYCLER:
-        		result = 2;
+        		result = ComponentType.RECYCLER;
         		myBC = (BuilderController) newComp;
         		break;
         		
         	case FACTORY:
-        		result = 3;
+        		result = ComponentType.FACTORY;
         		myBC = (BuilderController) newComp;
         		break;
         		
         	case ARMORY:
-        		result = 4;
+        		result = ComponentType.ARMORY;
         		myBC = (BuilderController) newComp;
         		break;
         	}

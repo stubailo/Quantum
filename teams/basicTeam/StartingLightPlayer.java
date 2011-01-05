@@ -17,9 +17,5 @@ public class StartingLightPlayer extends LightPlayer {
 		knowledge = know;
 		compHandler = compHand;
 	}
-	
-	public void runRound() {
-		
-	}
 
 }

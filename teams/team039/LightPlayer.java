@@ -47,6 +47,13 @@ public class LightPlayer extends RobotPlayer {
                 debug_setStrings();
                 myRC.yield();
 
+                /*if(!canSenseMine()) {
+                    // turn
+                }
+                else {
+                    // 1. find open spot near mine
+                    // 2. go to that spot
+                }*/
 
             }
             catch(Exception e) {

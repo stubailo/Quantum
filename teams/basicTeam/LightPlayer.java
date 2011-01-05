@@ -17,7 +17,11 @@ public class LightPlayer implements SpecificPlayer {
 		compHandler = compHand;
 	}
 	
-	public void runRound() {
+	public void doSpecificActions() {
+		
+	}
+	
+	public void doSpecificFirstRoundActions() {
 		
 	}
 

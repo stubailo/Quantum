@@ -17,7 +17,11 @@ public class BuildingPlayer implements SpecificPlayer {
 		compHandler = compHand;
 	}
 	
-	public void runRound() {
+	public void doSpecificActions() {
+		
+	}
+	
+    public void doSpecificFirstRoundActions() {
 		
 	}
 
