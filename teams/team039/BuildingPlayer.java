@@ -49,7 +49,7 @@ public class BuildingPlayer extends RobotPlayer {
 
                 Robot[] nearbyRobots = mySC.senseNearbyGameObjects(Robot.class);
                 for(Robot nearbyRobot: nearbyRobots) {
-                     nearbyRobotInfo = mySC.senseRobotInfo(nearbyRobot);
+                     //nearbyRobotInfo = mySC.senseRobotInfo(nearbyRobot);
                     
                 }
             }
