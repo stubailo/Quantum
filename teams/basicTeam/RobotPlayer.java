@@ -1,4 +1,4 @@
-package basicTeam;
+package team039;
 
 import battlecode.common.*;
 
@@ -40,8 +40,15 @@ public class RobotPlayer implements Runnable {
                 doCommonActions();
             }
             catch(Exception e) {
+<<<<<<< HEAD
                 System.out.println("Robot " + myRC.getRobot().getID() + " during round " + Clock.getRoundNum() + " caught exception:");
 
+=======
+                System.out.println("Robot " + myRC.getRobot().getID() + \
+                                   " during round " + Clock.getRoundNum() + \
+                                   " caught exception:");
+                e.printStackTrace();
+>>>>>>> parent of f351384... first commit
             }
         }
 
