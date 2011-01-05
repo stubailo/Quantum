@@ -1,7 +1,6 @@
-package team039;
+package oldTeam;
 
 import battlecode.common.*;
-import static battlecode.common.GameConstants.*;
 
 public class LightPlayer extends RobotPlayer {
    
@@ -35,6 +34,7 @@ public class LightPlayer extends RobotPlayer {
         }
     }
 
+    @Override
     public void run() {
 
         doFirstRoundActions();
@@ -47,6 +47,13 @@ public class LightPlayer extends RobotPlayer {
                 debug_setStrings();
                 myRC.yield();
 
+                /*if(!canSenseMine()) {
+                    // turn
+                }
+                else {
+                    // 1. find open spot near mine
+                    // 2. go to that spot
+                }*/
 
             }
             catch(Exception e) {

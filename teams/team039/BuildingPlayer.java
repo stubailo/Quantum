@@ -43,7 +43,7 @@ public class BuildingPlayer extends RobotPlayer {
         while(true) {
             try {
 
-                debug_printNewComponents();
+                //debug_printNewComponents();
                 debug_setStrings();
                 myRC.yield();
 
