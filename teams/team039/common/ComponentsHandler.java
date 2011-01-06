@@ -13,7 +13,7 @@ public class ComponentsHandler {
     private final Knowledge knowledge;
     /*** Controllers ***/
     private MovementController myMC;
-    // Code only utilizes one sensor at the moment... even if there's more than one.
+    // Some code only uses one sensor... these should be expanded to use either all sensors or the best sensor, depending on the application
     private SensorController[] mySCs = new SensorController[4];
     private BuilderController myBC;
     private WeaponController[] myWCs = new WeaponController[18];
@@ -42,8 +42,34 @@ public class ComponentsHandler {
     }
 
     /**
-     * Returns the object in a certain square and height
-     * @return        the robot in that square at that height
+     * Returns the first empty location that is sensed at the appropriate height.
+     * @return        One empty location
+     */
+    public MapLocation getAdjacentEmptySpot(RobotLevel height) {
+        MapLocation myLocation = myRC.getLocation();
+
+        if (height.equals(RobotLevel.IN_AIR)) {
+            if (senseARobot(myLocation, height) == null) {
+                return myLocation;
+            }
+        }
+
+        Direction direction = Direction.EAST;
+
+        while (senseARobot(myLocation.add(direction), height) != null && !direction.equals(Direction.EAST)) {
+            direction.rotateRight();
+        }
+
+        if (senseARobot(myLocation.add(direction), height) == null) {
+            return myLocation.add(direction);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the robot in a certain square and height
+     * @return        the robot in that square at that height, null if there is anything else there
      */
     public Robot senseARobot(MapLocation location, RobotLevel height) {
         if (numberOfSensors == 0) {
@@ -56,6 +82,8 @@ public class ComponentsHandler {
                     GameObject obj = currSensor.senseObjectAtLocation(location, height);
                     if (obj instanceof Robot) {
                         return (Robot) obj;
+                    } else {
+                        return null;
                     }
                 }
             } catch (Exception e) {
@@ -225,6 +253,43 @@ public class ComponentsHandler {
                 return false;
             }
             myMC.setDirection(direction);
+            return true;
+        } catch (Exception e) {
+            knowledge.printExceptionMessage(e);
+            return false;
+        }
+    }
+
+    /***************************** BUILDING METHODS *******************************/
+    public Boolean builderActive() {
+        return myBC.isActive();
+    }
+
+    public Boolean canIBuild(ComponentType component) {
+        return BuildMappings.canBuild(myBC.type(), component);
+    }
+
+    public Boolean buildComponent(ComponentType component, MapLocation location, RobotLevel height) {
+        if (myBC.isActive()) {
+            return false;
+        }
+
+        try {
+            myBC.build(component, location, height);
+            return true;
+        } catch (Exception e) {
+            knowledge.printExceptionMessage(e);
+            return false;
+        }
+    }
+
+    public Boolean buildChassis(Chassis chassis, MapLocation location) {
+        if (myBC.isActive()) {
+            return false;
+        }
+
+        try {
+            myBC.build(chassis, location);
             return true;
         } catch (Exception e) {
             knowledge.printExceptionMessage(e);

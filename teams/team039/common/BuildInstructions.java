@@ -18,12 +18,16 @@ public class BuildInstructions {
     private int totalCost = 0;
     private int numSteps = 0;
     private int totalWeight = 0;
+    private Chassis baseChassis;
     private ComponentType[] instructions;
 
     /**
      * Takes an array of components and calculates the cost and number of steps
      */
-    public BuildInstructions(ComponentType[] components) {
+    public BuildInstructions( Chassis chassis, ComponentType[] components) {
+
+        totalCost = chassis.cost;
+
         for (ComponentType currComp : components) {
             totalCost += currComp.cost;
             totalWeight += currComp.weight;
@@ -57,4 +61,10 @@ public class BuildInstructions {
     public int getTotalWeight() {
         return totalWeight;
     }
+
+    public Chassis getBaseChassis() {
+        return baseChassis;
+    }
+
+    
 }
