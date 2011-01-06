@@ -5,6 +5,7 @@ import team039.building.recycler.StartingBuildingPlayer;
 import team039.common.ComponentsHandler;
 import team039.common.Knowledge;
 import team039.common.SpecificPlayer;
+import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
 
@@ -12,20 +13,25 @@ public class RobotPlayer implements Runnable {
    
     private final  RobotController     myRC;
     
-    // ComponentsHandler
+    /*** ComponentsHandler ***/
     private final  ComponentsHandler   compHandler;
     
-    // Knowledge
+    /*** Knowledge ***/
     private final  Knowledge           knowledge;
     
 
+    
     public RobotPlayer(RobotController rc) {
         myRC = rc;
     	knowledge = new Knowledge(myRC);
     	compHandler = new ComponentsHandler(myRC, knowledge);
     }
+    
+    
 
     public void run() {
+    	
+    	// Order of these two should be determined by dependency.
     	doCommonActions();    	
     	doCommonFirstRoundActions();
     	SpecificPlayer specificPlayer = determineSpecificPlayer();
@@ -35,9 +41,10 @@ public class RobotPlayer implements Runnable {
             try {
 
                 debug_setStrings();
-                debug_printComponents();
                 myRC.yield();
                 
+                // Depending on new components, SpecificPlayer type might change!
+                // Also note that common actions are performed in this definition line.
                 ComponentType dominantNewComponent = doCommonActions();
                 if(dominantNewComponent != null) {
                 	specificPlayer =
@@ -54,10 +61,14 @@ public class RobotPlayer implements Runnable {
         }
 
     }
+    
+    
 
     public void doCommonFirstRoundActions() {
     	
     }
+    
+    
     
     public ComponentType doCommonActions() {
     	knowledge.update();
@@ -85,54 +96,27 @@ public class RobotPlayer implements Runnable {
     		}
     	}
     	
-    	/*else {
+    	else {
 	    	switch(myRC.getChassis()) {
 	    	case BUILDING:
-	    	    result = new BuildingPlayer(myRC);
+	    	    result = new BuildingPlayer(myRC, knowledge, compHandler);
 	    	    break;
 	
 	    	case LIGHT:
-	    	    result = new LightPlayer(myRC);
-	    	    break;
-	
-	
-	    	case MEDIUM:
-	    	    result = new MediumPlayer(myRC);
-	    	    break;
-	
-	
-	    	case HEAVY:
-	    	    result = new HeavyPlayer(myRC);
-	    	    break;
-	
-	
-	    	case FLYING:
-	    	    result = new FlyingPlayer(myRC);
-	    	    break;
-	
-	
-	    	case DUMMY:
-	    	    result = new DummyPlayer(myRC);
+	    	    result = new LightPlayer(myRC, knowledge, compHandler);
 	    	    break;
 	    	}
-    	}*/
+	    	//TODO: add other Chassis types!
+    	}
     	return result;
     }
+    
+    
 
-    public void debug_printComponents() {
-        ComponentController[] newComps = myRC.newComponents();
-        
-
-        if(newComps.length > 0) {
-            String displayString = "New components:";
-            for(ComponentController newComp : newComps) {
-                displayString += " " + newComp.type();
-            }
-            System.out.println(displayString);
-        }
-    }
-
+    /**
+     * Indicator string use should be contained within this method.
+     */
     public void debug_setStrings() { 
-        myRC.setIndicatorString(0, String.valueOf(myRC.getTeamResources()));
+        myRC.setIndicatorString(0, knowledge.myLocation.toString());
     }   
 }

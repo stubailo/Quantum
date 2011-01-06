@@ -28,6 +28,8 @@ public class RecyclerPlayer extends BuildingPlayer {
 	
     public void doSpecificFirstRoundActions() {
 		super.doSpecificFirstRoundActions();
+		
+		
 	}
 	
 	public SpecificPlayer determineSpecificPlayer(ComponentType compType) {

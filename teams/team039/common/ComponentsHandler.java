@@ -2,58 +2,55 @@ package team039.common;
 
 import battlecode.common.*;
 
+/**
+ * Hopefully abstracts some component functionality away from tedium.
+ * @author Jason
+ *
+ */
 public class ComponentsHandler {
 
 	private final RobotController myRC;
 	private final Knowledge       knowledge;
 	
-	// Controllers
+	/*** Controllers ***/
     public         MovementController   myMC;
     public         SensorController[]   mySCs = new SensorController[4];
     public         BuilderController    myBC;
     public         WeaponController[]   myWCs = new WeaponController[18];
     public         BroadcastController  myCC;
 
-    // Controller info
-    public         int                 numberOfSensors = 0;
-    public         boolean             hasBuilder      = false;
-    public         int                 numberOfWeapons = 0;
-    public         boolean             hasComm         = false;
+    /*** Controller info ***/
+    public         int                  numberOfSensors = 0;
+    public         boolean              hasBuilder      = false;
+    public         int                  numberOfWeapons = 0;
+    public         boolean              hasComm         = false;
 	
+    
+    
 	public ComponentsHandler(RobotController rc, Knowledge know) {
 		myRC = rc;
 		knowledge = know;
 	}
 	
-	public void sense() {
-		try {
-			
-			if(numberOfSensors == 0) return;
-			if(numberOfSensors == 1) {
-				SensorController sensor = mySCs[0];
-				
-				Mine[] sensedMines = sensor.senseNearbyGameObjects(Mine.class);
-				
-				if(sensedMines.length > 0) {
-					for(Mine sensedMine : sensedMines) {
-						MineInfo sensedMineInfo = sensor.senseMineInfo(sensedMine);
-						
-					}
-				}
-			}
-			else {
-				
-			}
-			
-		}
-		catch(Exception e) {
-            System.out.println("Robot " + myRC.getRobot().getID() + 
-                               " during round " + Clock.getRoundNum() + 
-                               " caught exception:");
-            e.printStackTrace();
-        }
+	
+	
+	/**
+	 * Returns an array of Robots that can be sensed
+	 * @return		an array of all nearby robots, empty if there are no robots or no sensors
+	 */
+	public Robot[] getSensedRobots() {
+		if(numberOfSensors == 0) return new Robot[0];
+		else return mySCs[0].senseNearbyGameObjects(Robot.class);
 	}
 	
+	
+	
+	/**
+	 * Looks at new components, sorts them, and returns the most interesting
+	 * 
+	 * @return		returns any component that might change the SpecificPlayer
+	 */
+	// TODO: Allow returning of more than one component-type...
 	public ComponentType updateComponents() {
         ComponentController[] newComps = myRC.newComponents();
         
