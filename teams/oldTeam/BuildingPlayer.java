@@ -1,7 +1,6 @@
 package oldTeam;
 
 import battlecode.common.*;
-import static battlecode.common.GameConstants.*;
 
 public class BuildingPlayer extends RobotPlayer {
    
@@ -35,6 +34,7 @@ public class BuildingPlayer extends RobotPlayer {
         }
     }
 
+    @Override
     public void run() {
 
         doFirstRoundActions();

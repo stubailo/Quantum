@@ -23,20 +23,21 @@ public class RobotPlayer implements Runnable {
     
     public RobotPlayer(RobotController rc) {
         myRC = rc;
-    	knowledge = new Knowledge(myRC);
-    	compHandler = new ComponentsHandler(myRC, knowledge);
+        knowledge = new Knowledge(myRC);
+        compHandler = new ComponentsHandler(myRC, knowledge);
+        
     }
     
     
 
     public void run() {
-    	
-    	// Order of these two should be determined by dependency.
-    	doCommonActions();    	
-    	doCommonFirstRoundActions();
-    	SpecificPlayer specificPlayer = determineSpecificPlayer();
-    	specificPlayer.doSpecificFirstRoundActions();
-    	specificPlayer.doSpecificActions();
+        
+        // Order of these two should be determined by dependency.
+        doCommonActions();        
+        doCommonFirstRoundActions();
+        SpecificPlayer specificPlayer = determineSpecificPlayer();
+        specificPlayer.doSpecificFirstRoundActions();
+        specificPlayer.doSpecificActions();
         while(true) {
             try {
 
@@ -47,8 +48,8 @@ public class RobotPlayer implements Runnable {
                 // Also note that common actions are performed in this definition line.
                 ComponentType dominantNewComponent = doCommonActions();
                 if(dominantNewComponent != null) {
-                	specificPlayer =
-                		specificPlayer.determineSpecificPlayer(dominantNewComponent);
+                    specificPlayer =
+                        specificPlayer.determineSpecificPlayer(dominantNewComponent);
                 }
                 specificPlayer.doSpecificActions();
             }
@@ -65,50 +66,50 @@ public class RobotPlayer implements Runnable {
     
 
     public void doCommonFirstRoundActions() {
-    	
+        
     }
     
     
     
     public ComponentType doCommonActions() {
-    	knowledge.update();
+        knowledge.update();
         return compHandler.updateComponents();
     }
 
     
     
     public SpecificPlayer determineSpecificPlayer() {
-    	
-    	// Use of BuildingPlayer below is arbitrary - it's a place holder
-    	SpecificPlayer result = new BuildingPlayer(myRC, knowledge, compHandler);
-    	
-    	// First buildings are special
-    	if(knowledge.roundNum == 0) {
-    		
-    		switch(myRC.getChassis()) {
-    		
-    		case BUILDING:
-    			result = new StartingBuildingPlayer(myRC, knowledge, compHandler);
-    			break;
-    			
-    		case LIGHT:
-    			result = new StartingLightPlayer(myRC, knowledge, compHandler);
-    		}
-    	}
-    	
-    	else {
-	    	switch(myRC.getChassis()) {
-	    	case BUILDING:
-	    	    result = new BuildingPlayer(myRC, knowledge, compHandler);
-	    	    break;
-	
-	    	case LIGHT:
-	    	    result = new LightPlayer(myRC, knowledge, compHandler);
-	    	    break;
-	    	}
-	    	//TODO: add other Chassis types!
-    	}
-    	return result;
+        
+        // Use of BuildingPlayer below is arbitrary - it's a place holder
+        SpecificPlayer result = new BuildingPlayer(myRC, knowledge, compHandler);
+        
+        // First buildings are special
+        if(knowledge.roundNum == 0) {
+            
+            switch(myRC.getChassis()) {
+            
+            case BUILDING:
+                result = new StartingBuildingPlayer(myRC, knowledge, compHandler);
+                break;
+                
+            case LIGHT:
+                result = new StartingLightPlayer(myRC, knowledge, compHandler);
+            }
+        }
+        
+        else {
+            switch(myRC.getChassis()) {
+            case BUILDING:
+                result = new BuildingPlayer(myRC, knowledge, compHandler);
+                break;
+    
+            case LIGHT:
+                result = new LightPlayer(myRC, knowledge, compHandler);
+                break;
+            }
+            //TODO: add other Chassis types!
+        }
+        return result;
     }
     
     

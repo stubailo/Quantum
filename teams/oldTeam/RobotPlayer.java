@@ -1,7 +1,6 @@
 package oldTeam;
 
 import battlecode.common.*;
-import static battlecode.common.GameConstants.*;
 
 public class RobotPlayer implements Runnable {
    

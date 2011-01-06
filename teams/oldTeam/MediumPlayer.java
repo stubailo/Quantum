@@ -1,7 +1,6 @@
 package oldTeam;
 
 import battlecode.common.*;
-import static battlecode.common.GameConstants.*;
 
 public class MediumPlayer extends RobotPlayer {
    
@@ -12,6 +11,7 @@ public class MediumPlayer extends RobotPlayer {
         myRC = rc;
     }
 
+    @Override
     public void run() {
         while(true) {
             try {
