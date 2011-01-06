@@ -19,6 +19,8 @@ public class RobotPlayer implements Runnable {
     /*** Knowledge ***/
     private final  Knowledge           knowledge;
     
+    /*** Specific Player ***/
+    private        SpecificPlayer      specificPlayer;  
 
     
     public RobotPlayer(RobotController rc) {
@@ -33,13 +35,8 @@ public class RobotPlayer implements Runnable {
     public void run() {
         
         // Order of these two should be determined by dependency.
-        ComponentType dominantNewComponent = doCommonActions();       
         doCommonFirstRoundActions();
-        SpecificPlayer specificPlayer = determineSpecificPlayer();
-        if(dominantNewComponent != null) {
-            specificPlayer =
-                specificPlayer.determineSpecificPlayer(dominantNewComponent);
-        }
+        doCommonActions();
         specificPlayer.doSpecificFirstRoundActions();
         specificPlayer.doSpecificActions();
         while(true) {
@@ -49,12 +46,7 @@ public class RobotPlayer implements Runnable {
                 myRC.yield();
                 
                 // Depending on new components, SpecificPlayer type might change!
-                // Also note that common actions are performed in this definition line.
-                dominantNewComponent = doCommonActions();
-                if(dominantNewComponent != null) {
-                    specificPlayer =
-                        specificPlayer.determineSpecificPlayer(dominantNewComponent);
-                }
+                doCommonActions();
                 specificPlayer.doSpecificActions();
             }
             catch(Exception e) {
@@ -70,14 +62,19 @@ public class RobotPlayer implements Runnable {
     
 
     public void doCommonFirstRoundActions() {
-        
+        specificPlayer = determineSpecificPlayer();
     }
     
     
     
-    public ComponentType doCommonActions() {
+    public void doCommonActions() {
         knowledge.update();
-        return compHandler.updateComponents();
+        ComponentType[] newCompTypes = compHandler.updateComponents();
+        if(newCompTypes != null) {
+            for(ComponentType newCompType : newCompTypes) {
+                specificPlayer = specificPlayer.determineSpecificPlayer(newCompType);
+            }
+        }
     }
 
     

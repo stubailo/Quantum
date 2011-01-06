@@ -92,6 +92,80 @@ public class ComponentsHandler {
         }
     }
     
+    /**
+     * Looks at new components, sorts them, and returns them
+     * 
+     * @return        returns new components
+     */
+    // TODO: Allow returning of more than one component-type...
+    public ComponentType[] updateComponents() {
+        ComponentController[] newComps = myRC.newComponents();
+        
+        int length = newComps.length;
+        
+        if(length == 0) return null;
+        ComponentType[] newCompTypes = new ComponentType[length];
+        
+        for(int index = 0; index < length; index++) {
+            ComponentController newComp = newComps[index];
+            ComponentType newCompType = newComp.type();
+            newCompTypes[index] = newCompType;
+            switch(newCompType) { // TODO: handle IRON, JUMP, DROPSHIP, BUG, DUMMY
+                                     // TODO: handle passives
+            
+            case BUILDING_MOTOR:
+            case SMALL_MOTOR:
+            case MEDIUM_MOTOR:
+            case LARGE_MOTOR:
+            case FLYING_MOTOR:
+                myMC = (MovementController) newComp;
+                break;
+                
+            case ANTENNA:
+            case DISH:
+            case NETWORK:
+                myCC = (BroadcastController) newComp;
+                hasComm = true;
+                break;
+                
+            case SATELLITE:
+            case TELESCOPE:
+            case SIGHT:
+            case RADAR:
+            case BUILDING_SENSOR:
+                mySCs[numberOfSensors] = (SensorController) newComp;
+                numberOfSensors += 1;
+                break;
+                
+            case BLASTER:
+            case SMG:
+            case RAILGUN:
+            case HAMMER:
+            case BEAM:
+            case MEDIC: // Should MEDIC be under weapons?
+                myWCs[numberOfWeapons] = (WeaponController) newComp;
+                numberOfWeapons += 1;
+                break;
+                
+            case CONSTRUCTOR:
+                myBC = (BuilderController) newComp;
+                break;
+                
+            case RECYCLER:
+                myBC = (BuilderController) newComp;
+                break;
+                
+            case FACTORY:
+                myBC = (BuilderController) newComp;
+                break;
+                
+            case ARMORY:
+                myBC = (BuilderController) newComp;
+                break;
+            }
+        }
+        return newCompTypes;
+    }
     
     /**
      * Looks at new components, sorts them, and returns the most interesting
@@ -99,7 +173,7 @@ public class ComponentsHandler {
      * @return        returns any component that might change the SpecificPlayer
      */
     // TODO: Allow returning of more than one component-type...
-    public ComponentType updateComponents() {
+    public ComponentType oldUpdateComponents() {
         ComponentController[] newComps = myRC.newComponents();
         
         if(newComps.length == 0) return null;
