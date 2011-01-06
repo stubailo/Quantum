@@ -29,6 +29,7 @@ public class RecyclerCommPlayer extends RecyclerPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
+        
     }
     
     @Override

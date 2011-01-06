@@ -33,9 +33,13 @@ public class RobotPlayer implements Runnable {
     public void run() {
         
         // Order of these two should be determined by dependency.
-        doCommonActions();        
+        ComponentType dominantNewComponent = doCommonActions();       
         doCommonFirstRoundActions();
         SpecificPlayer specificPlayer = determineSpecificPlayer();
+        if(dominantNewComponent != null) {
+            specificPlayer =
+                specificPlayer.determineSpecificPlayer(dominantNewComponent);
+        }
         specificPlayer.doSpecificFirstRoundActions();
         specificPlayer.doSpecificActions();
         while(true) {
@@ -46,7 +50,7 @@ public class RobotPlayer implements Runnable {
                 
                 // Depending on new components, SpecificPlayer type might change!
                 // Also note that common actions are performed in this definition line.
-                ComponentType dominantNewComponent = doCommonActions();
+                dominantNewComponent = doCommonActions();
                 if(dominantNewComponent != null) {
                     specificPlayer =
                         specificPlayer.determineSpecificPlayer(dominantNewComponent);
