@@ -14,6 +14,7 @@ public class ComponentsHandler {
     
     /*** Controllers ***/
     public         MovementController   myMC;
+    // Code only utilizes one sensor at the moment... even if there's more than one.
     public         SensorController[]   mySCs = new SensorController[4];
     public         BuilderController    myBC;
     public         WeaponController[]   myWCs = new WeaponController[18];
@@ -40,9 +41,51 @@ public class ComponentsHandler {
      */
     public Robot[] getSensedRobots() {
         if(numberOfSensors == 0) return new Robot[0];
-        else return mySCs[0].senseNearbyGameObjects(Robot.class);
+        return mySCs[0].senseNearbyGameObjects(Robot.class);
     }
     
+    
+    
+    /**
+     * Updates sense-related allied recycler information.
+     * 
+     * More specifically, identifies and locates lowest ID recycler so that it can turn
+     * off if it's not the lowest...
+     */
+    public void updateAlliedRecyclerInformation() {
+        if(numberOfSensors == 0) return;
+        try {
+            SensorController sensor = mySCs[0];
+            for(Robot robot : sensor.senseNearbyGameObjects(Robot.class)) {
+                RobotInfo   robotInfo = sensor.senseRobotInfo(robot);
+                Team        team      = robot.getTeam();
+                int         lowest    = knowledge.myRobotID;
+                MapLocation lowestLoc = knowledge.myLocation;
+                if(team == knowledge.myTeam) {
+                    ComponentType[] compTypes = robotInfo.components;
+                    switch(robotInfo.chassis) {
+                    case BUILDING:
+                        for(ComponentType compType : compTypes) {
+                            if(compType == ComponentType.RECYCLER) {
+                                int id = robot.getID();
+                                if(id < lowest) {
+                                    lowest    = id;
+                                    lowestLoc = robotInfo.location;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    knowledge.numberOfSensedEnemies += 1;
+                }
+            }
+        }
+        catch(Exception e) {
+            knowledge.printExceptionMessage(e);
+        }
+    }
     
     
     /**

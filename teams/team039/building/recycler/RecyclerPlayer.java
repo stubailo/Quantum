@@ -30,7 +30,10 @@ public class RecyclerPlayer extends BuildingPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        
+        compHandler.updateAlliedRecyclerInformation();
+        if(knowledge.lowestAlliedRecyclerID < knowledge.myRobotID) {
+            myRC.turnOff();
+        }
         
     }
     
