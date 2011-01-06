@@ -1,5 +1,11 @@
 package team039;
 
+import team039.building.BuildingPlayer;
+import team039.building.recycler.StartingBuildingPlayer;
+import team039.common.ComponentsHandler;
+import team039.common.Knowledge;
+import team039.common.SpecificPlayer;
+import team039.light.StartingLightPlayer;
 import battlecode.common.*;
 
 public class RobotPlayer implements Runnable {
