@@ -27,6 +27,11 @@ public class Knowledge {
     public         double              previousFlux    = 0;
     public         double              deltaFlux       = 0;  
     public         int                 roundNum;
+    
+    /*** Sense information ***/
+    public         int                 numberOfSensedEnemies;
+    public         int                 lowestAlliedRecyclerID = 65536;
+    public         MapLocation         lowestAlliedRecyclerIDLocation;
 
     /* Each piece of data should be time stamped somehow.  Otherwise, when a
      * robot receives two conflicting pieces of information it won't know
@@ -112,13 +117,14 @@ public class Knowledge {
     
     
     /**
-     * Generates string to be printed upon exception
-     * @return the string
+     * Prints string to help debug, as well as exception stack trace.
+     * @param   e   Exception
      */
-    public String getExceptionMessage () {
-        return ("Robot " + myRC.getRobot().getID() + 
-                " during round " + Clock.getRoundNum() + 
-                " caught exception:");
+    public void printExceptionMessage(Exception e) {
+        System.out.println("Robot " + myRC.getRobot().getID() + 
+                           " during round " + Clock.getRoundNum() + 
+                           " caught exception:");
+        e.printStackTrace();
     }
 
 }
