@@ -56,11 +56,11 @@ public class ComponentsHandler {
         if(numberOfSensors == 0) return;
         try {
             SensorController sensor = mySCs[0];
+            int         lowest    = knowledge.myRobotID;
+            MapLocation lowestLoc = knowledge.myLocation;
             for(Robot robot : sensor.senseNearbyGameObjects(Robot.class)) {
                 RobotInfo   robotInfo = sensor.senseRobotInfo(robot);
                 Team        team      = robot.getTeam();
-                int         lowest    = knowledge.myRobotID;
-                MapLocation lowestLoc = knowledge.myLocation;
                 if(team == knowledge.myTeam) {
                     ComponentType[] compTypes = robotInfo.components;
                     switch(robotInfo.chassis) {
@@ -68,6 +68,8 @@ public class ComponentsHandler {
                         for(ComponentType compType : compTypes) {
                             if(compType == ComponentType.RECYCLER) {
                                 int id = robot.getID();
+                                System.out.println("found recycler with id " +
+                                        String.valueOf(id));
                                 if(id < lowest) {
                                     lowest    = id;
                                     lowestLoc = robotInfo.location;
@@ -81,6 +83,9 @@ public class ComponentsHandler {
                     knowledge.numberOfSensedEnemies += 1;
                 }
             }
+            knowledge.lowestAlliedRecyclerID         = lowest;
+            knowledge.lowestAlliedRecyclerIDLocation = lowestLoc;
+            
         }
         catch(Exception e) {
             knowledge.printExceptionMessage(e);
