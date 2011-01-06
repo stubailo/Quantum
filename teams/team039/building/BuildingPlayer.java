@@ -85,6 +85,7 @@ public class BuildingPlayer implements SpecificPlayer {
      */
     public Boolean autoBuildRobot( BuildInstructions instructions )
     {
+        if(myRC.getTeamResources() < instructions.getTotalCost()) return false;
         if( buildTarget==null )
         {
             Chassis chassis = instructions.getBaseChassis();
