@@ -31,6 +31,11 @@ public class BuildingPlayer implements SpecificPlayer {
     
     public void doSpecificActions() {
 
+        build();
+    }
+
+    public void build()
+    {
         //build actions
         if( !compHandler.builderActive() && buildTarget != null )
         {
@@ -78,16 +83,22 @@ public class BuildingPlayer implements SpecificPlayer {
      * The building no longer needs to waste turns rotating, so this can be done in one turn
      * unless there is no space around the building.
      */
-    private Boolean autoBuildRobot( BuildInstructions instructions )
+    public Boolean autoBuildRobot( BuildInstructions instructions )
     {
-        Chassis chassis = instructions.getBaseChassis();
-        MapLocation location = compHandler.getAdjacentEmptySpot(chassis.level);
-        if(location==null)
+        if( buildTarget==null )
         {
-           return false;
-        } else {
-            buildChassisAndThenComponents( instructions, location );
-            return true;
+            Chassis chassis = instructions.getBaseChassis();
+            MapLocation location = compHandler.getAdjacentEmptySpot(chassis.level);
+            if(location==null)
+            {
+                System.out.print("no location found to build something");
+               return false;
+            } else {
+                buildChassisAndThenComponents( instructions, location );
+                return true;
+            }
+        }else {
+            return false;
         }
     }
 

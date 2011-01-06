@@ -55,10 +55,17 @@ public class ComponentsHandler {
         }
 
         Direction direction = Direction.EAST;
+        int counter = 0;
 
-        while (senseARobot(myLocation.add(direction), height) != null && !direction.equals(Direction.EAST)) {
-            direction.rotateRight();
+        while (senseARobot(myLocation.add(direction), height) != null && counter<9) {
+            counter++;
+
+            System.out.println(senseARobot(myLocation.add(direction), height));
+            direction = direction.rotateRight();
+            
         }
+
+        
 
         if (senseARobot(myLocation.add(direction), height) == null) {
             return myLocation.add(direction);

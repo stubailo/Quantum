@@ -26,7 +26,9 @@ public class BuildInstructions {
      */
     public BuildInstructions( Chassis chassis, ComponentType[] components) {
 
+        instructions = new ComponentType[10];
         totalCost = chassis.cost;
+        baseChassis = chassis;
 
         for (ComponentType currComp : components) {
             totalCost += currComp.cost;
