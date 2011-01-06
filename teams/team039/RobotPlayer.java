@@ -109,7 +109,7 @@ public class RobotPlayer implements Runnable {
 	try {
 	    Class<? extends Robot> robotClass = myRC.getRobot().getClass();
 	    System.out.println(myRC.getRobot().getClass());
-	    GameObject [] nearbots = sensor.senseNearbyGameObjects(robotClass);
+	    GameObject [] nearbots = sensor.senseNearbyGameObjects(Robot.class);
 	    RobotInfo [] nearbotsInfo = new RobotInfo[nearbots.length];
 	    for (int i = 0; i<nearbots.length; i++) {
 		nearbotsInfo[i] = sensor.senseRobotInfo((Robot)nearbots[i]);
