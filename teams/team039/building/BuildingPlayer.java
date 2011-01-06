@@ -4,6 +4,7 @@ import team039.building.recycler.RecyclerPlayer;
 import team039.common.ComponentsHandler;
 import team039.common.Knowledge;
 import team039.common.SpecificPlayer;
+import team039.common.BuildInstructions;
 import battlecode.common.*;
 
 public class BuildingPlayer implements SpecificPlayer {
@@ -38,6 +39,13 @@ public class BuildingPlayer implements SpecificPlayer {
             break;
         }
         return result;
+    }
+
+    public void startBuildingComponents( BuildInstructions instructions, MapLocation location, RobotLevel height )
+    {
+        //first, find the robot ID to make sure you're building on the right robot
+
+
     }
 
 }
