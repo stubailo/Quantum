@@ -2,15 +2,15 @@ package team039;
 
 import battlecode.common.*;
 
-public class StartingLightPlayer extends LightConstructorPlayer {
+public class RecyclerCommPlayer extends RecyclerPlayer {
 	
 	private final RobotController   myRC;
 	private final Knowledge         knowledge;
 	private final ComponentsHandler compHandler;
 		
-	public StartingLightPlayer(RobotController rc,
-							   Knowledge know,
-							   ComponentsHandler compHand) {
+	public RecyclerCommPlayer(RobotController rc,
+					   		  Knowledge know,
+					   		  ComponentsHandler compHand) {
 		
 		super(rc, know, compHand);
 		myRC = rc;

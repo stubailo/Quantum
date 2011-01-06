@@ -32,8 +32,11 @@ public class RobotPlayer implements Runnable {
                 debug_printComponents();
                 myRC.yield();
                 
-                
-                doCommonActions();
+                ComponentType dominantNewComponent = doCommonActions();
+                if(dominantNewComponent != null) {
+                	specificPlayer =
+                		specificPlayer.determineSpecificPlayer(dominantNewComponent);
+                }
                 specificPlayer.doSpecificActions();
             }
             catch(Exception e) {

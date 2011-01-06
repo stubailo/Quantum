@@ -24,5 +24,20 @@ public class LightPlayer implements SpecificPlayer {
 	public void doSpecificFirstRoundActions() {
 		
 	}
+	
+	public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
+		SpecificPlayer result = this;
+		
+		switch(compType) {
+		case CONSTRUCTOR:
+			result = new LightConstructorPlayer(myRC, knowledge, compHandler);
+			break;
+		case BLASTER:
+			result = new LightSoldierPlayer(myRC, knowledge, compHandler);
+			break;
+		}
+		
+		return result;
+	}
 
 }

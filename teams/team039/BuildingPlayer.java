@@ -24,5 +24,16 @@ public class BuildingPlayer implements SpecificPlayer {
     public void doSpecificFirstRoundActions() {
 		
 	}
+    
+    public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
+		SpecificPlayer result = this;
+		
+		switch(compType) {
+		case RECYCLER:
+			result = new RecyclerPlayer(myRC, knowledge, compHandler);
+			break;
+		}
+		return result;
+	}
 
 }

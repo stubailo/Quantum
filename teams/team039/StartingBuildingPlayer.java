@@ -2,7 +2,7 @@ package team039;
 
 import battlecode.common.*;
 
-public class StartingBuildingPlayer extends BuildingPlayer {
+public class StartingBuildingPlayer extends RecyclerPlayer {
 	
 	private final RobotController   myRC;
 	private final Knowledge         knowledge;
@@ -16,6 +16,19 @@ public class StartingBuildingPlayer extends BuildingPlayer {
 		myRC = rc;
 		knowledge = know;
 		compHandler = compHand;
+	}
+	
+	public void doSpecificActions() {
+		super.doSpecificActions();
+	}
+	
+    public void doSpecificFirstRoundActions() {
+		super.doSpecificFirstRoundActions();
+	}
+	
+	public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
+		SpecificPlayer result = this;
+		return result;
 	}
 
 }

@@ -89,8 +89,9 @@ public class ComponentsHandler {
         		numberOfSensors += 1;
         		break;
         		
-        	case SMG:
         	case BLASTER:
+        		result = ComponentType.BLASTER;
+        	case SMG:
         	case RAILGUN:
         	case HAMMER:
         	case BEAM:

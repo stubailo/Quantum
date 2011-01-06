@@ -2,15 +2,15 @@ package team039;
 
 import battlecode.common.*;
 
-public class StartingLightPlayer extends LightConstructorPlayer {
+public class RecyclerPlayer extends BuildingPlayer {
 	
 	private final RobotController   myRC;
 	private final Knowledge         knowledge;
 	private final ComponentsHandler compHandler;
 		
-	public StartingLightPlayer(RobotController rc,
-							   Knowledge know,
-							   ComponentsHandler compHand) {
+	public RecyclerPlayer(RobotController rc,
+					   	  Knowledge know,
+					   	  ComponentsHandler compHand) {
 		
 		super(rc, know, compHand);
 		myRC = rc;
@@ -28,6 +28,14 @@ public class StartingLightPlayer extends LightConstructorPlayer {
 	
 	public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
 		SpecificPlayer result = this;
+		
+		switch(compType) {
+		case ANTENNA:
+		case DISH:
+		case NETWORK:
+			result = new RecyclerCommPlayer(myRC, knowledge, compHandler);
+			break;
+		}
 		return result;
 	}
 

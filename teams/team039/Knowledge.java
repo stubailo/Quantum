@@ -7,8 +7,8 @@ public class Knowledge {
 	private final RobotController myRC;
 	
 	// Constants
-    public final   Team                team;
-    public final   MapLocation         startLocation;
+    public  final  Team                team;
+    public  final  MapLocation         startLocation;
     
     // Round constants
     public         MapLocation         myLocation; 
