@@ -28,7 +28,25 @@ public class StartingLightPlayer extends LightConstructorPlayer {
     
     @Override
     public void doSpecificFirstRoundActions() {
-        super.doSpecificFirstRoundActions();
+        try {
+            super.doSpecificFirstRoundActions();
+            
+            Direction desiredDirection = compHandler.senseStartingLocation();
+            if(desiredDirection == Direction.OMNI) {
+                if(knowledge.myLocation.isAdjacentTo(knowledge.startingUnminedMineLocations[0])) {
+                    // wait to build mine?
+                }
+                else {
+                    // move to be adjacent to mine
+                }
+            }
+            else if(desiredDirection != Direction.NONE) {
+                compHandler.setDirection(desiredDirection);
+            }
+        }
+        catch(Exception e) {
+            knowledge.printExceptionMessage(e);
+        }
     }
     
     @Override
