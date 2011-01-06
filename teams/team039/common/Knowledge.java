@@ -20,6 +20,7 @@ public class Knowledge {
     public  final  Team                myTeam;
     public  final  MapLocation         myStartLocation;
     public  final  int                 myRobotID;
+    public  final  Robot               myRobot;
     
     /*** Round constants ***/
     public         MapLocation         myLocation; 
@@ -32,6 +33,8 @@ public class Knowledge {
     public         int                 numberOfSensedEnemies;
     public         int                 lowestAlliedRecyclerID = 65536;
     public         MapLocation         lowestAlliedRecyclerIDLocation;
+    public         MapLocation         startingTurnedOnRecyclerLocation;
+    public         MapLocation[]       startingUnminedMineLocations = new MapLocation[2];
 
     /* Each piece of data should be time stamped somehow.  Otherwise, when a
      * robot receives two conflicting pieces of information it won't know
@@ -67,7 +70,8 @@ public class Knowledge {
         myRC            = rc;
         myTeam          = myRC.getTeam();
         myStartLocation = myRC.getLocation();
-        myRobotID       = myRC.getRobot().getID();
+        myRobot         = myRC.getRobot();
+        myRobotID       = myRobot.getID();
     }
     
     

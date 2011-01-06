@@ -13,18 +13,18 @@ public class ComponentsHandler {
     private final Knowledge       knowledge;
     
     /*** Controllers ***/
-    public         MovementController   myMC;
+    private        MovementController   myMC;
     // Code only utilizes one sensor at the moment... even if there's more than one.
-    public         SensorController[]   mySCs = new SensorController[4];
-    public         BuilderController    myBC;
-    public         WeaponController[]   myWCs = new WeaponController[18];
-    public         BroadcastController  myCC;
+    private        SensorController[]   mySCs = new SensorController[4];
+    private        BuilderController    myBC;
+    private        WeaponController[]   myWCs = new WeaponController[18];
+    private        BroadcastController  myCC;
 
     /*** Controller info ***/
-    public         int                  numberOfSensors = 0;
-    public         boolean              hasBuilder      = false;
-    public         int                  numberOfWeapons = 0;
-    public         boolean              hasComm         = false;
+    private        int                  numberOfSensors = 0;
+    private        boolean              hasBuilder      = false;
+    private        int                  numberOfWeapons = 0;
+    private        boolean              hasComm         = false;
     
     
     
@@ -35,6 +35,7 @@ public class ComponentsHandler {
     
     
     
+    /******************************* SENSOR METHODS *******************************/
     /**
      * Returns an array of Robots that can be sensed
      * @return        an array of all nearby robots, empty if there are no robots or no sensors
@@ -47,10 +48,9 @@ public class ComponentsHandler {
     
     
     /**
-     * Updates sense-related allied recycler information.
+     * Designed by first-round use of recycler, finds lowest ID adjacent recycler.
      * 
-     * More specifically, identifies and locates lowest ID recycler so that it can turn
-     * off if it's not the lowest...
+     * (So that it can turn itself off if it's not the lowest)
      */
     public void updateAlliedRecyclerInformation() {
         if(numberOfSensors == 0) return;
@@ -92,6 +92,126 @@ public class ComponentsHandler {
         }
     }
     
+    
+    
+    /**
+     * Designed for use by starting light, records locations of recyclers and mines
+     * @return      direction to turn in, OMNI if it sees everything, NONE upon error.
+     */
+    public Direction senseStartingLocation() {
+        if(numberOfSensors == 0) return Direction.NONE;
+        
+        try {
+            SensorController sensor       = mySCs[0];
+            
+            Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
+            Mine[]  sensedMines  = sensor.senseNearbyGameObjects(Mine.class);
+            
+            boolean    overcorrect      = false;
+            GameObject correctingObject = knowledge.myRobot;
+            
+            // If we see all robots/mines, we record them.
+            // Otherwise, depending on number of seen robots/mines, we cleverly turn
+            //    towards them.
+            switch(sensedRobots.length) {
+            
+            case 0:
+                switch(sensedMines.length) {
+                
+                case 0:
+                    overcorrect = true;
+                    break;
+                case 1:
+                    overcorrect = true;
+                    correctingObject = sensedMines[0];
+                    break;
+                case 2:
+                    correctingObject = sensedMines[0];
+                    break;
+                }
+                break;
+                
+            case 1:
+                correctingObject = sensedRobots[0];
+                if(sensedMines.length == 0) overcorrect = true;
+                
+            case 2:
+                switch(sensedMines.length) {
+                
+                case 0:
+                    correctingObject = sensedRobots[0];
+                    break;
+                case 1:
+                    correctingObject = sensedMines[0];
+                    break;
+                }
+                break;
+            }
+            // We can sense some objects but not all... so we turn towards correcting object
+            if(!correctingObject.equals(knowledge.myRobot)) {
+                MapLocation sensedLoc = sensor.senseLocationOf(sensedRobots[0]);
+                Direction   sensedDir = knowledge.myLocation.directionTo(sensedLoc);
+                
+                // If overcorrect is true then we turn twice in the direction of the object
+                if(overcorrect) {
+                    if(knowledge.myDirection.rotateRight().equals(sensedDir)) {
+                        return sensedDir.rotateRight();
+                    }
+                    else {
+                        return sensedDir.rotateLeft();
+                    } 
+                }
+                return sensedDir;
+            }
+            
+            // If overcorrect is true we sense NO objects, so we might as well do a 180.
+            if(overcorrect) return knowledge.myDirection.opposite();
+            
+            // Now we know we can sense everything, so we quickly jot it down.
+            Robot recycler1 = sensedRobots[0], recycler2 = sensedRobots[1];
+            if(recycler1.getID() < recycler2.getID())
+                knowledge.startingTurnedOnRecyclerLocation =
+                    sensor.senseLocationOf(recycler1);
+            else
+                knowledge.startingTurnedOnRecyclerLocation =
+                    sensor.senseLocationOf(recycler2);
+            
+            MapLocation mine1Loc = sensor.senseLocationOf(sensedMines[0]),
+                        mine2Loc = sensor.senseLocationOf(sensedMines[1]);
+            
+            if(knowledge.myLocation.distanceSquaredTo(mine1Loc) <
+               knowledge.myLocation.distanceSquaredTo(mine2Loc)) {
+                knowledge.startingUnminedMineLocations[0] = mine1Loc;
+                knowledge.startingUnminedMineLocations[1] = mine2Loc;
+            }
+            else {
+                knowledge.startingUnminedMineLocations[0] = mine2Loc;
+                knowledge.startingUnminedMineLocations[1] = mine1Loc;
+            }
+            return Direction.OMNI;
+        }
+        catch(Exception e) {
+            knowledge.printExceptionMessage(e);
+            return Direction.NONE;
+        }
+    }
+    
+    /***************************** MOVEMENT METHODS *******************************/
+    public boolean setDirection(Direction direction) {
+        try {
+            if(myMC.isActive()) return false;
+            myMC.setDirection(direction);
+            return true;
+        }
+        catch(Exception e) {
+            knowledge.printExceptionMessage(e);
+            return false;
+        }
+    }
+    
+    
+    
+    /******************************** OTHER METHODS *******************************/
     /**
      * Looks at new components, sorts them, and returns them
      * 
@@ -166,6 +286,8 @@ public class ComponentsHandler {
         }
         return newCompTypes;
     }
+    
+    
     
     /**
      * Looks at new components, sorts them, and returns the most interesting
