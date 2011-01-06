@@ -1,4 +1,4 @@
-package team039;
+package oldTeam;
 
 import battlecode.common.*;
 import static battlecode.common.GameConstants.*;

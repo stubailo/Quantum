@@ -1,4 +1,4 @@
-package basicTeam;
+package team039;
 
 import battlecode.common.*;
 import static battlecode.common.GameConstants.*;
@@ -41,8 +41,8 @@ public class MapLocationSet {
 		return containsHash[location.x % TABLE_SIZE][location.y % TABLE_SIZE];
 	}
 	
-	public MapLocation get (int index) {
-	}
+	//public MapLocation get (int index) {
+	//}
 	
 	public int getLength() {
 		return length;
