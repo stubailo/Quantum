@@ -40,7 +40,7 @@ public class ComponentsHandler {
      * @return        an array of all nearby robots, empty if there are no robots or no sensors
      */
     public Robot[] getSensedRobots() {
-        if(numberOfSensors == 0) return new Robot[0];
+        if(numberOfSensors == 0) return null;
         return mySCs[0].senseNearbyGameObjects(Robot.class);
     }
     
@@ -52,8 +52,8 @@ public class ComponentsHandler {
      * More specifically, identifies and locates lowest ID recycler so that it can turn
      * off if it's not the lowest...
      */
-    public void updateAlliedRecyclerInformation() {
-        if(numberOfSensors == 0) return;
+    public Boolean updateAlliedRecyclerInformation() {
+        if(numberOfSensors == 0) return false;
         try {
             SensorController sensor = mySCs[0];
             int         lowest    = knowledge.myRobotID;
@@ -85,10 +85,11 @@ public class ComponentsHandler {
             }
             knowledge.lowestAlliedRecyclerID         = lowest;
             knowledge.lowestAlliedRecyclerIDLocation = lowestLoc;
-            
+            return true;
         }
         catch(Exception e) {
             knowledge.printExceptionMessage(e);
+            return false;
         }
     }
     

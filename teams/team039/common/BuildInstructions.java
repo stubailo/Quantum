@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package team039.common;
 
 import battlecode.common.*;
@@ -19,18 +18,13 @@ public class BuildInstructions {
     private int totalCost = 0;
     private int numSteps = 0;
     private int totalWeight = 0;
-
     private ComponentType[] instructions;
-
 
     /**
      * Takes an array of components and calculates the cost and number of steps
      */
-
-    public BuildInstructions ( ComponentType[] components )
-    {
-        for( ComponentType currComp : components )
-        {
+    public BuildInstructions(ComponentType[] components) {
+        for (ComponentType currComp : components) {
             totalCost += currComp.cost;
             totalWeight += currComp.weight;
             instructions[numSteps] = currComp;
@@ -43,33 +37,24 @@ public class BuildInstructions {
      *
      * @return        returns the component to be built at step stepNumber
      */
-
-    public ComponentType getComponent( int stepNumber )
-    {
-        if( stepNumber >= 0 && stepNumber < numSteps )
-        {
+    public ComponentType getComponent(int stepNumber) {
+        if (stepNumber >= 0 && stepNumber < numSteps) {
             return instructions[stepNumber];
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     //the get methods are obvious
-
-    public int getNumSteps ()
-    {
+    public int getNumSteps() {
         return numSteps;
     }
 
-    public int getTotalCost ()
-    {
+    public int getTotalCost() {
         return totalCost;
     }
 
-    public int getTotalWeight ()
-    {
+    public int getTotalWeight() {
         return totalWeight;
     }
 }
