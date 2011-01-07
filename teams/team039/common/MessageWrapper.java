@@ -31,33 +31,149 @@ public class MessageWrapper {
      *
      */
 
-    public static final int mainHeaderLength = 2; //how many initial indices are used for the header
+    public static final int mainHeaderLength = 3; //how many initial indices are used for the header
 
 
     /*
      * ints         ID of broadcaster, number of messages
      * locations    location of broadcaster, __________
-     * strings      passcode, _________
+     * strings      passcode, message type
      */
+
+    public static final String GO_TO_FACTORY = "gtf";
 
     public static final int subHeaderLength = 1; //how many indices are used for the header of each sub-message
 
-    private static Message[] messagesArray;
-
+    private int[] ints;
+    private String[] strings;
+    private MapLocation[] locations;
 
     private int broadcasterID;
     private int numberOfMessages;
+    private int targetID;
     private MapLocation broadcasterLocation;
+    private MapLocation targetLocation; //for messages that only have the header
     private String passcode;
+    private String messageType;
 
-    public MessageWrapper( int broadcastID )
+    public MessageWrapper()
     {
-        numberOfMessages = 0;
-        broadcasterID = broadcastID;
-
-        messagesArray = new Message[16]; //maximum number of messages that can be combined in one.  Reducing this number doesn't decrease the size of each message broadcast.
+        numberOfMessages = 1;
+        broadcasterID = -1;
     }
 
+    public void genGoToFactoryMsg( RobotController myRC, int arg_targetID, MapLocation factoryLocation )
+    {
+        broadcasterID = myRC.getRobot().getID();
+        targetID = arg_targetID;
+        numberOfMessages = 0;
+
+        broadcasterLocation = myRC.getLocation();
+        targetLocation = factoryLocation;
+        passcode = broadcasterLocation.toString();
+        messageType = GO_TO_FACTORY;
+
+        encodeHeader();
+    }
+
+    public Message getMessage()
+    {
+        Message output = new Message();
+
+        output.ints = ints;
+        output.strings = strings;
+        output.locations = locations;
+
+        return output;
+    }
+
+    public int getBroadcasterID() {
+        return broadcasterID;
+    }
+
+    public MapLocation getBroadcasterLocation() {
+        return broadcasterLocation;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public int getNumberOfMessages() {
+        return numberOfMessages;
+    }
+
+    public int getTargetID() {
+        return targetID;
+    }
+
+    public MapLocation getTargetLocation() {
+        return targetLocation;
+    }
+
+    private void encodeHeader()
+    {
+        int[] t_ints = { broadcasterID, targetID, numberOfMessages  };
+        MapLocation[] t_mlocs = { broadcasterLocation, targetLocation };
+        String[] t_strings = { passcode, messageType };
+
+        strings = t_strings;
+        ints = t_ints;
+        locations = t_mlocs;
+    }
+
+    private void decodeHeader()
+    {
+        broadcasterID = ints[0];
+        targetID = ints[1];
+        numberOfMessages = ints[2];
+
+        broadcasterLocation = locations[0];
+        targetLocation = locations[1];
+
+        passcode = strings[0];
+        messageType = strings[1];
+    }
+
+    /*
+     * Takes a message encoded with one of the MessageWrapper message generating functions
+     * and extracts the information needed, based on the messageType.
+     *
+     * Returns a string that will match a messageType.
+     */
+
+    public String decode( Message messageToDecode )
+    {
+        ints = messageToDecode.ints;
+        strings = messageToDecode.strings;
+        locations = messageToDecode.locations;
+
+        decodeHeader();
+
+        return messageType;
+    }
+
+    /*
+     * Checks if a message has the correct passcode to see if it was created by our team
+     *
+     * Returns true or false
+     */
+
+    public static Boolean isValid ( Message receivedMessage )
+    {
+        //we need a more secure code than locations[0].toString()
+
+        String code = receivedMessage.strings[0];
+
+        if(code.equals( receivedMessage.locations[0].toString() ) )
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /* These are under construction... planned features
     public void addMessage ( Message toBeAdded )
     {
         messagesArray[numberOfMessages] = toBeAdded;
@@ -79,36 +195,6 @@ public class MessageWrapper {
 
     public Message[] getMessagesArray() {
         return messagesArray;
-    }
-
-    public static Boolean validate ( Message receivedMessage )
-    {
-        //we need a more secure code than locations[0].toString()
-
-        String code = receivedMessage.strings[0];
-
-        if(code.equals( receivedMessage.locations[0].toString() ) )
-        {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public Message encode()
-    {
-        Message output = new Message();
-
-        //generate main heading
-
-
-        return output;
-    }
-
-    public void decode( Message messageToDecode )
-    {
-
-    }
-
+    } */
 
 }
