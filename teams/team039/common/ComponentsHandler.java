@@ -1,5 +1,7 @@
 package team039.common;
 
+import java.util.Arrays;
+
 import battlecode.common.*;
 
 /**
@@ -25,6 +27,15 @@ public class ComponentsHandler {
     public         int                  numberOfWeapons = 0;
     public         boolean              hasComm         = false;
     
+    /*** Navigation info ***/
+    private        boolean              bugNavigating;
+    private        boolean              tracking;
+    private        Direction            trackingDirection;
+    private        MapLocation          bugGoal;
+    private        MapLocation          bugStart;
+    private        MapLocation []       bugPrevLocations;
+    private        Direction []         bugPrevDirections;
+    private        int                  bugStep;
     
     
     public ComponentsHandler(RobotController rc, Knowledge know) {
@@ -120,4 +131,91 @@ public class ComponentsHandler {
         }
         return result;
     }
+    
+    public void initiateBugNavigation(MapLocation goal) {
+    	bugNavigating = true;
+    	tracking = false;
+    	bugGoal = goal;
+    	bugStart = myRC.getLocation();
+		bugPrevLocations = new MapLocation [QuantumConstants.BUG_MEMORY_LENGTH];
+		bugPrevDirections = new Direction [QuantumConstants.BUG_MEMORY_LENGTH];
+		bugStep = 0;
+    }
+    
+    public void navigateBug() throws GameActionException {
+    	if(numberOfSensors == 0) 
+    		return; 
+    	if(myMC.isActive())
+    		return;
+    	
+    	MapLocation location = myRC.getLocation();
+    	Direction directionToGoal = location.directionTo(bugGoal);
+    	Direction myDirection = myRC.getDirection();
+    	
+    	if(tracking){
+    		
+    	} else {
+    		if(myMC.canMove(directionToGoal)) {
+    			if(myDirection == directionToGoal) 
+    				myMC.moveForward();
+    			else if(myDirection == directionToGoal.opposite())
+    				myMC.moveBackward();
+    			else
+    				myMC.setDirection(directionToGoal);
+    			
+    			return;
+    		} else {
+    			tracking = true;
+    			bugPrevLocations[bugStep % QuantumConstants.BUG_MEMORY_LENGTH] = location;
+    			
+    			//TODO: This seems like information we could store somewhere permanent...
+    			Direction [] open = findAdjacentOpenDirections(location);
+    			//findBestMove(open);
+    			
+    			//bugPrevDirections[bugStep % QuantumConstants.BUG_MEMORY_LENGTH] = dir;
+    		}
+    	}
+
+//    	SensorController sensor = mySCs[0];
+
+    	
+    	myRC.yield();
+    	
+	
+    }
+    
+    private Direction [] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
+    	
+    	SensorController sensor = mySCs[0];
+    	Direction [] open = new Direction [8];
+    	boolean [] blocked = new boolean [8];
+    	Arrays.fill(blocked, false);
+    	int i = 0;
+
+    	//sense nearby robots
+    	Robot [] nearBots = getSensedRobots();
+
+    	//find adjacent robots and record their direction as blocked
+    	RobotInfo nearBotInfo;
+    	for(Robot r : nearBots){
+    		if(r.getRobotLevel() == RobotLevel.ON_GROUND) {
+	    		nearBotInfo = sensor.senseRobotInfo(r);
+	    		if(location.distanceSquaredTo(nearBotInfo.location) <= 2) {
+	    			blocked[location.directionTo(nearBotInfo.location).ordinal()] = true;
+	    		}
+    		}
+    	}
+    	  	
+    	//sense the adjacent terrain tiles, and record the open ones.
+    	for(Direction d : Direction.values()){
+    		if(!blocked[d.ordinal()] && myRC.senseTerrainTile(location.add(d)) == TerrainTile.LAND) {
+    			open[i] = d;
+    			i++;
+    		}
+    	}  
+    	   	
+    	// TODO:  not sure if this is the best way to trim the array...
+    	return (Direction [])Arrays.asList(open).subList(0, i-1).toArray();
+    }
+    
 }
