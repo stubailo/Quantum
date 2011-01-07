@@ -77,6 +77,7 @@ public class Knowledge {
         myStartLocation = myRC.getLocation();
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
+        myLocation      = myStartLocation;
     }
     
     
