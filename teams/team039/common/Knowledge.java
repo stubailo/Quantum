@@ -16,6 +16,9 @@ public class Knowledge {
     
     private final RobotController myRC;
     
+    /*** State ***/
+    public         RobotState          myState;
+    
     /*** Constants ***/
     public  final  Team                myTeam;
     public  final  MapLocation         myStartLocation;
@@ -23,7 +26,9 @@ public class Knowledge {
     public  final  Robot               myRobot;
     
     /*** Round constants ***/
-    public         MapLocation         myLocation; 
+    public         MapLocation         myLocation;
+    public         MapLocation         myPreviousLocation;
+    public         Direction           myMovementDirection;
     public         Direction           myDirection;
     public         double              previousFlux    = 0;
     public         double              deltaFlux       = 0;  
@@ -88,7 +93,13 @@ public class Knowledge {
         previousFlux = deltaFlux + previousFlux;
         
         roundNum = Clock.getRoundNum();
-        myLocation = myRC.getLocation();
+        
+        MapLocation myNewLocation = myRC.getLocation();
+        if(myNewLocation != myLocation) {
+            myPreviousLocation = myLocation;
+            myLocation = myNewLocation;
+            myMovementDirection = myPreviousLocation.directionTo(myNewLocation);
+        }
         myDirection = myRC.getDirection();
     }
 

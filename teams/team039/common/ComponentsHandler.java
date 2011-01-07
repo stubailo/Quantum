@@ -46,7 +46,7 @@ public class ComponentsHandler {
      * @return        One empty location
      */
     public MapLocation getAdjacentEmptySpot(RobotLevel height) {
-        MapLocation myLocation = myRC.getLocation();
+        MapLocation myLocation = knowledge.myLocation;
 
         if (height.equals(RobotLevel.IN_AIR)) {
             if (senseARobot(myLocation, height) == null) {
@@ -57,7 +57,7 @@ public class ComponentsHandler {
         Direction direction = Direction.EAST;
         int counter = 0;
 
-        while (senseARobot(myLocation.add(direction), height) != null && counter<9) {
+        while (senseARobot(myLocation.add(direction), height) != null && counter<8) {
             counter++;
 
             System.out.println(senseARobot(myLocation.add(direction), height));
@@ -268,15 +268,15 @@ public class ComponentsHandler {
     }
 
     /***************************** BUILDING METHODS *******************************/
-    public Boolean builderActive() {
+    public boolean builderActive() {
         return myBC.isActive();
     }
 
-    public Boolean canIBuild(ComponentType component) {
+    public boolean canIBuild(ComponentType component) {
         return BuildMappings.canBuild(myBC.type(), component);
     }
 
-    public Boolean buildComponent(ComponentType component, MapLocation location, RobotLevel height) {
+    public boolean buildComponent(ComponentType component, MapLocation location, RobotLevel height) {
         if (myBC.isActive()) {
             return false;
         }

@@ -40,7 +40,7 @@ public class BuildingPlayer implements SpecificPlayer {
         if( !compHandler.builderActive() && buildTarget != null )
         {
             //skip components that this building can't build
-            while (buildStep!=buildInstructions.getNumSteps() && !compHandler.canIBuild(buildInstructions.getComponent(buildStep)))
+            while (buildStep != buildInstructions.getNumSteps() && !compHandler.canIBuild(buildInstructions.getComponent(buildStep)))
             {
                 buildStep++;
             }
@@ -51,7 +51,7 @@ public class BuildingPlayer implements SpecificPlayer {
                 {
                     abortBuilding();
                 }
-                 else
+                else
                 {
                     buildStep++;
                 }

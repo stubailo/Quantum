@@ -62,6 +62,7 @@ public class RobotPlayer implements Runnable {
     
 
     public void doCommonFirstRoundActions() {
+        debug_printGameConstants();
         specificPlayer = determineSpecificPlayer();
     }
     
@@ -121,5 +122,9 @@ public class RobotPlayer implements Runnable {
     public void debug_setStrings() { 
         myRC.setIndicatorString(0, knowledge.myLocation.toString());
         myRC.setIndicatorString(1, String.valueOf(knowledge.deltaFlux));
-    }   
+    }
+    
+    public static void debug_printGameConstants() {
+        System.out.println("MAP_MAX_WIDTH: " + String.valueOf(GameConstants.MAP_MAX_WIDTH));
+    }
 }
