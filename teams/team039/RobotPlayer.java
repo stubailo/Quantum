@@ -2,10 +2,7 @@ package team039;
 
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
-import team039.common.MessageHandler;
+import team039.common.*;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
@@ -23,15 +20,11 @@ public class RobotPlayer implements Runnable {
     /*** Specific Player ***/
     private        SpecificPlayer      specificPlayer;  
 
-
-    private        MessageHandler      msgHandler;
-
     
     public RobotPlayer(RobotController rc) {
         myRC = rc;
 
-        msgHandler = new MessageHandler(myRC);
-        knowledge = new Knowledge(myRC, msgHandler);
+        knowledge = new Knowledge(myRC);
         compHandler = new ComponentsHandler(myRC, knowledge);
     }
     
@@ -88,7 +81,6 @@ public class RobotPlayer implements Runnable {
 
     public void doCommonEndTurnActions()
     {
-        System.out.println("end turn...");
         compHandler.broadcast( knowledge.msg().composeMessage() );
     }
     
