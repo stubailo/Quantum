@@ -122,7 +122,7 @@ public class BuildingPlayer implements SpecificPlayer {
     /**
      * Initiates component build process by setting all of the required variables
      */
-    private void startBuildingComponents( BuildInstructions instructions, MapLocation location, RobotLevel height )
+    public void startBuildingComponents( BuildInstructions instructions, MapLocation location, RobotLevel height )
     {
         //first, find the robot
         buildTarget = compHandler.senseARobot( location, height );

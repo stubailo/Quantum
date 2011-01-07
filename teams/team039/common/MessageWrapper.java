@@ -78,6 +78,8 @@ public class MessageWrapper {
 
     public Message getMessage()
     {
+        
+
         Message output = new Message();
 
         output.ints = ints;
@@ -149,6 +151,14 @@ public class MessageWrapper {
         locations = messageToDecode.locations;
 
         decodeHeader();
+
+        //at this point, the header has been extracted.  The statements below will parse the rest of the message.
+        if( messageType.equals(MessageWrapper.GO_TO_FACTORY))
+        {
+            ints = null;
+            strings = null;
+            locations = null;
+        }
 
         return messageType;
     }

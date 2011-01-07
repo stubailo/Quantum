@@ -59,10 +59,7 @@ public class ComponentsHandler {
 
         while (senseARobot(myLocation.add(direction), height) != null && counter<8) {
             counter++;
-
-            System.out.println(senseARobot(myLocation.add(direction), height));
             direction = direction.rotateRight();
-            
         }
 
         
@@ -260,6 +257,30 @@ public class ComponentsHandler {
                 return false;
             }
             myMC.setDirection(direction);
+            return true;
+        } catch (Exception e) {
+            knowledge.printExceptionMessage(e);
+            return false;
+        }
+    }
+
+    /***************************** BROADCAST METHODS *******************************/
+
+    //this method is called by doCommonEndTurnActions() in RobotPlayer
+    public boolean broadcast(Message composedMessage) {
+
+        
+
+        if( composedMessage == null )
+        {
+            return false;
+        }
+
+        try {
+            if (myCC.isActive()) {
+                return false;
+            }
+            myCC.broadcast(composedMessage);
             return true;
         } catch (Exception e) {
             knowledge.printExceptionMessage(e);

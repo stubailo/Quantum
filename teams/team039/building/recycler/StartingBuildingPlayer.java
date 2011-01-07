@@ -1,10 +1,6 @@
 package team039.building.recycler;
 
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
-import team039.common.BuildInstructions;
-import team039.common.Prefab;
+import team039.common.*;
 import battlecode.common.*;
 
 public class StartingBuildingPlayer extends RecyclerPlayer {
@@ -27,6 +23,14 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public void doSpecificActions() {
         super.doSpecificActions();
 
+        MessageWrapper sampleMessage = new MessageWrapper();
+        sampleMessage.genGoToFactoryMsg(myRC, 0, null);
+
+        System.out.println( myRC.getTeamResources() );
+
+        knowledge.msg().addToQueue( sampleMessage );
+
+
         if( myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost()*2 )
         {
             autoBuildRobot( Prefab.lightSoldier );
@@ -36,6 +40,8 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
+
+        startBuildingComponents( Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
     }
     
     @Override
