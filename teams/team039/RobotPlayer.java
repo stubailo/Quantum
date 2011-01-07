@@ -22,12 +22,15 @@ public class RobotPlayer implements Runnable {
     /*** Specific Player ***/
     private        SpecificPlayer      specificPlayer;  
 
+
+    private        MessageHandler      msgHandler;
+
     
     public RobotPlayer(RobotController rc) {
         myRC = rc;
         knowledge = new Knowledge(myRC);
         compHandler = new ComponentsHandler(myRC, knowledge);
-        
+        msgHandler = new MessageHandler(myRC, knowledge);
     }
     
     
