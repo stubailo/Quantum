@@ -88,8 +88,8 @@ public class RobotPlayer implements Runnable {
 
     public void doCommonEndTurnActions()
     {
-        System.out.println("end turn...");
         compHandler.broadcast( knowledge.msg().composeMessage() );
+        knowledge.msg().emptyQueue();
     }
     
     public SpecificPlayer determineSpecificPlayer() {

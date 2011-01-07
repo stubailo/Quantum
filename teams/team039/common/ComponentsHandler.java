@@ -271,7 +271,7 @@ public class ComponentsHandler {
 
         
 
-        if( composedMessage == null )
+        if( composedMessage == null || myCC == null )
         {
             return false;
         }
