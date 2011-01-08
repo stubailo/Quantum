@@ -5,6 +5,7 @@ import team039.building.recycler.StartingBuildingPlayer;
 import team039.common.ComponentsHandler;
 import team039.common.Knowledge;
 import team039.common.SpecificPlayer;
+import team039.common.MessageHandler;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
@@ -22,12 +23,16 @@ public class RobotPlayer implements Runnable {
     /*** Specific Player ***/
     private        SpecificPlayer      specificPlayer;  
 
+
+    private        MessageHandler      msgHandler;
+
     
     public RobotPlayer(RobotController rc) {
         myRC = rc;
-        knowledge = new Knowledge(myRC);
+
+        msgHandler = new MessageHandler(myRC);
+        knowledge = new Knowledge(myRC, msgHandler);
         compHandler = new ComponentsHandler(myRC, knowledge);
-        
     }
     
     
@@ -36,6 +41,7 @@ public class RobotPlayer implements Runnable {
         
         // Order of these two should be determined by dependency.
         doCommonFirstRoundActions();
+
         doCommonActions();
         specificPlayer.doSpecificFirstRoundActions();
         specificPlayer.doSpecificActions();
@@ -48,6 +54,8 @@ public class RobotPlayer implements Runnable {
                 // Depending on new components, SpecificPlayer type might change!
                 doCommonActions();
                 specificPlayer.doSpecificActions();
+
+                doCommonEndTurnActions();
             }
             catch(Exception e) {
                 System.out.println("Robot " + myRC.getRobot().getID() + 
@@ -79,7 +87,11 @@ public class RobotPlayer implements Runnable {
         }
     }
 
-    
+    public void doCommonEndTurnActions()
+    {
+        System.out.println("end turn...");
+        compHandler.broadcast( knowledge.msg().composeMessage() );
+    }
     
     public SpecificPlayer determineSpecificPlayer() {
         

@@ -16,7 +16,9 @@ import battlecode.common.*;
 public class Knowledge {
     
     private final RobotController myRC;
-    
+
+    private final MessageHandler myMsgHandler;
+
     /*** State ***/
     public         RobotState          myState;
     
@@ -76,12 +78,14 @@ public class Knowledge {
      * 
      * @param    rc    RobotController associated with this RobotPlayer
      */
-    public Knowledge (RobotController rc) {
+    public Knowledge (RobotController rc, MessageHandler msg) {
         myRC            = rc;
         myTeam          = myRC.getTeam();
         myStartLocation = myRC.getLocation();
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
+        myLocation      = myStartLocation;
+        myMsgHandler    = msg;
     }
     
     
@@ -122,6 +126,15 @@ public class Knowledge {
             justTurned = true;
         }
         else justTurned = false;
+
+
+        myMsgHandler.receiveMessages();
+
+    }
+
+    public MessageHandler msg()
+    {
+        return myMsgHandler;
     }
 
 
