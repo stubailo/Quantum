@@ -37,7 +37,9 @@ public class LightPlayer implements SpecificPlayer {
     
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer result = this;
+
         
+
         switch(compType) {
         case CONSTRUCTOR:
             result = new LightConstructorPlayer(myRC, knowledge, compHandler);

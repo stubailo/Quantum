@@ -24,9 +24,9 @@ public class ComponentsHandler {
     private WeaponController[] myWCs = new WeaponController[18];
     private BroadcastController myCC;
     /*** Controller info ***/
-    public int numberOfSensors = 0;
+    public int numberOfSensors;
     public boolean hasBuilder = false;
-    public int numberOfWeapons = 0;
+    public int numberOfWeapons;
     public boolean hasComm = false;
     /*** Navigation info ***/
     private boolean bugNavigating;
@@ -44,6 +44,9 @@ public class ComponentsHandler {
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
         knowledge = know;
+
+        numberOfWeapons = 0;
+        numberOfSensors = 0;
 
         buildHandler = new BuildHandler(rc, this, know);
     }
@@ -613,8 +616,7 @@ public class ComponentsHandler {
         return buildHandler;
     }
 
-    public boolean canIBuild()
-    {
+    public boolean canIBuild() {
         return !(myBC == null);
     }
 
@@ -627,7 +629,7 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2 ;
+        return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
     }
 
     public boolean buildComponent(ComponentType component,
@@ -660,6 +662,53 @@ public class ComponentsHandler {
         }
     }
 
+    /******************************** ATTACKING METHODS *******************************/
+    public boolean attackVisible() {
+        System.out.println("lolol" + numberOfSensors + " sensors and " + myWCs.length );
+
+        if (numberOfSensors == 0 || numberOfWeapons == 0) {
+            return false;
+        }
+        Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
+
+        int weaponsFired = 0;
+
+        System.out.println("see " + sensedRobots.length + " robots");
+
+        for (Robot sensedRobot : sensedRobots) {
+            for (WeaponController weapon : myWCs) {
+                if (weapon.isActive()) {
+                    weaponsFired++;
+                } else {
+                    try {
+                        MapLocation enemyLocation = mySCs[0].senseLocationOf(sensedRobot);
+
+                        if (weapon.withinRange( enemyLocation ) ) {
+                            weapon.attackSquare( enemyLocation , sensedRobot.getRobotLevel() );
+                            weaponsFired++;
+                        } else {
+                        }
+                    } catch (Exception e) {
+                        knowledge.printExceptionMessage(e);
+                        return false;
+                    }
+                }
+
+                if(weaponsFired == numberOfWeapons)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return weaponsFired > 0;
+    }
+
+    public boolean hasWeapons() {
+        System.out.println( "teehee weapons: " + numberOfWeapons );
+        return numberOfWeapons > 0;
+    }
+
     /******************************** OTHER METHODS *******************************/
     /**
      * Looks at new components, sorts them, and returns them
@@ -677,10 +726,15 @@ public class ComponentsHandler {
         }
         ComponentType[] newCompTypes = new ComponentType[length];
 
-        for (int index = 0; index < length; index++) {
-            ComponentController newComp = newComps[index];
+        int index = 0;
+
+        for ( ComponentController newComp : newComps ) {
             ComponentType newCompType = newComp.type();
             newCompTypes[index] = newCompType;
+            index++;
+
+            
+
             switch (newCompType) { // TODO: handle IRON, JUMP, DROPSHIP, BUG, DUMMY
                 // TODO: handle passives
 
@@ -703,6 +757,7 @@ public class ComponentsHandler {
                 case TELESCOPE:
                 case SIGHT:
                 case RADAR:
+
                 case BUILDING_SENSOR:
                     mySCs[numberOfSensors] = (SensorController) newComp;
                     numberOfSensors += 1;
@@ -714,6 +769,7 @@ public class ComponentsHandler {
                 case HAMMER:
                 case BEAM:
                 case MEDIC: // Should MEDIC be under weapons?
+                    
                     myWCs[numberOfWeapons] = (WeaponController) newComp;
                     numberOfWeapons += 1;
                     break;
@@ -726,6 +782,8 @@ public class ComponentsHandler {
                     break;
             }
         }
+
+        
         return newCompTypes;
     }
 

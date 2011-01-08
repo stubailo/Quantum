@@ -33,6 +33,9 @@ public class LightConstructorPlayer extends LightPlayer {
             case BUILDING_RECYCLER:
                 buildRecycler();
                 break;
+            case ATTACKING:
+                attack();
+                break;
             case BUILDING:
                 compHandler.build().step();
                 break;
@@ -68,12 +71,24 @@ public class LightConstructorPlayer extends LightPlayer {
         return result;
     }
 
+    public void attack()
+    {
+        
+        if (compHandler.attackVisible()) {
+                System.out.println("Attacking!");
+        } else {
+            System.out.println("Can't see anyone.");
+            knowledge.myState = RobotState.IDLE;
+        }
+    }
+
     public void explore() {
         if (compHandler.canIBuild()) {
             Mine[] sensedMines = compHandler.senseEmptyMines();
 
-            if (compHandler.canSenseEnemies()) {
-                System.out.println("I see an enemy!");
+            if (compHandler.canSenseEnemies() && compHandler.hasWeapons()) {
+                knowledge.myState = RobotState.ATTACKING;
+                attack();
             }
 
             if (sensedMines != null) {
@@ -92,6 +107,7 @@ public class LightConstructorPlayer extends LightPlayer {
             e.printStackTrace();
         }
     }
+
     MapLocation buildRecyclerLocation;
 
     public void buildRecycler() {
