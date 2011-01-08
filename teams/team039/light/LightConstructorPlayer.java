@@ -32,10 +32,44 @@ public class LightConstructorPlayer extends LightPlayer {
         {
             explore();
         }
+
+        if( knowledge.myState == RobotState.BUILDING_RECYCLER )
+        {
+            buildRecycler();
+        }
     }
 
     public void explore()
     {
+        Mine[] sensedMines = compHandler.senseEmptyMines();
+
+        if( compHandler.canSenseEnemies() )
+        {
+            System.out.println( "I see an enemy!" );
+        }
+
+        if( sensedMines != null )
+        {
+            buildRecyclerLocation = sensedMines[0].getLocation();
+            compHandler.initiateBugNavigation( buildRecyclerLocation );
+            knowledge.myState = RobotState.BUILDING_RECYCLER;
+        }
+
+        try {
+        	compHandler.navigateBug();
+        } catch(Exception e) {
+        	System.out.println("Robot " + myRC.getRobot().getID() +
+                    " during round " + Clock.getRoundNum() +
+                    " caught exception:");
+            e.printStackTrace();
+        }
+    }
+
+    MapLocation buildRecyclerLocation;
+    public void buildRecycler()
+    {
+        
+
         try {
         	compHandler.navigateBug();
         } catch(Exception e) {

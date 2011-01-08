@@ -3,12 +3,6 @@
  * and open the template in the editor.
  */
 package team039.common;
-
-import team039.building.BuildingPlayer;
-import team039.building.recycler.StartingBuildingPlayer;
-import team039.common.*;
-import team039.light.LightPlayer;
-import team039.light.StartingLightPlayer;
 import battlecode.common.*;
 
 /**
@@ -50,7 +44,7 @@ public class MessageHandler {
         if (messageQueue == null) {
             messageQueue = new MessageWrapper[10];
         }
-        messageQueue[ 0] = msgToAdd;
+        messageQueue[0] = msgToAdd;
     }
 
     public void emptyQueue() {
