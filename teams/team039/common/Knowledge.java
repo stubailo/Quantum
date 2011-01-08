@@ -1,5 +1,6 @@
 package team039.common;
 
+import team039.common.data.LocationMemory;
 import battlecode.common.*;
 
 /**
@@ -30,8 +31,11 @@ public class Knowledge {
     public         MapLocation         myPreviousLocation;
     public         Direction           myMovementDirection;
     public         Direction           myDirection;
-    public         double              previousFlux    = 0;
-    public         double              deltaFlux       = 0;  
+    public         Direction           myPreviousDirection;
+    public         boolean             justMoved;
+    public         boolean             justTurned;
+    public         double              previousFlux;
+    public         double              deltaFlux;
     public         int                 roundNum;
     
     /*** Sense information ***/
@@ -49,6 +53,7 @@ public class Knowledge {
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.
+    public final LocationMemory locationMemory = new LocationMemory();
     /***public         MapLocation[]       unminedMineLocations     = new MapLocation[100];
     public         MapLocation[]       ourMineLocations         = new MapLocation[100];
     public         MapLocation[]       theirMineLocations       = new MapLocation[100];
@@ -81,6 +86,13 @@ public class Knowledge {
     
     
     
+    public void initialize() {
+        previousFlux = 0;
+        myLocation = myRC.getLocation();
+    }
+    
+    
+    
     /**
      * Called at the beginning of each round, should update all relevant information.
      */
@@ -99,8 +111,17 @@ public class Knowledge {
             myPreviousLocation = myLocation;
             myLocation = myNewLocation;
             myMovementDirection = myPreviousLocation.directionTo(myNewLocation);
+            justMoved = true;
         }
-        myDirection = myRC.getDirection();
+        else justMoved = false;
+        
+        Direction myNewDirection = myRC.getDirection();
+        if(myNewDirection != myDirection) {
+            myPreviousDirection = myDirection;
+            myDirection = myNewDirection;
+            justTurned = true;
+        }
+        else justTurned = false;
     }
 
 
