@@ -55,6 +55,7 @@ public class LightConstructorPlayer extends LightPlayer {
 
         if( knowledge.myState == RobotState.IDLE )
         {
+            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
             knowledge.myState = RobotState.EXPLORING;
         }
     }

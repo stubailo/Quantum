@@ -14,6 +14,7 @@ public class ComponentsHandler {
 
     private final RobotController myRC;
     private final Knowledge knowledge;
+    private final BuildHandler buildHandler;
     /*** Controllers ***/
     private MovementController myMC;
     // Some code only uses one sensor... these should be expanded to use either all sensors
@@ -44,6 +45,8 @@ public class ComponentsHandler {
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
         knowledge = know;
+        
+        buildHandler = new BuildHandler( rc, this, know );
     }
 
     /******************************* SENSOR METHODS *******************************/
@@ -609,6 +612,32 @@ public class ComponentsHandler {
     }
 
     /***************************** BUILDING METHODS *******************************/
+
+    public void buildStep()
+    {
+        buildHandler.build();
+    }
+
+    public boolean autoBuildRobot( BuildInstructions instructions )
+    {
+        return buildHandler.autoBuildRobot(instructions);
+    }
+
+    public boolean buildAtLocation( BuildInstructions instructions, MapLocation location )
+    {
+        return buildHandler.buildChassisAndThenComponents( instructions, location  );
+    }
+
+    public void buildComponents( BuildInstructions instructions, MapLocation location )
+    {
+        buildHandler.startBuildingComponents(instructions, location, instructions.getBaseChassis().level);
+    }
+
+    public void abortBuilding()
+    {
+        buildHandler.abortBuilding();
+    }
+
     public boolean builderActive() {
         return myBC.isActive();
     }
@@ -711,17 +740,8 @@ public class ComponentsHandler {
                     break;
 
                 case CONSTRUCTOR:
-                    myBC = (BuilderController) newComp;
-                    break;
-
                 case RECYCLER:
-                    myBC = (BuilderController) newComp;
-                    break;
-
                 case FACTORY:
-                    myBC = (BuilderController) newComp;
-                    break;
-
                 case ARMORY:
                     myBC = (BuilderController) newComp;
                     break;
