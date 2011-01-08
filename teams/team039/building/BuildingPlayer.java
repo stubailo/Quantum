@@ -10,11 +10,6 @@ public class BuildingPlayer implements SpecificPlayer {
     private final RobotController myRC;
     private final Knowledge knowledge;
     private final ComponentsHandler compHandler;
-    private Robot buildTarget = null;
-    private MapLocation buildLocation = null;
-    private RobotLevel buildHeight = null;
-    private BuildInstructions buildInstructions = null;
-    private int buildStep = 0;
 
     public BuildingPlayer(RobotController rc,
             Knowledge know,

@@ -55,7 +55,6 @@ public class BuildHandler {
             Chassis chassis = instructions.getBaseChassis();
             MapLocation location = compHandler.getAdjacentEmptySpot(chassis.level);
             if (location == null) {
-                System.out.print("no location found to build something");
                 return false;
             } else {
                 buildChassisAndThenComponents(instructions, location);

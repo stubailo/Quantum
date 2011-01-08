@@ -54,7 +54,10 @@ public class LightConstructorPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+        	compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+            compHandler.pathFinder.initiateBugNavigation();
+//            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
             knowledge.myState = RobotState.EXPLORING;
         }
     }
@@ -62,7 +65,9 @@ public class LightConstructorPlayer extends LightPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
+        compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+        compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH, 13));
+        compHandler.pathFinder.initiateBugNavigation();
     }
 
     @Override
@@ -91,15 +96,19 @@ public class LightConstructorPlayer extends LightPlayer {
                 attack();
             }
 
+
             if (sensedMines != null) {
                 buildRecyclerLocation = sensedMines[0].getLocation();
-                compHandler.initiateBugNavigation(buildRecyclerLocation);
+                compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+                compHandler.pathFinder.setGoal(buildRecyclerLocation);
+                compHandler.pathFinder.initiateBugNavigation();
+//                compHandler.initiateBugNavigation(buildRecyclerLocation);
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
             }
         }
 
         try {
-            compHandler.navigateBug();
+            compHandler.pathFinder.navigateBug();
         } catch (Exception e) {
             System.out.println("Robot " + myRC.getRobot().getID()
                     + " during round " + Clock.getRoundNum()
@@ -107,16 +116,14 @@ public class LightConstructorPlayer extends LightPlayer {
             e.printStackTrace();
         }
     }
-
     MapLocation buildRecyclerLocation;
-
     public void buildRecycler() {
         if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150) {
-            System.out.println("Trying to build here...");
+            
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
             try {
-                compHandler.navigateToAdjacent();
+                compHandler.pathFinder.navigateToAdjacent();
             } catch (Exception e) {
                 System.out.println("Robot " + myRC.getRobot().getID()
                         + " during round " + Clock.getRoundNum()

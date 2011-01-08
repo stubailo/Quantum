@@ -26,8 +26,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
         MessageWrapper sampleMessage = new MessageWrapper();
         sampleMessage.genGoToFactoryMsg(myRC, 0, null);
 
-        System.out.println(myRC.getTeamResources());
-
         knowledge.msg().addToQueue(sampleMessage);
     }
 

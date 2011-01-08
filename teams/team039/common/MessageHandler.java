@@ -31,7 +31,6 @@ public class MessageHandler {
 
         for (Message currentMessage : newMessages) {
             MessageWrapper newMsgWrapper = new MessageWrapper();
-            System.out.println("Received: " + newMsgWrapper.decode(currentMessage));
         }
     }
 
