@@ -6,9 +6,7 @@ package team039.common;
 
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
+import team039.common.*;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
@@ -43,15 +41,15 @@ public class MessageHandler {
         }
     }
 
-
-
     /*
      * In the future there will be capability to send more than one message per turn.
      * right now, every message added to the queue replaces the previous one.
      */
     public void addToQueue(MessageWrapper msgToAdd) {
 
-        if( messageQueue == null) { messageQueue = new MessageWrapper[10]; }
+        if (messageQueue == null) {
+            messageQueue = new MessageWrapper[10];
+        }
         messageQueue[ 0] = msgToAdd;
     }
 
