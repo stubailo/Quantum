@@ -37,6 +37,38 @@ public class LightConstructorPlayer extends LightPlayer {
         {
             buildRecycler();
         }
+
+        if( knowledge.myState == RobotState.BUILDING )
+        {
+            build();
+        }
+    }
+
+    @Override
+    public void beginningStateSwitches()
+    {
+        if( knowledge.myState == RobotState.JUST_BUILT )
+        {
+            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
+            knowledge.myState = RobotState.IDLE;
+        }
+
+        if( knowledge.myState == RobotState.IDLE )
+        {
+            knowledge.myState = RobotState.EXPLORING;
+        }
+    }
+
+    @Override
+    public void doSpecificFirstRoundActions() {
+        super.doSpecificFirstRoundActions();
+        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
+    }
+
+    @Override
+    public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
+        SpecificPlayer result = this;
+        return result;
     }
 
     public void explore()
@@ -68,8 +100,11 @@ public class LightConstructorPlayer extends LightPlayer {
     MapLocation buildRecyclerLocation;
     public void buildRecycler()
     {
-        
-
+        if(compHandler.canBuildBuildingHere( buildRecyclerLocation )  && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150)
+        {
+            System.out.println("Trying to build here...");
+            buildChassisAndThenComponents( Prefab.commRecycler, buildRecyclerLocation );
+        }
         try {
         	compHandler.navigateToAdjacent();
         } catch(Exception e) {
@@ -80,31 +115,116 @@ public class LightConstructorPlayer extends LightPlayer {
         }
     }
 
-    @Override
-    public void beginningStateSwitches()
+    private Robot buildTarget = null;
+    private MapLocation buildLocation = null;
+    private RobotLevel buildHeight = null;
+    private BuildInstructions buildInstructions = null;
+    private int buildStep = 0;
+    public void build()
     {
-        if( knowledge.myState == RobotState.JUST_BUILT )
+        //build actions
+        if( !compHandler.builderActive() && buildTarget != null )
         {
-            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
-            knowledge.myState = RobotState.IDLE;
-        }
+            //skip components that this building can't build
+            while (buildStep != buildInstructions.getNumSteps() && !compHandler.canIBuild(buildInstructions.getComponent(buildStep)))
+            {
+                buildStep++;
+            }
 
-        if( knowledge.myState == RobotState.IDLE )
-        {
-            knowledge.myState = RobotState.EXPLORING;
+            if(buildStep < buildInstructions.getNumSteps())
+            {
+                if(!compHandler.buildComponent(buildInstructions.getComponent(buildStep), buildLocation, buildHeight))
+                {
+                }
+                else
+                {
+                    buildStep++;
+                }
+            }
+            else
+            {
+                finishBuilding();
+            }
         }
     }
-    
-    @Override
-    public void doSpecificFirstRoundActions() {
-        super.doSpecificFirstRoundActions();
-        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
+
+    public Boolean autoBuildRobot( BuildInstructions instructions )
+    {
+        if(myRC.getTeamResources() < instructions.getTotalCost()) return false;
+        if( buildTarget==null )
+        {
+            Chassis chassis = instructions.getBaseChassis();
+            MapLocation location = compHandler.getAdjacentEmptySpot(chassis.level);
+            if(location==null)
+            {
+                System.out.print("no location found to build something");
+               return false;
+            } else {
+                buildChassisAndThenComponents( instructions, location );
+                return true;
+            }
+        }else {
+            return false;
+        }
     }
-    
-    @Override
-    public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
-        SpecificPlayer result = this;
-        return result;
+
+    /**
+     * Builds a chassis in the designated location, then begins building components
+     * on it with startBuildingComponents
+     */
+    private Boolean buildChassisAndThenComponents( BuildInstructions instructions, MapLocation location )
+    {
+        Chassis chassis = instructions.getBaseChassis();
+        if(compHandler.buildChassis( chassis, location ))
+        {
+            startBuildingComponents( instructions, location, chassis.level );
+            return true;
+        }
+        else
+        return false;
+    }
+
+    /**
+     * Initiates component build process by setting all of the required variables
+     */
+    public void startBuildingComponents( BuildInstructions instructions, MapLocation location, RobotLevel height )
+    {
+        //first, find the robot
+        buildTarget = compHandler.senseARobot( location, height );
+        buildStep = 0;
+        buildInstructions = instructions;
+        buildLocation = location;
+        buildHeight = height;
+
+        knowledge.myState = RobotState.BUILDING;
+    }
+
+    /**
+     * Called after a successful build process... anything to activate the just-built robot should go here
+     */
+    private void finishBuilding()
+    {
+        buildTarget = null;
+        buildStep = 0;
+        buildInstructions = null;
+        buildLocation = null;
+        buildHeight = null;
+
+        knowledge.myState = RobotState.IDLE;
+    }
+
+    /**
+     * Only called if something went wrong - erase all evidence of target
+     */
+    private void abortBuilding()
+    {
+        buildTarget = null;
+        buildStep = 0;
+        buildInstructions = null;
+        buildLocation = null;
+        buildHeight = null;
+
+        knowledge.myState = RobotState.IDLE;
     }
 
 }

@@ -52,7 +52,6 @@ public class BuildingPlayer implements SpecificPlayer {
             {
                 if(!compHandler.buildComponent(buildInstructions.getComponent(buildStep), buildLocation, buildHeight))
                 {
-                    abortBuilding();
                 }
                 else
                 {

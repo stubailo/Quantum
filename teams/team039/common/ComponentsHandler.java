@@ -428,7 +428,6 @@ public class ComponentsHandler {
     public void navigateBug() throws GameActionException {
 //    	if(numberOfSensors == 0) 
 //    		return; 
-    	
     	//do nothing if the motor is active or you are not navigating
     	if(!bugNavigating)
     		return;
@@ -616,6 +615,11 @@ public class ComponentsHandler {
 
     public boolean canIBuild(ComponentType component) {
         return BuildMappings.canBuild(myBC.type(), component);
+    }
+
+    public boolean canBuildBuildingHere( MapLocation location )
+    {
+        return myMC.canMove( myRC.getLocation().directionTo(location) );
     }
 
     public boolean buildComponent(ComponentType component,
