@@ -71,7 +71,7 @@ public class LightConstructorPlayer extends LightPlayer {
         
 
         try {
-        	compHandler.navigateBug();
+        	compHandler.navigateToAdjacent();
         } catch(Exception e) {
         	System.out.println("Robot " + myRC.getRobot().getID() +
                     " during round " + Clock.getRoundNum() +
@@ -98,7 +98,7 @@ public class LightConstructorPlayer extends LightPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.NORTH, 100));
+        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
     }
     
     @Override
