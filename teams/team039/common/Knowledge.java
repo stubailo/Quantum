@@ -1,6 +1,6 @@
 package team039.common;
 
-import team039.common.data.LocationMemory;
+import team039.common.location.LocationMemory;
 import battlecode.common.*;
 
 /**
@@ -78,19 +78,15 @@ public class Knowledge {
      * 
      * @param    rc    RobotController associated with this RobotPlayer
      */
-    public Knowledge (RobotController rc, MessageHandler msg) {
+    public Knowledge (RobotController rc) {
         myRC            = rc;
         myTeam          = myRC.getTeam();
         myStartLocation = myRC.getLocation();
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
         myLocation      = myStartLocation;
-        myMsgHandler    = msg;
-    }
-    
-    
-    
-    public void initialize() {
+        myMsgHandler    = new MessageHandler( myRC );
+        
         previousFlux = 0;
         myLocation = myRC.getLocation();
     }
@@ -127,7 +123,6 @@ public class Knowledge {
         }
         else justTurned = false;
 
-
         myMsgHandler.receiveMessages();
 
     }
@@ -135,6 +130,11 @@ public class Knowledge {
     public MessageHandler msg()
     {
         return myMsgHandler;
+    }
+
+    public void changeState( RobotState newState )
+    {
+        myState = newState;
     }
 
 

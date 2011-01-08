@@ -2,7 +2,7 @@ package team039.common;
 
 import java.util.Arrays;
 
-import team039.common.data.LocationType;
+import team039.common.location.LocationType;
 import battlecode.common.*;
 
 /**
@@ -344,7 +344,7 @@ public class ComponentsHandler {
 
         
 
-        if( composedMessage == null )
+        if( composedMessage == null || myCC == null )
         {
             return false;
         }
