@@ -1,8 +1,6 @@
 package team039.light;
 
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
+import team039.common.*;
 import battlecode.common.*;
 
 public class LightPlayer implements SpecificPlayer {
@@ -21,11 +19,20 @@ public class LightPlayer implements SpecificPlayer {
     }
     
     public void doSpecificActions() {
-        
+        beginningStateSwitches();
     }
     
     public void doSpecificFirstRoundActions() {
         
+    }
+
+    public void beginningStateSwitches()
+    {
+        if( knowledge.myState == RobotState.JUST_BUILT )
+        {
+            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
+            knowledge.myState = RobotState.IDLE;
+        }
     }
     
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {

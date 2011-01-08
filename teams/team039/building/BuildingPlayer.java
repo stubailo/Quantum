@@ -2,9 +2,7 @@ package team039.building;
 
 import team039.building.recycler.RecyclerPlayer;
 import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
-import team039.common.BuildInstructions;
+import team039.common.*;
 import battlecode.common.*;
 
 public class BuildingPlayer implements SpecificPlayer {
@@ -31,7 +29,12 @@ public class BuildingPlayer implements SpecificPlayer {
     
     public void doSpecificActions() {
 
-        build();
+        beginningStateSwitches();
+
+        if( knowledge.myState == RobotState.BUILDING )
+        {
+            build();
+        }
     }
 
     public void build()
@@ -62,9 +65,17 @@ public class BuildingPlayer implements SpecificPlayer {
             }
         }
     }
+
+    public void beginningStateSwitches()
+    {
+        if( knowledge.myState == RobotState.JUST_BUILT )
+        {
+            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
+            knowledge.myState = RobotState.IDLE;
+        }
+    }
     
     public void doSpecificFirstRoundActions() {
-        
     }
     
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
@@ -130,6 +141,8 @@ public class BuildingPlayer implements SpecificPlayer {
         buildInstructions = instructions;
         buildLocation = location;
         buildHeight = height;
+
+        knowledge.myState = RobotState.BUILDING;
     }
 
     /**
@@ -142,6 +155,8 @@ public class BuildingPlayer implements SpecificPlayer {
         buildInstructions = null;
         buildLocation = null;
         buildHeight = null;
+
+        knowledge.myState = RobotState.IDLE;
     }
 
     /**
@@ -154,5 +169,7 @@ public class BuildingPlayer implements SpecificPlayer {
         buildInstructions = null;
         buildLocation = null;
         buildHeight = null;
+
+        knowledge.myState = RobotState.IDLE;
     }
 }

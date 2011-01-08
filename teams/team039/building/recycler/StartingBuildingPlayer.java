@@ -29,12 +29,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
         System.out.println( myRC.getTeamResources() );
 
         knowledge.msg().addToQueue( sampleMessage );
-
-
-        if( myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost()*2 )
-        {
-            autoBuildRobot( Prefab.lightSoldier );
-        }
     }
     
     @Override
@@ -48,6 +42,18 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer result = this;
         return result;
+    }
+
+    @Override
+    public void beginningStateSwitches() {
+        super.beginningStateSwitches();
+
+        System.out.println( "running state switches for building player" );
+
+        if( knowledge.myState == RobotState.IDLE && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost()*2 )
+        {
+            autoBuildRobot( Prefab.lightSoldier );
+        }
     }
 
 }
