@@ -20,6 +20,9 @@ public class RobotPlayer implements Runnable {
     /*** Specific Player ***/
     private        SpecificPlayer      specificPlayer;  
 
+
+    private        MessageHandler      msgHandler;
+
     
     public RobotPlayer(RobotController rc) {
         myRC = rc;
@@ -40,7 +43,7 @@ public class RobotPlayer implements Runnable {
         specificPlayer.doSpecificActions();
         while(true) {
             try {
-
+                debug_testSomething();
                 debug_setStrings();
                 myRC.yield();
                 
@@ -134,6 +137,15 @@ public class RobotPlayer implements Runnable {
     
     
 
+    public void debug_testSomething() {
+        TerrainTile tile1 = myRC.senseTerrainTile(new MapLocation(9340, 25581));
+        TerrainTile tile2 = myRC.senseTerrainTile(new MapLocation(9340, 25575));
+        
+        if(tile1 == null) System.out.println("tile1 is null");
+        if(tile2 == null) System.out.println("tile2 is null");
+    }
+    
+    
     /**
      * Indicator string use should be contained within this method.
      */

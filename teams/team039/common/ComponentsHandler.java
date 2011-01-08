@@ -2,6 +2,7 @@ package team039.common;
 
 import java.util.Arrays;
 
+import team039.common.location.LocationType;
 import battlecode.common.*;
 
 /**
@@ -15,7 +16,8 @@ public class ComponentsHandler {
     private final Knowledge knowledge;
     /*** Controllers ***/
     private MovementController myMC;
-    // Some code only uses one sensor... these should be expanded to use either all sensors or the best sensor, depending on the application
+    // Some code only uses one sensor... these should be expanded to use either all sensors
+    // or the best sensor, depending on the application
     private SensorController[] mySCs = new SensorController[4];
     private BuilderController myBC;
     private WeaponController[] myWCs = new WeaponController[18];
@@ -44,9 +46,65 @@ public class ComponentsHandler {
     }
 
     /******************************* SENSOR METHODS *******************************/
+    
+    
+    
+    public void sense() {
+        if(numberOfSensors == 0) return;
+        
+        if(knowledge.justTurned) {
+            for(SensorController sensor : mySCs) {
+                switch(sensor.type()) {
+                
+                }
+            }
+        }
+    }
+    
+    /**
+     * Optimizes void-checking.  Considers off_map to be void.
+     * @param mySCs     robot's sensor controllers
+     * @param location  location to be checked
+     * @return          an integer, 0 = no, 1 = yes, -1 = dunno (will be convention)
+     */
+    public int isGroundTraversable(MapLocation location) {
+        
+        LocationType locationType = knowledge.locationMemory.getType(location);
+        if(locationType == null) {
+            TerrainTile locationTile = myRC.senseTerrainTile(location);
+            if(locationTile == null) return -1;
+            switch(locationTile) {
+            
+            case LAND:
+                knowledge.locationMemory.setType(location,
+                                                 LocationType.LAND,
+                                                 knowledge.roundNum);
+                break;
+                
+            case OFF_MAP:
+                knowledge.locationMemory.setType(location,
+                        LocationType.LAND,
+                        knowledge.roundNum);
+                break;
+                
+            case VOID:
+                knowledge.locationMemory.setType(location,
+                        LocationType.LAND,
+                        knowledge.roundNum);
+                break;
+            }
+        }
+        
+        if(locationType == LocationType.VOID || locationType == LocationType.OFF_MAP)
+            return 0;
+        return 1;
+    }
+    
+    
+    
     /**
      * Returns an array of Robots that can be sensed
-     * @return        an array of all nearby robots, empty if there are no robots or no sensors
+     * @return        an array of all nearby robots, null if there are no robots or no sensors
      */
     public Robot[] getSensedRobots() {
         if (numberOfSensors == 0) {
@@ -87,7 +145,8 @@ public class ComponentsHandler {
 
     /**
      * Returns the robot in a certain square and height
-     * @return        the robot in that square at that height, null if there is anything else there
+     * @return        the robot in that square at that height,
+     *                null if there is anything else there
      */
     public Robot senseARobot(MapLocation location, RobotLevel height) {
         if (numberOfSensors == 0) {
@@ -311,7 +370,9 @@ public class ComponentsHandler {
         return BuildMappings.canBuild(myBC.type(), component);
     }
 
-    public boolean buildComponent(ComponentType component, MapLocation location, RobotLevel height) {
+    public boolean buildComponent(ComponentType component,
+                                  MapLocation location,
+                                  RobotLevel height) {
         if (myBC.isActive()) {
             return false;
         }
@@ -422,7 +483,6 @@ public class ComponentsHandler {
      * 
      * @return        returns any component that might change the SpecificPlayer
      */
-    // TODO: Allow returning of more than one component-type...
     public ComponentType oldUpdateComponents() {
         ComponentController[] newComps = myRC.newComponents();
 
@@ -433,8 +493,7 @@ public class ComponentsHandler {
         ComponentType result = null;
 
         for (ComponentController newComp : newComps) {
-            switch (newComp.type()) { // TODO: handle IRON, JUMP, DROPSHIP, BUG, DUMMY
-                // TODO: handle passives
+            switch (newComp.type()) {
 
                 case BUILDING_MOTOR:
                 case SMALL_MOTOR:
