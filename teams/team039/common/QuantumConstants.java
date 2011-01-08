@@ -14,6 +14,12 @@ public final class QuantumConstants {
 	/** Bug distance increase before trying different path */
 	public static final double BUG_DISTANCE_SWITCH = 1.2;
 	
+	
+	/** Planck's constant */
+	public static final double H = 6.626069E-34;
+	/** Reduced Planck's constant */
+	public static final double H_BAR = 1.0545716E-34;
+	
 	private QuantumConstants() {	
 	}
 }
