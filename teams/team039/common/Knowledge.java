@@ -1,6 +1,6 @@
 package team039.common;
 
-import team039.common.location.LocationMemory;
+//import team039.common.location.LocationMemory;
 import battlecode.common.*;
 
 /**
@@ -55,7 +55,7 @@ public class Knowledge {
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.
-    public final LocationMemory locationMemory = new LocationMemory();
+//    public final LocationMemory locationMemory = new LocationMemory();
     /***public         MapLocation[]       unminedMineLocations     = new MapLocation[100];
     public         MapLocation[]       ourMineLocations         = new MapLocation[100];
     public         MapLocation[]       theirMineLocations       = new MapLocation[100];

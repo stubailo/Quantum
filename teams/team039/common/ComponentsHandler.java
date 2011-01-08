@@ -2,7 +2,7 @@ package team039.common;
 
 import java.util.Arrays;
 
-import team039.common.location.LocationType;
+//import team039.common.location.LocationType;
 import battlecode.common.*;
 
 /**
@@ -67,7 +67,7 @@ public class ComponentsHandler {
      * @param location  location to be checked
      * @return          an integer, 0 = no, 1 = yes, -1 = dunno (will be convention)
      */
-    public int isGroundTraversable(MapLocation location) {
+/*    public int isGroundTraversable(MapLocation location) {
         
         LocationType locationType = knowledge.locationMemory.getType(location);
         if(locationType == null) {
@@ -99,7 +99,7 @@ public class ComponentsHandler {
             return 0;
         return 1;
     }
-    
+ */   
     
     
     /**
@@ -695,7 +695,12 @@ public class ComponentsHandler {
     }
     
 
-    
+    /**
+     * This doesn't really seem useful.  Just keeping it around until we have a better 
+     * sensor method.  
+     * @param location
+     * @throws GameActionException
+     */
     
     private Direction [] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
     	
