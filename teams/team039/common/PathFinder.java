@@ -231,8 +231,8 @@ public class PathFinder {
     	BugState action;
     	if(knowledge.myDirection == dir)
     		action = BugState.MOVE_FORWARD;
-    	else if(knowledge.myDirection == dir.opposite())
-    		action = BugState.MOVE_BACKWARD;
+//    	else if(knowledge.myDirection == dir.opposite())
+//    		action = BugState.MOVE_BACKWARD;
     	else
     		action = BugState.ROTATE;
     	
