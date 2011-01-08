@@ -7,5 +7,6 @@ public enum RobotState {
     BUILDING,
     FLEEING,
     ATTACKING,
-    DEFENDING
+    DEFENDING,
+    JUST_BUILT
 }

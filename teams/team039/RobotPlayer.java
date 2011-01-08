@@ -65,17 +65,30 @@ public class RobotPlayer implements Runnable {
     public void doCommonFirstRoundActions() {
         debug_printGameConstants();
         specificPlayer = determineSpecificPlayer();
+
+        knowledge.myState = RobotState.JUST_BUILT;
     }
     
     
     
     public void doCommonActions() {
         knowledge.update();
+
         ComponentType[] newCompTypes = compHandler.updateComponents();
         if(newCompTypes != null) {
             for(ComponentType newCompType : newCompTypes) {
                 specificPlayer = specificPlayer.determineSpecificPlayer(newCompType);
             }
+        }
+
+        beginningTurnStateSwitches();
+    }
+
+    public void beginningTurnStateSwitches()
+    {
+        if( knowledge.myState == RobotState.JUST_BUILT && knowledge.roundNum < 5 )
+        {
+            knowledge.myState = RobotState.STARTING;
         }
     }
 
