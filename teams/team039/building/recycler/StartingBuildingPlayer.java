@@ -35,7 +35,7 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
 
-        compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
+        if( compHandler.canIBuild()) compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public void beginningStateSwitches() {
         super.beginningStateSwitches();
 
-        if (knowledge.myState == RobotState.IDLE && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 200) {
+        if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300) {
             compHandler.build().autoBuildRobot(Prefab.lightSoldier);
         }
     }

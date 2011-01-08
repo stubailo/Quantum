@@ -613,16 +613,21 @@ public class ComponentsHandler {
         return buildHandler;
     }
 
+    public boolean canIBuild()
+    {
+        return !(myBC == null);
+    }
+
     public boolean builderActive() {
         return myBC.isActive();
     }
 
-    public boolean canIBuild(ComponentType component) {
+    public boolean canIBuildThis(ComponentType component) {
         return BuildMappings.canBuild(myBC.type(), component);
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        return myMC.canMove(myRC.getLocation().directionTo(location));
+        return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2 ;
     }
 
     public boolean buildComponent(ComponentType component,
