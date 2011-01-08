@@ -23,10 +23,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public void doSpecificActions() {
         super.doSpecificActions();
 
-        MessageWrapper sampleMessage = new MessageWrapper();
-        sampleMessage.genGoToFactoryMsg(myRC, 0, null);
-
-        knowledge.msg().addToQueue(sampleMessage);
     }
 
     @Override
