@@ -613,29 +613,9 @@ public class ComponentsHandler {
 
     /***************************** BUILDING METHODS *******************************/
 
-    public void buildStep()
+    public BuildHandler build()
     {
-        buildHandler.build();
-    }
-
-    public boolean autoBuildRobot( BuildInstructions instructions )
-    {
-        return buildHandler.autoBuildRobot(instructions);
-    }
-
-    public boolean buildAtLocation( BuildInstructions instructions, MapLocation location )
-    {
-        return buildHandler.buildChassisAndThenComponents( instructions, location  );
-    }
-
-    public void buildComponents( BuildInstructions instructions, MapLocation location )
-    {
-        buildHandler.startBuildingComponents(instructions, location, instructions.getBaseChassis().level);
-    }
-
-    public void abortBuilding()
-    {
-        buildHandler.abortBuilding();
+        return buildHandler;
     }
 
     public boolean builderActive() {
