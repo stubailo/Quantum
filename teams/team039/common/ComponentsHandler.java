@@ -30,7 +30,9 @@ public class ComponentsHandler {
     /*** Navigation info ***/
     private        boolean              bugNavigating;
     private        boolean              tracking;
+    private        boolean              trackingCW;
     private        Direction            trackingDirection;
+    private        Direction            trackingRefDirection;
     private        MapLocation          bugGoal;
     private        MapLocation          bugStart;
     private        MapLocation []       bugPrevLocations;
@@ -143,18 +145,70 @@ public class ComponentsHandler {
     }
     
     public void navigateBug() throws GameActionException {
-    	if(numberOfSensors == 0) 
-    		return; 
+//    	if(numberOfSensors == 0) 
+//    		return; 
+    	
+    	//do nothing if the motor is active or you are not navigating
+    	if(!bugNavigating)
+    		return;
     	if(myMC.isActive())
     		return;
+
     	
     	MapLocation location = myRC.getLocation();
     	Direction directionToGoal = location.directionTo(bugGoal);
     	Direction myDirection = myRC.getDirection();
+    	int bugPos = bugStep % QuantumConstants.BUG_MEMORY_LENGTH;
     	
+    	myRC.yield();
+    	
+    	//check to see if the robot is tracking
     	if(tracking){
+    		//set the initial reference direction to begin testing from.
+    		Direction testDirection = trackingRefDirection;
+            
+    		//avoids moving back and forth, which can arise in some cases.
+    		if(trackingDirection == trackingRefDirection.opposite()){
+    			if(trackingCW)
+    				testDirection = testDirection.rotateLeft();
+    			else
+    				testDirection = testDirection.rotateRight();
+    		}
     		
+    		//check directions beginning with the reference direction, in the order depending on 
+    		//if you are tracking clockwise or counterclockwise
+    		boolean pathBlocked = true;
+    		while(pathBlocked) {
+    			if(myMC.canMove(testDirection)){
+    				trackingDirection = testDirection;
+    				pathBlocked = false;
+    			}
+    			
+    			//increment direction
+    			if(trackingCW)
+    				testDirection = testDirection.rotateLeft();
+    			else
+    				testDirection = testDirection.rotateRight();
+    			
+    			//stop checking if you are surrounded
+    			if(testDirection == trackingRefDirection)
+    				break;
+    		}
+    		
+    		//move or change direction as necessary
+    		if(myDirection == trackingDirection)
+    			myMC.moveForward();
+    		else if(myDirection == trackingDirection.opposite())
+    			myMC.moveBackward();
+    		else
+    			myMC.setDirection(trackingDirection);
+  
+    		//check if you are done tracking
+    		if(trackingDirection == trackingRefDirection) {
+    			tracking = false;
+    		}	
     	} else {
+    		//if you are not tracking, check if you can move toward the goal
     		if(myMC.canMove(directionToGoal)) {
     			if(myDirection == directionToGoal) 
     				myMC.moveForward();
@@ -165,27 +219,52 @@ public class ComponentsHandler {
     			
     			return;
     		} else {
+    			//the path is blocked, so begin tracking.
     			tracking = true;
-    			bugPrevLocations[bugStep % QuantumConstants.BUG_MEMORY_LENGTH] = location;
+    			bugPos = (bugPos + 1) % QuantumConstants.BUG_MEMORY_LENGTH;
+    			bugPrevLocations[bugPos] = location;
+    			trackingRefDirection = directionToGoal;
+    		
+    			//determine if you should track around the obstacle clockwise or counterclockwise
+    			Direction ccwDir = directionToGoal;
+    			Direction cwDir = directionToGoal;
+    			boolean searching = true;
+    			while(searching) {
+    				ccwDir = ccwDir.rotateRight();
+    				cwDir = cwDir.rotateLeft();
+    				if(myMC.canMove(ccwDir)) {
+    					bugPrevDirections[bugPos] = ccwDir;
+    					trackingCW = false;
+    					if(myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(bugGoal) < location.add(ccwDir).distanceSquaredTo(bugGoal)) {
+    						bugPrevDirections[bugPos] = cwDir;
+    						trackingCW = true;
+    					}
+    					searching = false;
+    				}
+    					
+    				//stop searching if you are surrounded
+    				if(ccwDir == cwDir) {
+    					trackingDirection = ccwDir;
+    					break;
+    				}
+    			}
     			
-    			//TODO: This seems like information we could store somewhere permanent...
-    			Direction [] open = findAdjacentOpenDirections(location);
-    			//findBestMove(open);
+    			trackingDirection = bugPrevDirections[bugPos];
+    			//myMC.setDirection(trackingDirection);
     			
-    			//bugPrevDirections[bugStep % QuantumConstants.BUG_MEMORY_LENGTH] = dir;
     		}
     	}
-
-//    	SensorController sensor = mySCs[0];
-
     	
-    	myRC.yield();
-    	
+    	//stop navigating once you have reached your goal
+    	if(location == bugGoal)
+    		bugNavigating = false;
 	
     }
     
+    
     private Direction [] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
     	
+    	/** easier to just use the canMove() method.  */
     	SensorController sensor = mySCs[0];
     	Direction [] open = new Direction [8];
     	boolean [] blocked = new boolean [8];
