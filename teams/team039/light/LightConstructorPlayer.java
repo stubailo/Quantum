@@ -4,57 +4,49 @@ import team039.common.*;
 import battlecode.common.*;
 
 public class LightConstructorPlayer extends LightPlayer {
-    
-    private final RobotController   myRC;
-    private final Knowledge         knowledge;
+
+    private final RobotController myRC;
+    private final Knowledge knowledge;
     private final ComponentsHandler compHandler;
-    
     private MapLocation goal;
     private boolean atGoal = true;
     private int goalSqDist;
-    
-        
+
     public LightConstructorPlayer(RobotController rc,
-                                     Knowledge know,
-                                     ComponentsHandler compHand) {
-        
+            Knowledge know,
+            ComponentsHandler compHand) {
+
         super(rc, know, compHand);
-        myRC        = rc;
-        knowledge   = know;
+        myRC = rc;
+        knowledge = know;
         compHandler = compHand;
     }
-    
+
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
 
-        if( knowledge.myState == RobotState.EXPLORING )
-        {
+        if (knowledge.myState == RobotState.EXPLORING) {
             explore();
         }
 
-        if( knowledge.myState == RobotState.BUILDING_RECYCLER )
-        {
+        if (knowledge.myState == RobotState.BUILDING_RECYCLER) {
             buildRecycler();
         }
 
-        if( knowledge.myState == RobotState.BUILDING )
-        {
+        if (knowledge.myState == RobotState.BUILDING) {
             compHandler.build().step();
         }
     }
 
     @Override
-    public void beginningStateSwitches()
-    {
-        if( knowledge.myState == RobotState.JUST_BUILT )
-        {
-            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
+    public void beginningStateSwitches() {
+        if (knowledge.myState == RobotState.JUST_BUILT) {
+            System.out.println("I called JUST_BUILT at round " + knowledge.roundNum);
             knowledge.myState = RobotState.IDLE;
         }
 
-        if( knowledge.myState == RobotState.IDLE )
-        {
+        if (knowledge.myState == RobotState.IDLE) {
             compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
             knowledge.myState = RobotState.EXPLORING;
         }
@@ -72,46 +64,41 @@ public class LightConstructorPlayer extends LightPlayer {
         return result;
     }
 
-    public void explore()
-    {
+    public void explore() {
         Mine[] sensedMines = compHandler.senseEmptyMines();
 
-        if( compHandler.canSenseEnemies() )
-        {
-            System.out.println( "I see an enemy!" );
+        if (compHandler.canSenseEnemies()) {
+            System.out.println("I see an enemy!");
         }
 
-        if( sensedMines != null )
-        {
+        if (sensedMines != null) {
             buildRecyclerLocation = sensedMines[0].getLocation();
-            compHandler.initiateBugNavigation( buildRecyclerLocation );
+            compHandler.initiateBugNavigation(buildRecyclerLocation);
             knowledge.myState = RobotState.BUILDING_RECYCLER;
         }
 
         try {
-        	compHandler.navigateBug();
-        } catch(Exception e) {
-        	System.out.println("Robot " + myRC.getRobot().getID() +
-                    " during round " + Clock.getRoundNum() +
-                    " caught exception:");
+            compHandler.navigateBug();
+        } catch (Exception e) {
+            System.out.println("Robot " + myRC.getRobot().getID()
+                    + " during round " + Clock.getRoundNum()
+                    + " caught exception:");
             e.printStackTrace();
         }
     }
-
     MapLocation buildRecyclerLocation;
-    public void buildRecycler()
-    {
-        if(compHandler.canBuildBuildingHere( buildRecyclerLocation )  && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150)
-        {
+
+    public void buildRecycler() {
+        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150) {
             System.out.println("Trying to build here...");
-            compHandler.build().buildChassisAndThenComponents( Prefab.commRecycler , buildRecyclerLocation);
+            compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         }
         try {
-        	compHandler.navigateToAdjacent();
-        } catch(Exception e) {
-        	System.out.println("Robot " + myRC.getRobot().getID() +
-                    " during round " + Clock.getRoundNum() +
-                    " caught exception:");
+            compHandler.navigateToAdjacent();
+        } catch (Exception e) {
+            System.out.println("Robot " + myRC.getRobot().getID()
+                    + " during round " + Clock.getRoundNum()
+                    + " caught exception:");
             e.printStackTrace();
         }
     }

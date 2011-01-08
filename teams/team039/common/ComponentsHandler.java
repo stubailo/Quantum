@@ -24,106 +24,101 @@ public class ComponentsHandler {
     private WeaponController[] myWCs = new WeaponController[18];
     private BroadcastController myCC;
     /*** Controller info ***/
-    public         int                  numberOfSensors = 0;
-    public         boolean              hasBuilder      = false;
-    public         int                  numberOfWeapons = 0;
-    public         boolean              hasComm         = false;
-    
+    public int numberOfSensors = 0;
+    public boolean hasBuilder = false;
+    public int numberOfWeapons = 0;
+    public boolean hasComm = false;
     /*** Navigation info ***/
-    private        boolean              bugNavigating;
-    private        boolean              tracking;
-    private        boolean              trackingCW;
-    private        boolean              moveOnNext;
-    private        Direction            trackingDirection;
-    private        Direction            trackingRefDirection;
-    private        MapLocation          bugGoal;
-    private        MapLocation          bugStart;
-    private        MapLocation []       bugPrevLocations;
-    private        Direction []         bugPrevDirections;
-    private        int                  bugStep;
-   
+    private boolean bugNavigating;
+    private boolean tracking;
+    private boolean trackingCW;
+    private boolean moveOnNext;
+    private Direction trackingDirection;
+    private Direction trackingRefDirection;
+    private MapLocation bugGoal;
+    private MapLocation bugStart;
+    private MapLocation[] bugPrevLocations;
+    private Direction[] bugPrevDirections;
+    private int bugStep;
+
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
         knowledge = know;
-        
-        buildHandler = new BuildHandler( rc, this, know );
+
+        buildHandler = new BuildHandler(rc, this, know);
     }
 
     /******************************* SENSOR METHODS *******************************/
-    
-    
-    
     public void sense() {
-        if(numberOfSensors == 0) return;
-        
-        if(knowledge.justTurned) {
-            for(SensorController sensor : mySCs) {
-                switch(sensor.type()) {
-                
+        if (numberOfSensors == 0) {
+            return;
+        }
+
+        if (knowledge.justTurned) {
+            for (SensorController sensor : mySCs) {
+                switch (sensor.type()) {
+
                 }
             }
         }
     }
-    
+
     /**
      * Optimizes void-checking.  Considers off_map to be void.
      * @param mySCs     robot's sensor controllers
      * @param location  location to be checked
      * @return          an integer, 0 = no, 1 = yes, -1 = dunno (will be convention)
      */
-/*    public int isGroundTraversable(MapLocation location) {
-        
-        LocationType locationType = knowledge.locationMemory.getType(location);
-        if(locationType == null) {
-            TerrainTile locationTile = myRC.senseTerrainTile(location);
-            if(locationTile == null) return -1;
-            switch(locationTile) {
-            
-            case LAND:
-                knowledge.locationMemory.setType(location,
-                                                 LocationType.LAND,
-                                                 knowledge.roundNum);
-                break;
-                
-            case OFF_MAP:
-                knowledge.locationMemory.setType(location,
-                        LocationType.LAND,
-                        knowledge.roundNum);
-                break;
-                
-            case VOID:
-                knowledge.locationMemory.setType(location,
-                        LocationType.LAND,
-                        knowledge.roundNum);
-                break;
-            }
-        }
-        
-        if(locationType == LocationType.VOID || locationType == LocationType.OFF_MAP)
-            return 0;
-        return 1;
-    }
- */   
+    /*    public int isGroundTraversable(MapLocation location) {
 
-    public Mine[] senseMines()
-    {
+    LocationType locationType = knowledge.locationMemory.getType(location);
+    if(locationType == null) {
+    TerrainTile locationTile = myRC.senseTerrainTile(location);
+    if(locationTile == null) return -1;
+    switch(locationTile) {
+
+    case LAND:
+    knowledge.locationMemory.setType(location,
+    LocationType.LAND,
+    knowledge.roundNum);
+    break;
+
+    case OFF_MAP:
+    knowledge.locationMemory.setType(location,
+    LocationType.LAND,
+    knowledge.roundNum);
+    break;
+
+    case VOID:
+    knowledge.locationMemory.setType(location,
+    LocationType.LAND,
+    knowledge.roundNum);
+    break;
+    }
+    }
+
+    if(locationType == LocationType.VOID || locationType == LocationType.OFF_MAP)
+    return 0;
+    return 1;
+    }
+     */
+    public Mine[] senseMines() {
         if (numberOfSensors == 0) {
             return null;
         }
         return mySCs[0].senseNearbyGameObjects(Mine.class);
     }
 
-    public boolean canSenseEnemies()
-    {
+    public boolean canSenseEnemies() {
         if (numberOfSensors == 0) {
             return false;
         }
         Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
 
-        for( Robot sensedRobot : sensedRobots )
-        {
-            if( !sensedRobot.getTeam().equals(myRC.getTeam()) )
+        for (Robot sensedRobot : sensedRobots) {
+            if (!sensedRobot.getTeam().equals(myRC.getTeam())) {
                 return true;
+            }
         }
 
         return false;
@@ -132,9 +127,7 @@ public class ComponentsHandler {
     /*
      * Gets a list of mines that don't have anything on them.
      */
-
-    public Mine[] senseEmptyMines()
-    {
+    public Mine[] senseEmptyMines() {
         if (numberOfSensors == 0) {
             return null;
         }
@@ -143,45 +136,41 @@ public class ComponentsHandler {
 
         int len = sensedMines.length;
 
-        boolean[] empty = new boolean[ len ];
-        Mine [] output = new Mine[len];
+        boolean[] empty = new boolean[len];
+        Mine[] output = new Mine[len];
 
         Mine sensedMine;
         int numEmptyMines = 0;
 
-        for( int i=0; i < len; i++ )
-        {
+        for (int i = 0; i < len; i++) {
             sensedMine = sensedMines[i];
 
             try {
-            GameObject obj = mySCs[0].senseObjectAtLocation( sensedMine.getLocation() , RobotLevel.ON_GROUND );
+                GameObject obj = mySCs[0].senseObjectAtLocation(sensedMine.getLocation(), RobotLevel.ON_GROUND);
 
-            if( obj == null )
-            {
-                empty[i] = true;
-                output[numEmptyMines] = sensedMine;
-                numEmptyMines ++;
+                if (obj == null) {
+                    empty[i] = true;
+                    output[numEmptyMines] = sensedMine;
+                    numEmptyMines++;
 
-            } else if ( obj instanceof Robot )
-            {
-                //not sure how to tell the difference between our team's recyclers and anything else.. :/
-            } else {
-                empty[i] = false;
-            }
+                } else if (obj instanceof Robot) {
+                    //not sure how to tell the difference between our team's recyclers and anything else.. :/
+                } else {
+                    empty[i] = false;
+                }
             } catch (Exception e) {
                 knowledge.printExceptionMessage(e);
                 return null;
             }
         }
 
-        if( numEmptyMines == 0 )
-        {
+        if (numEmptyMines == 0) {
             return null;
         } else {
             return output;
         }
     }
-    
+
     /**
      * Returns an array of Robots that can be sensed
      * @return        an array of all nearby robots, null if there are no robots or no sensors
@@ -209,12 +198,12 @@ public class ComponentsHandler {
         Direction direction = Direction.EAST;
         int counter = 0;
 
-        while (senseARobot(myLocation.add(direction), height) != null && counter<8) {
+        while (senseARobot(myLocation.add(direction), height) != null && counter < 8) {
             counter++;
             direction = direction.rotateRight();
         }
 
-        
+
 
         if (senseARobot(myLocation.add(direction), height) == null) {
             return myLocation.add(direction);
@@ -416,186 +405,194 @@ public class ComponentsHandler {
             return false;
         }
     }
-    
+
     public void initiateBugNavigation(MapLocation goal) {
-    	bugNavigating = true;
-    	tracking = false;
-    	moveOnNext = false;
-    	bugGoal = goal;
-    	bugStart = myRC.getLocation();
-		bugPrevLocations = new MapLocation [QuantumConstants.BUG_MEMORY_LENGTH];
-		bugPrevDirections = new Direction [QuantumConstants.BUG_MEMORY_LENGTH];
-		bugStep = 0;
+        bugNavigating = true;
+        tracking = false;
+        moveOnNext = false;
+        bugGoal = goal;
+        bugStart = myRC.getLocation();
+        bugPrevLocations = new MapLocation[QuantumConstants.BUG_MEMORY_LENGTH];
+        bugPrevDirections = new Direction[QuantumConstants.BUG_MEMORY_LENGTH];
+        bugStep = 0;
     }
-    
+
     public void navigateBug() throws GameActionException {
 //    	if(numberOfSensors == 0) 
 //    		return; 
-    	//do nothing if the motor is active or you are not navigating
-    	if(!bugNavigating)
-    		return;
-    	if(myMC.isActive())
-    		return;
- 	
-    	MapLocation location = myRC.getLocation();
-    	Direction directionToGoal = location.directionTo(bugGoal);
-    	Direction myDirection = myRC.getDirection();
-    	int bugPos = bugStep % QuantumConstants.BUG_MEMORY_LENGTH;
-    	
-    	//stop navigating once you have reached your goal
-    	if(location == bugGoal) {
-    		bugNavigating = false;
-    		return;
-    	}
-    	
-    	myRC.yield();
-    	
-    	//check to see if the robot is tracking
-    	if(tracking){
-    		//set the initial reference direction to begin testing from.
-    		Direction testDirection = trackingRefDirection;
-            
-    		//avoids moving back and forth, which can arise in some cases.
-    		if(trackingDirection == trackingRefDirection.opposite()){
-    			if(trackingCW)
-    				testDirection = testDirection.rotateLeft();
-    			else
-    				testDirection = testDirection.rotateRight();
-    		}
-    		
-    		//check directions beginning with the reference direction, in the order depending on 
-    		//if you are tracking clockwise or counterclockwise
-    		boolean pathBlocked = true;
-    		while(pathBlocked) {
-    			if(myMC.canMove(testDirection)){
-    				trackingDirection = testDirection;
-    				pathBlocked = false;
-    			}
-    			
-    			//increment direction
-    			if(trackingCW)
-    				testDirection = testDirection.rotateLeft();
-    			else
-    				testDirection = testDirection.rotateRight();
-    			
-    			//stop checking if you are surrounded
-    			if(testDirection == trackingRefDirection)
-    				break;
-    		}
-    		
-    		//move or change direction as necessary
-    		if(myDirection == trackingDirection)
-    			myMC.moveForward();
-    		else if(myDirection == trackingDirection.opposite())
-    			myMC.moveBackward();
-    		else
-    			myMC.setDirection(trackingDirection);
-  
-    		//check if you are done tracking
-    		if(trackingDirection == trackingRefDirection) {
-    			tracking = false;
-    			moveOnNext = true;
-    		}	
-    	} else if(moveOnNext) {
-    		if(myDirection == trackingDirection) {
-    			myMC.moveForward();
-    			moveOnNext = false;
-    		} else if(myDirection == trackingDirection.opposite()) {
-    			myMC.moveBackward();
-    			moveOnNext = false;
-    		} else
-    			myMC.setDirection(trackingDirection);
-    		
-    	} else {
-    		//if you are not tracking, check if you can move toward the goal
-    		if(myMC.canMove(directionToGoal)) {
-    			if(myDirection == directionToGoal) 
-    				myMC.moveForward();
-    			else if(myDirection == directionToGoal.opposite())
-    				myMC.moveBackward();
-    			else
-    				myMC.setDirection(directionToGoal);
-    			
-    			return;
-    		} else {
-    			//the path is blocked, so begin tracking.
-    			tracking = true;
-    			bugPos = (bugPos + 1) % QuantumConstants.BUG_MEMORY_LENGTH;
-    			bugPrevLocations[bugPos] = location;
-    			trackingRefDirection = directionToGoal;
-    		
-    			//determine if you should track around the obstacle clockwise or counterclockwise
-    			Direction ccwDir = directionToGoal;
-    			Direction cwDir = directionToGoal;
-    			boolean searching = true;
-    			while(searching) {
-    				ccwDir = ccwDir.rotateRight();
-    				cwDir = cwDir.rotateLeft();
-    				if(myMC.canMove(ccwDir)) {
-    					bugPrevDirections[bugPos] = ccwDir;
-    					trackingCW = false;
-    					searching = false;
-    					if(myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(bugGoal) 
-    							< location.add(ccwDir).distanceSquaredTo(bugGoal)) {
-    						bugPrevDirections[bugPos] = cwDir;
-    						trackingCW = true;
-    					}
-    				} else if(myMC.canMove(cwDir)) {
-    					bugPrevDirections[bugPos] = cwDir;
-    					trackingCW = true;
-    					searching = false;
-    				}
-    					
-    				//stop searching if you are surrounded
-    				if(ccwDir == cwDir) {
-    					bugPrevDirections[bugPos] = ccwDir;
-    					break;
-    				}
-    			}
-    			
-    			trackingDirection = bugPrevDirections[bugPos];
-    			//myMC.setDirection(trackingDirection);
-    			
-    		}
-    	}
-    	
-    	//debug indicator strings
-    	myRC.setIndicatorString(0, "reference " + trackingRefDirection +
-    			" tracking " + trackingDirection);
-    	myRC.setIndicatorString(1,"tracking: " + tracking + 
-    			"; orientation is clockwise: " + trackingCW);
-    	
-	
+        //do nothing if the motor is active or you are not navigating
+        if (!bugNavigating) {
+            return;
+        }
+        if (myMC.isActive()) {
+            return;
+        }
+
+        MapLocation location = myRC.getLocation();
+        Direction directionToGoal = location.directionTo(bugGoal);
+        Direction myDirection = myRC.getDirection();
+        int bugPos = bugStep % QuantumConstants.BUG_MEMORY_LENGTH;
+
+        //stop navigating once you have reached your goal
+        if (location == bugGoal) {
+            bugNavigating = false;
+            return;
+        }
+
+        myRC.yield();
+
+        //check to see if the robot is tracking
+        if (tracking) {
+            //set the initial reference direction to begin testing from.
+            Direction testDirection = trackingRefDirection;
+
+            //avoids moving back and forth, which can arise in some cases.
+            if (trackingDirection == trackingRefDirection.opposite()) {
+                if (trackingCW) {
+                    testDirection = testDirection.rotateLeft();
+                } else {
+                    testDirection = testDirection.rotateRight();
+                }
+            }
+
+            //check directions beginning with the reference direction, in the order depending on
+            //if you are tracking clockwise or counterclockwise
+            boolean pathBlocked = true;
+            while (pathBlocked) {
+                if (myMC.canMove(testDirection)) {
+                    trackingDirection = testDirection;
+                    pathBlocked = false;
+                }
+
+                //increment direction
+                if (trackingCW) {
+                    testDirection = testDirection.rotateLeft();
+                } else {
+                    testDirection = testDirection.rotateRight();
+                }
+
+                //stop checking if you are surrounded
+                if (testDirection == trackingRefDirection) {
+                    break;
+                }
+            }
+
+            //move or change direction as necessary
+            if (myDirection == trackingDirection) {
+                myMC.moveForward();
+            } else if (myDirection == trackingDirection.opposite()) {
+                myMC.moveBackward();
+            } else {
+                myMC.setDirection(trackingDirection);
+            }
+
+            //check if you are done tracking
+            if (trackingDirection == trackingRefDirection) {
+                tracking = false;
+                moveOnNext = true;
+            }
+        } else if (moveOnNext) {
+            if (myDirection == trackingDirection) {
+                myMC.moveForward();
+                moveOnNext = false;
+            } else if (myDirection == trackingDirection.opposite()) {
+                myMC.moveBackward();
+                moveOnNext = false;
+            } else {
+                myMC.setDirection(trackingDirection);
+            }
+
+        } else {
+            //if you are not tracking, check if you can move toward the goal
+            if (myMC.canMove(directionToGoal)) {
+                if (myDirection == directionToGoal) {
+                    myMC.moveForward();
+                } else if (myDirection == directionToGoal.opposite()) {
+                    myMC.moveBackward();
+                } else {
+                    myMC.setDirection(directionToGoal);
+                }
+
+                return;
+            } else {
+                //the path is blocked, so begin tracking.
+                tracking = true;
+                bugPos = (bugPos + 1) % QuantumConstants.BUG_MEMORY_LENGTH;
+                bugPrevLocations[bugPos] = location;
+                trackingRefDirection = directionToGoal;
+
+                //determine if you should track around the obstacle clockwise or counterclockwise
+                Direction ccwDir = directionToGoal;
+                Direction cwDir = directionToGoal;
+                boolean searching = true;
+                while (searching) {
+                    ccwDir = ccwDir.rotateRight();
+                    cwDir = cwDir.rotateLeft();
+                    if (myMC.canMove(ccwDir)) {
+                        bugPrevDirections[bugPos] = ccwDir;
+                        trackingCW = false;
+                        searching = false;
+                        if (myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(bugGoal)
+                                < location.add(ccwDir).distanceSquaredTo(bugGoal)) {
+                            bugPrevDirections[bugPos] = cwDir;
+                            trackingCW = true;
+                        }
+                    } else if (myMC.canMove(cwDir)) {
+                        bugPrevDirections[bugPos] = cwDir;
+                        trackingCW = true;
+                        searching = false;
+                    }
+
+                    //stop searching if you are surrounded
+                    if (ccwDir == cwDir) {
+                        bugPrevDirections[bugPos] = ccwDir;
+                        break;
+                    }
+                }
+
+                trackingDirection = bugPrevDirections[bugPos];
+                //myMC.setDirection(trackingDirection);
+
+            }
+        }
+
+        //debug indicator strings
+        myRC.setIndicatorString(0, "reference " + trackingRefDirection
+                + " tracking " + trackingDirection);
+        myRC.setIndicatorString(1, "tracking: " + tracking
+                + "; orientation is clockwise: " + trackingCW);
+
+
     }
 
     public void navigateToAdjacent() throws GameActionException {
-    	//must initiate bug navigation before calling.
-    	if(!bugNavigating)
-    		return;
-    	
-    	MapLocation location = myRC.getLocation();
-    	
-    	if(location.distanceSquaredTo(bugGoal) <= 2) {
-    		if(myMC.isActive()) {
-    			return;
-    		} else {
-    			bugNavigating = false;
-    			myMC.setDirection(location.directionTo(bugGoal));
-    			return;
-    		}
-    	}
-    		
-    	navigateBug();
-    }
-    /***************************** BROADCAST METHODS *******************************/
+        //must initiate bug navigation before calling.
+        if (!bugNavigating) {
+            return;
+        }
 
+        MapLocation location = myRC.getLocation();
+
+        if (location.distanceSquaredTo(bugGoal) <= 2) {
+            if (myMC.isActive()) {
+                return;
+            } else {
+                bugNavigating = false;
+                myMC.setDirection(location.directionTo(bugGoal));
+                return;
+            }
+        }
+
+        navigateBug();
+    }
+
+    /***************************** BROADCAST METHODS *******************************/
     //this method is called by doCommonEndTurnActions() in RobotPlayer
     public boolean broadcast(Message composedMessage) {
 
-        
 
-        if( composedMessage == null || myCC == null )
-        {
+
+        if (composedMessage == null || myCC == null) {
             return false;
         }
 
@@ -612,9 +609,7 @@ public class ComponentsHandler {
     }
 
     /***************************** BUILDING METHODS *******************************/
-
-    public BuildHandler build()
-    {
+    public BuildHandler build() {
         return buildHandler;
     }
 
@@ -626,14 +621,13 @@ public class ComponentsHandler {
         return BuildMappings.canBuild(myBC.type(), component);
     }
 
-    public boolean canBuildBuildingHere( MapLocation location )
-    {
-        return myMC.canMove( myRC.getLocation().directionTo(location) );
+    public boolean canBuildBuildingHere(MapLocation location) {
+        return myMC.canMove(myRC.getLocation().directionTo(location));
     }
 
     public boolean buildComponent(ComponentType component,
-                                  MapLocation location,
-                                  RobotLevel height) {
+            MapLocation location,
+            RobotLevel height) {
         if (myBC.isActive()) {
             return false;
         }
@@ -805,7 +799,6 @@ public class ComponentsHandler {
         }
         return result;
     }
-    
 
     /**
      * This doesn't really seem useful.  Just keeping it around until we have a better 
@@ -813,40 +806,38 @@ public class ComponentsHandler {
      * @param location
      * @throws GameActionException
      */
-    
-    private Direction [] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
-    	
-    	/** easier to just use the canMove() method.  */
-    	SensorController sensor = mySCs[0];
-    	Direction [] open = new Direction [8];
-    	boolean [] blocked = new boolean [8];
-    	Arrays.fill(blocked, false);
-    	int i = 0;
+    private Direction[] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
 
-    	//sense nearby robots
-    	Robot [] nearBots = getSensedRobots();
+        /** easier to just use the canMove() method.  */
+        SensorController sensor = mySCs[0];
+        Direction[] open = new Direction[8];
+        boolean[] blocked = new boolean[8];
+        Arrays.fill(blocked, false);
+        int i = 0;
 
-    	//find adjacent robots and record their direction as blocked
-    	RobotInfo nearBotInfo;
-    	for(Robot r : nearBots){
-    		if(r.getRobotLevel() == RobotLevel.ON_GROUND) {
-	    		nearBotInfo = sensor.senseRobotInfo(r);
-	    		if(location.distanceSquaredTo(nearBotInfo.location) <= 2) {
-	    			blocked[location.directionTo(nearBotInfo.location).ordinal()] = true;
-	    		}
-    		}
-    	}
-    	  	
-    	//sense the adjacent terrain tiles, and record the open ones.
-    	for(Direction d : Direction.values()){
-    		if(!blocked[d.ordinal()] && myRC.senseTerrainTile(location.add(d)) == TerrainTile.LAND) {
-    			open[i] = d;
-    			i++;
-    		}
-    	}  
-    	   	
-    	// TODO:  not sure if this is the best way to trim the array...
-    	return (Direction [])Arrays.asList(open).subList(0, i-1).toArray();
+        //sense nearby robots
+        Robot[] nearBots = getSensedRobots();
+
+        //find adjacent robots and record their direction as blocked
+        RobotInfo nearBotInfo;
+        for (Robot r : nearBots) {
+            if (r.getRobotLevel() == RobotLevel.ON_GROUND) {
+                nearBotInfo = sensor.senseRobotInfo(r);
+                if (location.distanceSquaredTo(nearBotInfo.location) <= 2) {
+                    blocked[location.directionTo(nearBotInfo.location).ordinal()] = true;
+                }
+            }
+        }
+
+        //sense the adjacent terrain tiles, and record the open ones.
+        for (Direction d : Direction.values()) {
+            if (!blocked[d.ordinal()] && myRC.senseTerrainTile(location.add(d)) == TerrainTile.LAND) {
+                open[i] = d;
+                i++;
+            }
+        }
+
+        // TODO:  not sure if this is the best way to trim the array...
+        return (Direction[]) Arrays.asList(open).subList(0, i - 1).toArray();
     }
-    
 }
