@@ -13,7 +13,7 @@ import battlecode.common.*;
  */
 public abstract class Prefab {
 
-    private static final ComponentType[] commRecyclerComponents = {ComponentType.ANTENNA };
+    private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA };
     public static BuildInstructions commRecycler = new BuildInstructions(Chassis.BUILDING, commRecyclerComponents);
 
     private static final ComponentType[] lightSoldierComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.BLASTER, ComponentType.BLASTER};
