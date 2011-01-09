@@ -69,6 +69,7 @@ public class RobotPlayer implements Runnable {
     public void doCommonFirstRoundActions() {
         debug_printGameConstants();
         knowledge.update();
+        System.out.println("JASON WAS HERE");
         specificPlayer = determineSpecificPlayer();
 
         knowledge.myState = RobotState.JUST_BUILT;
@@ -97,6 +98,7 @@ public class RobotPlayer implements Runnable {
     public SpecificPlayer determineSpecificPlayer() {
         
         // Use of BuildingPlayer below is arbitrary - it's a place holder
+        // TODO: Make this SpecificPlayerImpl instead of BuildingPlayer
         SpecificPlayer result = new BuildingPlayer(myRC, knowledge, compHandler);
         
         // First buildings are special
@@ -105,6 +107,8 @@ public class RobotPlayer implements Runnable {
             switch(myRC.getChassis()) {
             
             case BUILDING:
+                System.out.println("DELETE ME");
+                knowledge.debug_printCustomErrorMessage("JASON specificplayer");
                 result = new StartingBuildingPlayer(myRC, knowledge, compHandler);
                 break;
                 

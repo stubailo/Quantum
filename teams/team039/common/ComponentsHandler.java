@@ -290,6 +290,7 @@ public class ComponentsHandler {
      */
     public Boolean updateAlliedRecyclerInformation() {
         if (numberOfSensors == 0) {
+            knowledge.debug_printCustomErrorMessage("JASON ZEROFAIL");
             return false;
         }
         try {

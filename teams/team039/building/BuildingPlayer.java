@@ -37,6 +37,7 @@ public class BuildingPlayer implements SpecificPlayer {
     }
 
     public void doSpecificFirstRoundActions() {
+        System.out.println( "testing for shutoff" );
     }
 
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
@@ -44,6 +45,7 @@ public class BuildingPlayer implements SpecificPlayer {
 
         switch (compType) {
             case RECYCLER:
+                knowledge.debug_printCustomErrorMessage("I AM A JASON RECYCLER");
                 result = new RecyclerPlayer(myRC, knowledge, compHandler);
                 break;
         }
