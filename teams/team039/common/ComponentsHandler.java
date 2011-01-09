@@ -22,14 +22,15 @@ public class ComponentsHandler {
     private BuilderController myBC;
     private WeaponController[] myWCs = new WeaponController[18];
     private BroadcastController myCC;
+    /*** Navigation ***/
+    public         PathFinder           pathfinder;
     /*** Controller info ***/
     public         int                  numberOfSensors = 0;
     public         boolean              hasBuilder      = false;
     public         int                  numberOfWeapons = 0;
     public         boolean              hasComm         = false;
     
-    /*** Navigation ***/
-    public         PathFinder           pathfinder;
+
     /*** Navigation info ***/
     private        boolean              bugNavigating;
     private        boolean              tracking;
@@ -46,6 +47,7 @@ public class ComponentsHandler {
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
         knowledge = know;
+        pathfinder = new PathFinder(myRC, this, knowledge);
     }
 
     /******************************* SENSOR METHODS *******************************/
@@ -414,6 +416,10 @@ public class ComponentsHandler {
             knowledge.printExceptionMessage(e);
             return false;
         }
+    }
+    
+    public boolean motorActive () {
+    	return myMC.isActive();
     }
     
     public void initiateBugNavigation(MapLocation goal) {
