@@ -169,11 +169,22 @@ public class Knowledge {
      * Prints string to help debug, as well as exception stack trace.
      * @param   e   Exception
      */
-    public void printExceptionMessage(Exception e) {
+    public void debug_printExceptionMessage(Exception e) {
         System.out.println("Robot " + myRC.getRobot().getID() + 
                            " during round " + Clock.getRoundNum() + 
                            " caught exception:");
         e.printStackTrace();
+    }
+    
+    /**
+     * Prints string to help debug, as well as custom error text.
+     * @param   s   custom error message
+     */
+    public void debug_printCustomErrorMessage(String s) {
+        System.out.println("Robot " + myRC.getRobot().getID() + 
+                           " during round " + Clock.getRoundNum() + 
+                           " wanted to print custom error message:");
+        System.out.println(s);
     }
 
 }

@@ -45,7 +45,7 @@ public class StartingLightPlayer extends LightConstructorPlayer {
             }
         }
         catch(Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
         }
     }
     
