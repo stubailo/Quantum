@@ -573,7 +573,7 @@ public class ComponentsHandler {
                         } else {
                         }
                     } catch (Exception e) {
-                        knowledge.printExceptionMessage(e);
+                        knowledge.debug_printExceptionMessage(e);
                         return false;
                     }
                 }
