@@ -29,7 +29,6 @@ public class RecyclerCommPlayer extends RecyclerPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        knowledge.debug_printCustomErrorMessage("JASON!! 2");
         
     }
     

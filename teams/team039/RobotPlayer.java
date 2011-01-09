@@ -3,6 +3,7 @@ package team039;
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
 import team039.common.*;
+import team039.common.util.Logger;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
@@ -55,10 +56,7 @@ public class RobotPlayer implements Runnable {
                 doCommonEndTurnActions();
             }
             catch(Exception e) {
-                System.out.println("Robot " + myRC.getRobot().getID() + 
-                                   " during round " + Clock.getRoundNum() + 
-                                   " caught exception:");
-                e.printStackTrace();
+                Logger.debug_printExceptionMessage(e);
             }
         }
 
@@ -99,11 +97,6 @@ public class RobotPlayer implements Runnable {
     
 
     public void debug_testSomething() {
-        TerrainTile tile1 = myRC.senseTerrainTile(new MapLocation(9340, 25581));
-        TerrainTile tile2 = myRC.senseTerrainTile(new MapLocation(9340, 25575));
-        
-        if(tile1 == null) System.out.println("tile1 is null");
-        if(tile2 == null) System.out.println("tile2 is null");
     }
     
     
@@ -116,6 +109,6 @@ public class RobotPlayer implements Runnable {
     }
     
     public static void debug_printGameConstants() {
-        System.out.println("MAP_MAX_WIDTH: " + String.valueOf(GameConstants.MAP_MAX_WIDTH));
+        Logger.debug_print("MAP_MAX_WIDTH: " + String.valueOf(GameConstants.MAP_MAX_WIDTH));
     }
 }

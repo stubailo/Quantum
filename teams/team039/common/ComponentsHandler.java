@@ -3,6 +3,8 @@ package team039.common;
 import java.util.Arrays;
 
 import team039.common.location.LocationType;
+import team039.common.util.Logger;
+
 import battlecode.common.*;
 
 /**
@@ -101,7 +103,7 @@ public class ComponentsHandler {
                 }
             }
             catch(Exception e) {
-                knowledge.debug_printExceptionMessage(e);
+                Logger.debug_printExceptionMessage(e);
             }
         }
     }
@@ -202,7 +204,7 @@ public class ComponentsHandler {
                     empty[i] = false;
                 }
             } catch (Exception e) {
-                knowledge.debug_printExceptionMessage(e);
+                Logger.debug_printExceptionMessage(e);
                 return null;
             }
         }
@@ -276,7 +278,7 @@ public class ComponentsHandler {
                     }
                 }
             } catch (Exception e) {
-                knowledge.debug_printExceptionMessage(e);
+                Logger.debug_printExceptionMessage(e);
             }
         }
 
@@ -290,7 +292,6 @@ public class ComponentsHandler {
      */
     public Boolean updateAlliedRecyclerInformation() {
         if (numberOfSensors == 0) {
-            knowledge.debug_printCustomErrorMessage("JASON ZEROFAIL");
             return false;
         }
         try {
@@ -307,7 +308,7 @@ public class ComponentsHandler {
                             for (ComponentType compType : compTypes) {
                                 if (compType == ComponentType.RECYCLER) {
                                     int id = robot.getID();
-                                    System.out.println("found recycler with id "
+                                    Logger.debug_print("found recycler with id "
                                             + String.valueOf(id));
                                     if (id < lowest) {
                                         lowest = id;
@@ -325,7 +326,7 @@ public class ComponentsHandler {
             knowledge.lowestAlliedRecyclerIDLocation = lowestLoc;
             return true;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -431,7 +432,7 @@ public class ComponentsHandler {
             }
             return Direction.OMNI;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return Direction.NONE;
         }
     }
@@ -445,7 +446,7 @@ public class ComponentsHandler {
             myMC.setDirection(direction);
             return true;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -489,7 +490,7 @@ public class ComponentsHandler {
             myCC.broadcast(composedMessage);
             return true;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -512,7 +513,7 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        System.out.println("Can I build here? range = " + myRC.getLocation().distanceSquaredTo(location));
+        Logger.debug_print("Can I build here? range = " + myRC.getLocation().distanceSquaredTo(location));
         return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
     }
 
@@ -527,7 +528,7 @@ public class ComponentsHandler {
             myBC.build(component, location, height);
             return true;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -541,14 +542,14 @@ public class ComponentsHandler {
             myBC.build(chassis, location);
             return true;
         } catch (Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
             return false;
         }
     }
 
     /******************************** ATTACKING METHODS *******************************/
     public boolean attackVisible() {
-        System.out.println("lolol" + numberOfSensors + " sensors and " + myWCs.length );
+        Logger.debug_print("lolol" + numberOfSensors + " sensors and " + myWCs.length );
 
         if (numberOfSensors == 0 || numberOfWeapons == 0) {
             return false;
@@ -557,7 +558,7 @@ public class ComponentsHandler {
 
         int weaponsFired = 0;
 
-        System.out.println("see " + sensedRobots.length + " robots");
+        Logger.debug_print("see " + sensedRobots.length + " robots");
 
         for (Robot sensedRobot : sensedRobots) {
             if( sensedRobot.getTeam()!=myRC.getRobot().getTeam() )
@@ -574,7 +575,7 @@ public class ComponentsHandler {
                         } else {
                         }
                     } catch (Exception e) {
-                        knowledge.debug_printExceptionMessage(e);
+                        Logger.debug_printExceptionMessage(e);
                         return false;
                     }
                 }
@@ -590,7 +591,7 @@ public class ComponentsHandler {
     }
 
     public boolean hasWeapons() {
-        System.out.println( "teehee weapons: " + numberOfWeapons );
+        Logger.debug_print( "teehee weapons: " + numberOfWeapons );
         return numberOfWeapons > 0;
     }
 

@@ -48,7 +48,6 @@ public class BuildingPlayer extends SpecificPlayerImpl {
 
         switch (compType) {
             case RECYCLER:
-                knowledge.debug_printCustomErrorMessage("I AM A JASON RECYCLER");
                 result = new RecyclerPlayer(myRC, knowledge, compHandler);
                 result.initialize();
                 break;

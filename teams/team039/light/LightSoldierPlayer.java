@@ -1,6 +1,7 @@
 package team039.light;
 
 import team039.common.*;
+import team039.common.util.Logger;
 import battlecode.common.*;
 
 public class LightSoldierPlayer extends LightPlayer {
@@ -40,7 +41,7 @@ public class LightSoldierPlayer extends LightPlayer {
     @Override
     public void beginningStateSwitches() {
         if (knowledge.myState == RobotState.JUST_BUILT) {
-            System.out.println("I called JUST_BUILT at round " + knowledge.roundNum);
+            Logger.debug_print("I called JUST_BUILT at round " + knowledge.roundNum);
             knowledge.myState = RobotState.IDLE;
         }
 
@@ -68,9 +69,9 @@ public class LightSoldierPlayer extends LightPlayer {
     {
 
         if (compHandler.attackVisible()) {
-                System.out.println("Attacking!");
+                Logger.debug_print("Attacking!");
         } else {
-            System.out.println("Can't see anyone.");
+            Logger.debug_print("Can't see anyone.");
             knowledge.myState = RobotState.IDLE;
         }
     }
@@ -84,10 +85,7 @@ public class LightSoldierPlayer extends LightPlayer {
         try {
             compHandler.pathFinder.navigateBug();
         } catch (Exception e) {
-            System.out.println("Robot " + myRC.getRobot().getID()
-                    + " during round " + Clock.getRoundNum()
-                    + " caught exception:");
-            e.printStackTrace();
+            Logger.debug_printExceptionMessage(e);
         }
     }
 

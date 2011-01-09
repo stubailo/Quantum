@@ -3,6 +3,8 @@ package team039.light;
 import team039.common.ComponentsHandler;
 import team039.common.Knowledge;
 import team039.common.SpecificPlayer;
+import team039.common.util.Logger;
+
 import battlecode.common.*;
 
 public class StartingLightPlayer extends LightConstructorPlayer {
@@ -45,7 +47,7 @@ public class StartingLightPlayer extends LightConstructorPlayer {
             }
         }
         catch(Exception e) {
-            knowledge.debug_printExceptionMessage(e);
+            Logger.debug_printExceptionMessage(e);
         }
     }
     
