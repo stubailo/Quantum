@@ -42,7 +42,7 @@ public class LightConstructorPlayer extends LightPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.NORTH, 100));
+        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
     }
     
     @Override
