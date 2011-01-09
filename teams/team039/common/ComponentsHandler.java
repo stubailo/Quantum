@@ -161,7 +161,7 @@ public class ComponentsHandler {
         Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
 
         for (Robot sensedRobot : sensedRobots) {
-            if (sensedRobot.getTeam().equals(myRC.getTeam().opponent())) {
+            if (!sensedRobot.getTeam().equals(myRC.getTeam())) {
                 return true;
             }
         }
@@ -553,7 +553,6 @@ public class ComponentsHandler {
 
     /******************************** ATTACKING METHODS *******************************/
     public boolean attackVisible() {
-        Logger.debug_print("lolol" + numberOfSensors + " sensors and " + myWCs.length );
 
         if (numberOfSensors == 0 || numberOfWeapons == 0) {
             return false;
@@ -562,31 +561,38 @@ public class ComponentsHandler {
 
         int weaponsFired = 0;
 
+        Robot foundEnemy = null;
+        Robot foundDebris = null;
+
         Logger.debug_print("see " + sensedRobots.length + " robots");
 
         for (Robot sensedRobot : sensedRobots) {
-            if( sensedRobot.getTeam()!=myRC.getRobot().getTeam() )
-            for (WeaponController weapon : myWCs) {
-                if (weapon.isActive()) {
-                    weaponsFired++;
-                } else {
-                    try {
-                        MapLocation enemyLocation = mySCs[0].senseLocationOf(sensedRobot);
+            if( sensedRobot.getTeam()==myRC.getRobot().getTeam().opponent() )
+            {
+                foundEnemy = sensedRobot;
+            } else if ( sensedRobot.getTeam() == Team.NEUTRAL )
+            {
+                foundDebris = sensedRobot;
+                Logger.debug_print("found debris");
+            }
+        }
 
-                        if (weapon.withinRange( enemyLocation ) ) {
-                            weapon.attackSquare( enemyLocation , sensedRobot.getRobotLevel() );
-                            weaponsFired++;
-                        } else {
-                        }
-                    } catch (Exception e) {
-                        Logger.debug_printExceptionMessage(e);
-                        return false;
+        for (WeaponController weapon : myWCs) {
+            if (weapon.isActive()) {
+            } else {
+
+                Robot robotToShoot = (foundEnemy==null)?foundDebris:foundEnemy;
+
+                try {
+                    MapLocation enemyLocation = mySCs[0].senseLocationOf(robotToShoot);
+
+                    if (weapon.withinRange( enemyLocation ) ) {
+                        weapon.attackSquare( enemyLocation , robotToShoot.getRobotLevel() );
+                    } else {
                     }
-                }
-
-                if(weaponsFired == numberOfWeapons)
-                {
-                    return true;
+                } catch (Exception e) {
+                    Logger.debug_printExceptionMessage(e);
+                    return false;
                 }
             }
         }
