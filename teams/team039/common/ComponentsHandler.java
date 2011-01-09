@@ -32,6 +32,7 @@ public class ComponentsHandler {
     private        boolean              bugNavigating;
     private        boolean              tracking;
     private        boolean              trackingCW;
+    private        boolean              moveOnNext;
     private        Direction            trackingDirection;
     private        Direction            trackingRefDirection;
     private        MapLocation          bugGoal;
@@ -340,6 +341,7 @@ public class ComponentsHandler {
     public void initiateBugNavigation(MapLocation goal) {
     	bugNavigating = true;
     	tracking = false;
+    	moveOnNext = false;
     	bugGoal = goal;
     	bugStart = myRC.getLocation();
 		bugPrevLocations = new MapLocation [QuantumConstants.BUG_MEMORY_LENGTH];
@@ -414,7 +416,18 @@ public class ComponentsHandler {
     		//check if you are done tracking
     		if(trackingDirection == trackingRefDirection) {
     			tracking = false;
+    			moveOnNext = true;
     		}	
+    	} else if(moveOnNext) {
+    		if(myDirection == trackingDirection) {
+    			myMC.moveForward();
+    			moveOnNext = false;
+    		} else if(myDirection == trackingDirection.opposite()) {
+    			myMC.moveBackward();
+    			moveOnNext = false;
+    		} else
+    			myMC.setDirection(trackingDirection);
+    		
     	} else {
     		//if you are not tracking, check if you can move toward the goal
     		if(myMC.canMove(directionToGoal)) {
@@ -477,6 +490,25 @@ public class ComponentsHandler {
 	
     }
 
+    public void navigateToAdjacent() throws GameActionException {
+    	//must initiate bug navigation before calling.
+    	if(!bugNavigating)
+    		return;
+    	
+    	MapLocation location = myRC.getLocation();
+    	
+    	if(location.distanceSquaredTo(bugGoal) <= 2) {
+    		if(myMC.isActive()) {
+    			return;
+    		} else {
+    			bugNavigating = false;
+    			myMC.setDirection(location.directionTo(bugGoal));
+    			return;
+    		}
+    	}
+    		
+    	navigateBug();
+    }
     /***************************** BROADCAST METHODS *******************************/
 
     //this method is called by doCommonEndTurnActions() in RobotPlayer
