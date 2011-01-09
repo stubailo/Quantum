@@ -755,7 +755,6 @@ public class ComponentsHandler {
                 case LARGE_MOTOR:
                 case FLYING_MOTOR:
                     myMC = (MovementController) newComp;
-                    pathfinder = new PathFinder(myRC,myMC);
                     break;
 
                 case ANTENNA:
@@ -772,7 +771,6 @@ public class ComponentsHandler {
                 case BUILDING_SENSOR:
                     mySCs[numberOfSensors] = (SensorController) newComp;
                     numberOfSensors += 1;
-                    pathfinder.addSensor((SensorController) newComp);
                     break;
 
                 case BLASTER:
