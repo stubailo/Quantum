@@ -33,6 +33,8 @@ public class SpecificPlayerImpl implements SpecificPlayer {
     
     public void beginningStateSwitches() {}
 
+    public void initialize() {}
+
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer chassisTypePlayer = this;
 
@@ -40,6 +42,7 @@ public class SpecificPlayerImpl implements SpecificPlayer {
             switch(myRC.getChassis()) {
             case BUILDING:
                 chassisTypePlayer = new StartingBuildingPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
                 break;
                 
             case LIGHT:

@@ -159,7 +159,7 @@ public class ComponentsHandler {
         Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
 
         for (Robot sensedRobot : sensedRobots) {
-            if (!sensedRobot.getTeam().equals(myRC.getTeam())) {
+            if (sensedRobot.getTeam().equals(myRC.getTeam().opponent())) {
                 return true;
             }
         }

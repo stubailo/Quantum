@@ -84,7 +84,9 @@ public class RobotPlayer implements Runnable {
             
             for(ComponentType newCompType : newCompTypes) {
                 specificPlayer = specificPlayer.determineSpecificPlayer(newCompType);
+                
             }
+            
         }
     }
 

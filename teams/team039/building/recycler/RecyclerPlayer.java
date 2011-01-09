@@ -18,10 +18,12 @@ public class RecyclerPlayer extends BuildingPlayer {
         myRC        = rc;
         knowledge   = know;
         compHandler = compHand;
+    }
 
-        knowledge.debug_printCustomErrorMessage("JASON!");
+    @Override
+    public void initialize()
+    {
         compHandler.updateAlliedRecyclerInformation();
-        knowledge.debug_printCustomErrorMessage(String.valueOf(knowledge.lowestAlliedRecyclerID));
         if(knowledge.lowestAlliedRecyclerID < knowledge.myRobotID) {
             myRC.setIndicatorString(2, "turning off");
             myRC.turnOff();
@@ -60,14 +62,19 @@ public class RecyclerPlayer extends BuildingPlayer {
         return result;
     }
 
+
+    private boolean haveBuiltConstructor = false;
     @Override
     public void beginningStateSwitches() {
         super.beginningStateSwitches();
 
-        if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300) {
+        if( haveBuiltConstructor == false && knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightConstructor.getTotalCost() + 100 )
+        {
+            compHandler.build().autoBuildRobot(Prefab.lightConstructor);
+            haveBuiltConstructor = true;
+        } else if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300) {
             compHandler.build().autoBuildRobot(Prefab.lightSoldier);
-        }
-        if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 100 && Clock.getRoundNum() > 2000) {
+        }else if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 100 && Clock.getRoundNum() > 2000) {
             compHandler.build().autoBuildRobot(Prefab.lightSoldier);
         }
     }
