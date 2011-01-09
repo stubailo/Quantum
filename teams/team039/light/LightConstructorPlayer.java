@@ -51,7 +51,10 @@ public class LightConstructorPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+        	compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+            compHandler.pathFinder.initiateBugNavigation();
+//            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
             knowledge.myState = RobotState.EXPLORING;
         }
     }
@@ -90,7 +93,7 @@ public class LightConstructorPlayer extends LightPlayer {
         }
 
         try {
-            compHandler.navigateBug();
+            compHandler.pathFinder.navigateBug();
         } catch (Exception e) {
             System.out.println("Robot " + myRC.getRobot().getID()
                     + " during round " + Clock.getRoundNum()
