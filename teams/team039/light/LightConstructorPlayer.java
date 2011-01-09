@@ -33,6 +33,9 @@ public class LightConstructorPlayer extends LightPlayer {
             case BUILDING_RECYCLER:
                 buildRecycler();
                 break;
+            case FLEEING:
+                flee();
+                break;
             case BUILDING:
                 compHandler.build().step();
                 break;
@@ -73,12 +76,17 @@ public class LightConstructorPlayer extends LightPlayer {
         return result;
     }
 
+    public void flee()
+    {
+        compHandler.pathFinder.setGoal( knowledge.startingTurnedOnRecyclerLocation );
+    }
+
     public void explore() {
         if (compHandler.canIBuild()) {
             Mine[] sensedMines = compHandler.senseEmptyMines();
 
             if (compHandler.canSenseEnemies()) {
-                System.out.println("I see an enemy!");
+                knowledge.myState = RobotState.FLEEING;
             }
 
 
@@ -101,11 +109,10 @@ public class LightConstructorPlayer extends LightPlayer {
             e.printStackTrace();
         }
     }
-    
     MapLocation buildRecyclerLocation;
     public void buildRecycler() {
         if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150) {
-            System.out.println("Trying to build here...");
+            
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
             try {

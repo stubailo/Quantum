@@ -68,6 +68,7 @@ public class RobotPlayer implements Runnable {
 
     public void doCommonFirstRoundActions() {
         debug_printGameConstants();
+        knowledge.update();
         specificPlayer = determineSpecificPlayer();
 
         knowledge.myState = RobotState.JUST_BUILT;
@@ -77,8 +78,10 @@ public class RobotPlayer implements Runnable {
     
     public void doCommonActions() {
         knowledge.update();
+        
         ComponentType[] newCompTypes = compHandler.updateComponents();
         if(newCompTypes != null) {
+            
             for(ComponentType newCompType : newCompTypes) {
                 specificPlayer = specificPlayer.determineSpecificPlayer(newCompType);
             }
@@ -106,6 +109,7 @@ public class RobotPlayer implements Runnable {
                 break;
                 
             case LIGHT:
+                
                 result = new StartingLightPlayer(myRC, knowledge, compHandler);
                 break;
             }

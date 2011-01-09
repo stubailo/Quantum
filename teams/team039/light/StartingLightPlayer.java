@@ -51,6 +51,7 @@ public class StartingLightPlayer extends LightConstructorPlayer {
     
     @Override
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
+        
         SpecificPlayer result = this;
         return result;
     }

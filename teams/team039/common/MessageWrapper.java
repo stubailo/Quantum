@@ -41,6 +41,7 @@ public class MessageWrapper {
      */
 
     public static final String GO_TO_FACTORY = "gtf";
+    public static final String RECYCLER_PING = "rp";
 
     public static final int subHeaderLength = 1; //how many indices are used for the header of each sub-message
 
@@ -72,6 +73,20 @@ public class MessageWrapper {
         targetLocation = factoryLocation;
         passcode = broadcasterLocation.toString();
         messageType = GO_TO_FACTORY;
+
+        encodeHeader();
+    }
+
+    public void genRecyclerPing( RobotController myRC )
+    {
+        broadcasterID = myRC.getRobot().getID();
+        targetID = 0;
+        numberOfMessages = 0;
+
+        broadcasterLocation = myRC.getLocation();
+        targetLocation = null;
+        passcode = broadcasterLocation.toString();
+        messageType = RECYCLER_PING;
 
         encodeHeader();
     }
@@ -154,6 +169,11 @@ public class MessageWrapper {
 
         //at this point, the header has been extracted.  The statements below will parse the rest of the message.
         if( messageType.equals(MessageWrapper.GO_TO_FACTORY))
+        {
+            ints = null;
+            strings = null;
+            locations = null;
+        } else if( messageType.equals(MessageWrapper.RECYCLER_PING))
         {
             ints = null;
             strings = null;

@@ -1,9 +1,7 @@
 package team039.building.recycler;
 
 import team039.building.BuildingPlayer;
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
+import team039.common.*;
 import battlecode.common.*;
 
 public class RecyclerPlayer extends BuildingPlayer {
@@ -25,6 +23,11 @@ public class RecyclerPlayer extends BuildingPlayer {
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
+
+        MessageWrapper ping = new MessageWrapper();
+        ping.genRecyclerPing(myRC);
+
+        knowledge.msg().addToQueue(ping);
     }
     
     @Override
@@ -35,6 +38,7 @@ public class RecyclerPlayer extends BuildingPlayer {
             myRC.setIndicatorString(2, "turning off");
             myRC.turnOff();
         }
+
     }
     
     @Override
