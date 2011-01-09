@@ -22,6 +22,12 @@ public final class QuantumConstants {
 	public static final int LOCATION_HASH_SIZE = GameConstants.MAP_MAX_WIDTH +
 	                                             2 * FARTHEST_SENSOR_DISTANCE;
 	
+	
+	/** Planck's constant */
+	public static final double H = 6.626069E-34;
+	/** Reduced Planck's constant */
+	public static final double H_BAR = 1.0545716E-34;
+	
 	private QuantumConstants() {	
 	}
 }

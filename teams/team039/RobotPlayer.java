@@ -49,6 +49,7 @@ public class RobotPlayer implements Runnable {
                 
                 // Depending on new components, SpecificPlayer type might change!
                 doCommonActions();
+
                 specificPlayer.doSpecificActions();
 
                 doCommonEndTurnActions();
@@ -68,6 +69,8 @@ public class RobotPlayer implements Runnable {
     public void doCommonFirstRoundActions() {
         debug_printGameConstants();
         specificPlayer = determineSpecificPlayer();
+
+        knowledge.myState = RobotState.JUST_BUILT;
     }
     
     
@@ -104,6 +107,7 @@ public class RobotPlayer implements Runnable {
                 
             case LIGHT:
                 result = new StartingLightPlayer(myRC, knowledge, compHandler);
+                break;
             }
         }
         

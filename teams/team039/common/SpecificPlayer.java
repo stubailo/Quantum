@@ -7,6 +7,8 @@ public interface SpecificPlayer {
     public void doSpecificActions();
     
     public void doSpecificFirstRoundActions();
+
+    public void beginningStateSwitches();
     
     public SpecificPlayer determineSpecificPlayer(ComponentType compType);
 

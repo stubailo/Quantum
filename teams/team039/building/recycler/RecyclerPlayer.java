@@ -51,4 +51,10 @@ public class RecyclerPlayer extends BuildingPlayer {
         return result;
     }
 
+    @Override
+    public void beginningStateSwitches() {
+        super.beginningStateSwitches();
+
+    }
+
 }
