@@ -62,7 +62,9 @@ public class LightConstructorPlayer extends LightPlayer {
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH, 13));
+        compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+        compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH, 13));
+        compHandler.pathFinder.initiateBugNavigation();
     }
 
     @Override
@@ -83,7 +85,10 @@ public class LightConstructorPlayer extends LightPlayer {
         if( sensedMines != null )
         {
             buildRecyclerLocation = sensedMines[0].getLocation();
-            compHandler.initiateBugNavigation( buildRecyclerLocation );
+            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+            compHandler.pathFinder.setGoal(buildRecyclerLocation);
+            compHandler.pathFinder.initiateBugNavigation();
+//            compHandler.initiateBugNavigation( buildRecyclerLocation );
             knowledge.myState = RobotState.BUILDING_RECYCLER;
         }
 
@@ -106,7 +111,7 @@ public class LightConstructorPlayer extends LightPlayer {
             buildChassisAndThenComponents( Prefab.commRecycler, buildRecyclerLocation );
         }
         try {
-        	compHandler.navigateToAdjacent();
+        	compHandler.pathFinder.navigateToAdjacent();
         } catch(Exception e) {
         	System.out.println("Robot " + myRC.getRobot().getID() +
                     " during round " + Clock.getRoundNum() +
