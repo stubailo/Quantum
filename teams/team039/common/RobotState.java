@@ -29,5 +29,7 @@ public enum RobotState {
      * make it spin like a helicopter so that it can sense everything around itself to
      * look for stimuli.
      */
-    IDLE
+    IDLE,
+
+    BUILDING_RECYCLER
 }

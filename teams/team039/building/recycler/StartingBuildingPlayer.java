@@ -50,7 +50,7 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
 
         System.out.println( "running state switches for building player" );
 
-        if( knowledge.myState == RobotState.IDLE && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost()*2 )
+        if( knowledge.myState == RobotState.IDLE && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 200 )
         {
             autoBuildRobot( Prefab.lightSoldier );
         }

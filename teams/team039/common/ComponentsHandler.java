@@ -103,7 +103,83 @@ public class ComponentsHandler {
         return 1;
     }
  */   
-    
+
+    public Mine[] senseMines()
+    {
+        if (numberOfSensors == 0) {
+            return null;
+        }
+        return mySCs[0].senseNearbyGameObjects(Mine.class);
+    }
+
+    public boolean canSenseEnemies()
+    {
+        if (numberOfSensors == 0) {
+            return false;
+        }
+        Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
+
+        for( Robot sensedRobot : sensedRobots )
+        {
+            if( !sensedRobot.getTeam().equals(myRC.getTeam()) )
+                return true;
+        }
+
+        return false;
+    }
+
+    /*
+     * Gets a list of mines that don't have anything on them.
+     */
+
+    public Mine[] senseEmptyMines()
+    {
+        if (numberOfSensors == 0) {
+            return null;
+        }
+
+        Mine[] sensedMines = senseMines();
+
+        int len = sensedMines.length;
+
+        boolean[] empty = new boolean[ len ];
+        Mine [] output = new Mine[len];
+
+        Mine sensedMine;
+        int numEmptyMines = 0;
+
+        for( int i=0; i < len; i++ )
+        {
+            sensedMine = sensedMines[i];
+
+            try {
+            GameObject obj = mySCs[0].senseObjectAtLocation( sensedMine.getLocation() , RobotLevel.ON_GROUND );
+
+            if( obj == null )
+            {
+                empty[i] = true;
+                output[numEmptyMines] = sensedMine;
+                numEmptyMines ++;
+
+            } else if ( obj instanceof Robot )
+            {
+                //not sure how to tell the difference between our team's recyclers and anything else.. :/
+            } else {
+                empty[i] = false;
+            }
+            } catch (Exception e) {
+                knowledge.printExceptionMessage(e);
+                return null;
+            }
+        }
+
+        if( numEmptyMines == 0 )
+        {
+            return null;
+        } else {
+            return output;
+        }
+    }
     
     /**
      * Returns an array of Robots that can be sensed
@@ -354,7 +430,6 @@ public class ComponentsHandler {
     public void navigateBug() throws GameActionException {
 //    	if(numberOfSensors == 0) 
 //    		return; 
-    	
     	//do nothing if the motor is active or you are not navigating
     	if(!bugNavigating)
     		return;
@@ -542,6 +617,11 @@ public class ComponentsHandler {
 
     public boolean canIBuild(ComponentType component) {
         return BuildMappings.canBuild(myBC.type(), component);
+    }
+
+    public boolean canBuildBuildingHere( MapLocation location )
+    {
+        return myMC.canMove( myRC.getLocation().directionTo(location) );
     }
 
     public boolean buildComponent(ComponentType component,
