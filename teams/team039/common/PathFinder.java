@@ -38,7 +38,7 @@ public class PathFinder {
 		
 		//set a pseudo-random direction to start exploring
 		exploreDirection = Direction.values()[knowledge.myRobotID % 8];
-		exploreRound = knowledge.roundNum + 1;
+		exploreRound = knowledge.roundNum - 1;
 		goal = knowledge.myLocation.add(exploreDirection, QuantumConstants.EXLPORE_GOAL_DISTANCE);
 	}
 	

@@ -100,17 +100,17 @@ public class LightConstructorPlayer extends LightPlayer {
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
-            }
-        } else {
+            } else {
 
-	        try {
-	            compHandler.pathFinder.explore();
-	        } catch (Exception e) {
-	            System.out.println("Robot " + myRC.getRobot().getID()
-	                    + " during round " + Clock.getRoundNum()
-	                    + " caught exception:");
-	            e.printStackTrace();
-	        }
+		        try {
+		            compHandler.pathFinder.explore();
+		        } catch (Exception e) {
+		            System.out.println("Robot " + myRC.getRobot().getID()
+		                    + " during round " + Clock.getRoundNum()
+		                    + " caught exception:");
+		            e.printStackTrace();
+		        }
+            }
         } 
     }
     
