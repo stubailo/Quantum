@@ -69,8 +69,7 @@ public class RobotPlayer implements Runnable {
     public void doCommonFirstRoundActions() {
         debug_printGameConstants();
         knowledge.update();
-        System.out.println("JASON WAS HERE");
-        specificPlayer = determineSpecificPlayer();
+        specificPlayer = new SpecificPlayerImpl(myRC, knowledge, compHandler);
 
         knowledge.myState = RobotState.JUST_BUILT;
     }
@@ -93,45 +92,6 @@ public class RobotPlayer implements Runnable {
     {
         compHandler.broadcast( knowledge.msg().composeMessage() );
         knowledge.msg().emptyQueue();
-    }
-    
-    public SpecificPlayer determineSpecificPlayer() {
-        
-        // Use of BuildingPlayer below is arbitrary - it's a place holder
-        // TODO: Make this SpecificPlayerImpl instead of BuildingPlayer
-        SpecificPlayer result = new BuildingPlayer(myRC, knowledge, compHandler);
-        
-        // First buildings are special
-        if(knowledge.roundNum == 0) {
-            
-            switch(myRC.getChassis()) {
-            
-            case BUILDING:
-                System.out.println("DELETE ME");
-                knowledge.debug_printCustomErrorMessage("JASON specificplayer");
-                result = new StartingBuildingPlayer(myRC, knowledge, compHandler);
-                break;
-                
-            case LIGHT:
-                
-                result = new StartingLightPlayer(myRC, knowledge, compHandler);
-                break;
-            }
-        }
-        
-        else {
-            switch(myRC.getChassis()) {
-            case BUILDING:
-                result = new BuildingPlayer(myRC, knowledge, compHandler);
-                break;
-    
-            case LIGHT:
-                result = new LightPlayer(myRC, knowledge, compHandler);
-                break;
-            }
-            //TODO: add other Chassis types!
-        }
-        return result;
     }
     
     

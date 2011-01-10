@@ -3,7 +3,7 @@ package team039.light;
 import team039.common.*;
 import battlecode.common.*;
 
-public class LightPlayer implements SpecificPlayer {
+public class LightPlayer extends SpecificPlayerImpl {
     
     private final RobotController   myRC;
     private final Knowledge         knowledge;
@@ -13,6 +13,7 @@ public class LightPlayer implements SpecificPlayer {
                        Knowledge know,
                        ComponentsHandler compHand) {
         
+        super(rc, know, compHand);
         myRC        = rc;
         knowledge   = know;
         compHandler = compHand;

@@ -5,7 +5,7 @@ import team039.common.ComponentsHandler;
 import team039.common.*;
 import battlecode.common.*;
 
-public class BuildingPlayer implements SpecificPlayer {
+public class BuildingPlayer extends SpecificPlayerImpl {
 
     private final RobotController myRC;
     private final Knowledge knowledge;
@@ -15,6 +15,7 @@ public class BuildingPlayer implements SpecificPlayer {
             Knowledge know,
             ComponentsHandler compHand) {
 
+        super(rc, know, compHand);
         myRC = rc;
         knowledge = know;
         compHandler = compHand;
