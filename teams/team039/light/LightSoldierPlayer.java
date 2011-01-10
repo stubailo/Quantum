@@ -45,9 +45,9 @@ public class LightSoldierPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
-            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
-            compHandler.pathFinder.initiateBugNavigation();
+//            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+//            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+//            compHandler.pathFinder.initiateBugNavigation();
 //            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
             knowledge.myState = RobotState.EXPLORING;
         }
@@ -78,16 +78,17 @@ public class LightSoldierPlayer extends LightPlayer {
     public void explore() {
         if (compHandler.canSenseEnemies() && compHandler.hasWeapons()) {
             knowledge.myState = RobotState.ATTACKING;
+            compHandler.pathFinder.pauseExploration();
             attack();
-        }
-
-        try {
-            compHandler.pathFinder.navigateBug();
-        } catch (Exception e) {
-            System.out.println("Robot " + myRC.getRobot().getID()
-                    + " during round " + Clock.getRoundNum()
-                    + " caught exception:");
-            e.printStackTrace();
+        } else {
+	        try {
+	            compHandler.pathFinder.explore();
+	        } catch (Exception e) {
+	            System.out.println("Robot " + myRC.getRobot().getID()
+	                    + " during round " + Clock.getRoundNum()
+	                    + " caught exception:");
+	            e.printStackTrace();
+	        }
         }
     }
 

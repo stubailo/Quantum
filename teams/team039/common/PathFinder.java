@@ -12,6 +12,13 @@ public class PathFinder {
 	private        boolean              navigating = false;
 	private        MapLocation          goal;
 	
+	/*** Exploring info ***/
+	private        int                  exploreRound;
+	private        int                  savedExploreRound;
+	private        MapLocation          savedExploreGoal;
+	private        Direction            exploreDirection;
+	private        boolean              exploringPaused = false;
+	
 	 /*** Bug Navigation info ***/
     private        boolean              tracking;
     private        boolean              trackingCW;
@@ -28,6 +35,42 @@ public class PathFinder {
 		myRC = rc;
 		myCH = comp;
 		knowledge = know;
+		
+		//set a pseudo-random direction to start exploring
+		exploreDirection = Direction.values()[knowledge.myRobotID % 8];
+		exploreRound = knowledge.roundNum + 1;
+		goal = knowledge.myLocation.add(exploreDirection, QuantumConstants.EXLPORE_GOAL_DISTANCE);
+	}
+	
+	public void explore () throws GameActionException {
+		if(exploringPaused) {
+			exploreRound = knowledge.roundNum - savedExploreRound;
+			exploringPaused = false;
+			goal = savedExploreGoal;
+			initiateBugNavigation();
+		}
+		
+		if(reachedGoal()) {
+			//keep exploring in the same direction
+			goal = knowledge.myLocation.add(exploreDirection, QuantumConstants.EXLPORE_GOAL_DISTANCE);
+			initiateBugNavigation();
+			exploreRound = knowledge.roundNum;
+		} else if((knowledge.roundNum - exploreRound) % QuantumConstants.EXPLORE_TIME == 0) {
+			// find a new exploration goal
+			exploreDirection = exploreDirection.rotateRight().rotateRight().rotateRight();
+			goal = knowledge.myLocation.add(exploreDirection, QuantumConstants.EXLPORE_GOAL_DISTANCE);
+			
+			initiateBugNavigation();
+		} 
+		
+		step();
+		
+	}
+	
+	public void pauseExploration() {
+		exploringPaused = true;
+		savedExploreRound = (knowledge.roundNum - exploreRound) % QuantumConstants.EXPLORE_TIME;
+		savedExploreGoal = goal;
 	}
 	
 	public void setNavigationAlgorithm(NavigationAlgorithm alg) {
@@ -59,7 +102,7 @@ public class PathFinder {
 	}
 	
 	public boolean reachedGoal() {		
-		return knowledge.myLocation == goal;
+		return knowledge.myLocation.equals(goal);
 	}
 	
     public void initiateBugNavigation() {
