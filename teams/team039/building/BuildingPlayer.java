@@ -1,8 +1,8 @@
 package team039.building;
 
 import team039.building.recycler.RecyclerPlayer;
-import team039.common.ComponentsHandler;
 import team039.common.*;
+import team039.common.util.Logger;
 import battlecode.common.*;
 
 public class BuildingPlayer extends SpecificPlayerImpl {
@@ -34,13 +34,12 @@ public class BuildingPlayer extends SpecificPlayerImpl {
 
     public void beginningStateSwitches() {
         if (knowledge.myState == RobotState.JUST_BUILT) {
-            System.out.println("I called JUST_BUILT at round " + knowledge.roundNum);
+            Logger.debug_printSashko("I called JUST_BUILT at round " + knowledge.roundNum);
             knowledge.myState = RobotState.IDLE;
         }
     }
 
     public void doSpecificFirstRoundActions() {
-        System.out.println( "testing for shutoff" );
     }
 
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
