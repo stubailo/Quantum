@@ -118,7 +118,7 @@ public class LightConstructorPlayer extends LightPlayer {
     
     MapLocation buildRecyclerLocation;
     public void buildRecycler() {
-        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 150) {
+        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
             
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
