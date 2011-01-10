@@ -33,8 +33,8 @@ public class LightConstructorPlayer extends LightPlayer {
             case BUILDING_RECYCLER:
                 buildRecycler();
                 break;
-            case ATTACKING:
-                attack();
+            case FLEEING:
+                flee();
                 break;
             case BUILDING:
                 compHandler.build().step();
@@ -79,24 +79,17 @@ public class LightConstructorPlayer extends LightPlayer {
         return result;
     }
 
-    public void attack()
+    public void flee()
     {
-        
-        if (compHandler.attackVisible()) {
-                System.out.println("Attacking!");
-        } else {
-            System.out.println("Can't see anyone.");
-            knowledge.myState = RobotState.IDLE;
-        }
+        compHandler.pathFinder.setGoal( knowledge.startingTurnedOnRecyclerLocation );
     }
 
     public void explore() {
         if (compHandler.canIBuild()) {
             Mine[] sensedMines = compHandler.senseEmptyMines();
 
-            if (compHandler.canSenseEnemies() && compHandler.hasWeapons()) {
-                knowledge.myState = RobotState.ATTACKING;
-                attack();
+            if (compHandler.canSenseEnemies()) {
+                knowledge.myState = RobotState.FLEEING;
             }
 
             // TODO: else statement here?

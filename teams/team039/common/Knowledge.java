@@ -1,6 +1,6 @@
 package team039.common;
 
-//import team039.common.location.LocationMemory;
+import team039.common.location.LocationMemory;
 import battlecode.common.*;
 
 /**
@@ -55,7 +55,7 @@ public class Knowledge {
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.
-//    public final LocationMemory locationMemory = new LocationMemory();
+    public final LocationMemory locationMemory = new LocationMemory();
     /***public         MapLocation[]       unminedMineLocations     = new MapLocation[100];
     public         MapLocation[]       ourMineLocations         = new MapLocation[100];
     public         MapLocation[]       theirMineLocations       = new MapLocation[100];
@@ -85,7 +85,7 @@ public class Knowledge {
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
         myLocation      = myStartLocation;
-        myMsgHandler    = new MessageHandler( myRC );
+        myMsgHandler    = new MessageHandler( myRC, this );
         
         previousFlux = 0;
         myLocation = myRC.getLocation();
@@ -127,6 +127,11 @@ public class Knowledge {
 
     }
 
+    public void recordRecyclerLocation( int r_id, MapLocation r_loc, int r_timestamp )
+    {
+        //System.out.println( "recording location of recycler!");
+    }
+
     public MessageHandler msg()
     {
         return myMsgHandler;
@@ -136,32 +141,6 @@ public class Knowledge {
     {
         myState = newState;
     }
-
-
-    /**
-     * Encodes knowledge acquired since a certain round
-     */
-    public void encodeMessage ( Integer timeStamp )
-    {
-        /* The timestamp of each map location should be kept as the time when
-         * it was found, rather than the time that it was sent in a message.
-         * Proposed format: Use MapLocations for map locations, integers for
-         * timestamps, and strings for designations such as recycler, factory.
-         */
-    }
-
-    /**
-     * Changes knowledge based on information from a message.  Needs to be
-     * reasonably efficient. Main restrictions include message size and processing;
-     * decoding a lot of messages could be processor intensive, so there should
-     * be a way of filtering messages. Might be complex enough for a message
-     * handler class.
-     */
-    public void decodeMessage ( Message msgReceived )
-    {
-        //should increase knowledge based on new information
-        //also, do we want a separate message handler class or should we do that here?
-    }
     
     
     
@@ -169,11 +148,22 @@ public class Knowledge {
      * Prints string to help debug, as well as exception stack trace.
      * @param   e   Exception
      */
-    public void printExceptionMessage(Exception e) {
+    public void debug_printExceptionMessage(Exception e) {
         System.out.println("Robot " + myRC.getRobot().getID() + 
                            " during round " + Clock.getRoundNum() + 
                            " caught exception:");
         e.printStackTrace();
+    }
+    
+    /**
+     * Prints string to help debug, as well as custom error text.
+     * @param   s   custom error message
+     */
+    public void debug_printCustomErrorMessage(String s) {
+        System.out.println("Robot " + myRC.getRobot().getID() + 
+                           " during round " + Clock.getRoundNum() + 
+                           " wanted to print custom error message:");
+        System.out.println(s);
     }
 
 }

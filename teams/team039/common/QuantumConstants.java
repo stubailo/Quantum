@@ -17,6 +17,8 @@ public final class QuantumConstants {
 	/** Farthest sensor distance... assumed to be the satellite **/
 	public static final int FARTHEST_SENSOR_DISTANCE = ComponentType.SATELLITE.range;
 	/** Size of map location hashes used **/
+	// Because robots can sense off the map in both directions, the hash must be big enough
+	//   to handle that.
 	public static final int LOCATION_HASH_SIZE = GameConstants.MAP_MAX_WIDTH +
 	                                             2 * FARTHEST_SENSOR_DISTANCE;
 	/** Number of rounds to navigate before setting a new exploration goal */

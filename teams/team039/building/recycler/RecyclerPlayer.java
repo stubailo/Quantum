@@ -1,9 +1,7 @@
 package team039.building.recycler;
 
 import team039.building.BuildingPlayer;
-import team039.common.ComponentsHandler;
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
+import team039.common.*;
 import battlecode.common.*;
 
 public class RecyclerPlayer extends BuildingPlayer {
@@ -20,21 +18,32 @@ public class RecyclerPlayer extends BuildingPlayer {
         myRC        = rc;
         knowledge   = know;
         compHandler = compHand;
+
+        knowledge.debug_printCustomErrorMessage("JASON!");
+        compHandler.updateAlliedRecyclerInformation();
+        knowledge.debug_printCustomErrorMessage(String.valueOf(knowledge.lowestAlliedRecyclerID));
+        if(knowledge.lowestAlliedRecyclerID < knowledge.myRobotID) {
+            myRC.setIndicatorString(2, "turning off");
+            myRC.turnOff();
+        }
+
+        if( compHandler.canIBuild()) compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
     }
     
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
+
+        MessageWrapper ping = new MessageWrapper();
+        ping.genRecyclerPing(myRC);
+
+        knowledge.msg().addToQueue(ping);
     }
     
     @Override
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
-        compHandler.updateAlliedRecyclerInformation();
-        if(knowledge.lowestAlliedRecyclerID < knowledge.myRobotID) {
-            myRC.setIndicatorString(2, "turning off");
-            myRC.turnOff();
-        }
+        
     }
     
     @Override
@@ -55,6 +64,12 @@ public class RecyclerPlayer extends BuildingPlayer {
     public void beginningStateSwitches() {
         super.beginningStateSwitches();
 
+        if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300) {
+            compHandler.build().autoBuildRobot(Prefab.lightSoldier);
+        }
+        if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 100 && Clock.getRoundNum() > 2000) {
+            compHandler.build().autoBuildRobot(Prefab.lightSoldier);
+        }
     }
 
 }

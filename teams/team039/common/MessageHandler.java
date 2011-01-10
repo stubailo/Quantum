@@ -14,9 +14,13 @@ public class MessageHandler {
     private RobotController myRC;
     private MessageWrapper[] messageQueue;
 
-    public MessageHandler(RobotController in_RC) {
+    private Knowledge knowledge;
+
+    public MessageHandler(RobotController in_RC, Knowledge know) {
 
         myRC = in_RC;
+
+        knowledge = know;
 
         messageQueue = null;
     }
@@ -31,6 +35,13 @@ public class MessageHandler {
 
         for (Message currentMessage : newMessages) {
             MessageWrapper newMsgWrapper = new MessageWrapper();
+            String messageType = newMsgWrapper.decode(currentMessage);
+
+            if( messageType.equals( MessageWrapper.RECYCLER_PING ) )
+            {
+                knowledge.recordRecyclerLocation( newMsgWrapper.getBroadcasterID(), newMsgWrapper.getBroadcasterLocation(), Clock.getRoundNum() );
+            }
+
         }
     }
 

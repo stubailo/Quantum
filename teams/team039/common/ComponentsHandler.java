@@ -2,7 +2,7 @@ package team039.common;
 
 import java.util.Arrays;
 
-//import team039.common.location.LocationType;
+import team039.common.location.LocationType;
 import battlecode.common.*;
 
 /**
@@ -59,22 +59,55 @@ public class ComponentsHandler {
     }
 
     /******************************* SENSOR METHODS *******************************/
-    public void sense() {
-        if (numberOfSensors == 0) {
-            return;
-        }
-
-        if (knowledge.justTurned) {
-            for (SensorController sensor : mySCs) {
-                switch (sensor.type()) {
-
+    
+    
+    
+    /**
+     * Looks for nearby mines, but only if just turned or just moved.
+     */
+    public void senseNearbyMines() {
+        if(numberOfSensors == 0) return;
+        
+        if(knowledge.justTurned || knowledge.justMoved) {
+            // Bytecode count: at least 100 + 25 * (number of sensed mines)
+            //            (plus another 25 * (number of sensed mines) if a robot is on it)
+            try {
+                for(SensorController sensor : mySCs) {
+                    Mine[] nearbyMines = sensor.senseNearbyGameObjects(Mine.class);
+                    for(Mine nearbyMine : nearbyMines) {
+                        MapLocation mineLocation = sensor.senseLocationOf(nearbyMine);
+                        Robot potentialBuilding = (Robot)
+                            sensor.senseObjectAtLocation(mineLocation, RobotLevel.ON_GROUND);
+                        if(potentialBuilding == null ||
+                           sensor.senseRobotInfo(potentialBuilding).chassis !=
+                               Chassis.BUILDING) {
+                            knowledge.locationMemory.setType(mineLocation,
+                                                             LocationType.UNMINED_MINE,
+                                                             knowledge.roundNum);
+                        }
+                        else {
+                            if(potentialBuilding.getTeam() == knowledge.myTeam) {
+                                knowledge.locationMemory.setType(mineLocation,
+                                                                 LocationType.OUR_MINE,
+                                                                 knowledge.roundNum);
+                            }
+                            else {
+                                knowledge.locationMemory.setType(mineLocation,
+                                        LocationType.OUR_MINE,
+                                        knowledge.roundNum);
+                            }
+                        }
+                    }
                 }
+            }
+            catch(Exception e) {
+                knowledge.debug_printExceptionMessage(e);
             }
         }
     }
 
     /**
-     * Optimizes void-checking.  Considers off_map to be void.
+     * Caches information related to ground-traversability.
      * @param mySCs     robot's sensor controllers
      * @param location  location to be checked
      * @return          an integer, 0 = no, 1 = yes, -1 = dunno (will be convention)
@@ -169,7 +202,7 @@ public class ComponentsHandler {
                     empty[i] = false;
                 }
             } catch (Exception e) {
-                knowledge.printExceptionMessage(e);
+                knowledge.debug_printExceptionMessage(e);
                 return null;
             }
         }
@@ -243,7 +276,7 @@ public class ComponentsHandler {
                     }
                 }
             } catch (Exception e) {
-                knowledge.printExceptionMessage(e);
+                knowledge.debug_printExceptionMessage(e);
             }
         }
 
@@ -257,6 +290,7 @@ public class ComponentsHandler {
      */
     public Boolean updateAlliedRecyclerInformation() {
         if (numberOfSensors == 0) {
+            knowledge.debug_printCustomErrorMessage("JASON ZEROFAIL");
             return false;
         }
         try {
@@ -291,7 +325,7 @@ public class ComponentsHandler {
             knowledge.lowestAlliedRecyclerIDLocation = lowestLoc;
             return true;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -397,7 +431,7 @@ public class ComponentsHandler {
             }
             return Direction.OMNI;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return Direction.NONE;
         }
     }
@@ -412,7 +446,7 @@ public class ComponentsHandler {
             myMC.setDirection(direction);
             return true;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -458,7 +492,7 @@ public class ComponentsHandler {
             myCC.broadcast(composedMessage);
             return true;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -497,7 +531,7 @@ public class ComponentsHandler {
             myBC.build(component, location, height);
             return true;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -511,7 +545,7 @@ public class ComponentsHandler {
             myBC.build(chassis, location);
             return true;
         } catch (Exception e) {
-            knowledge.printExceptionMessage(e);
+            knowledge.debug_printExceptionMessage(e);
             return false;
         }
     }
@@ -544,7 +578,7 @@ public class ComponentsHandler {
                         } else {
                         }
                     } catch (Exception e) {
-                        knowledge.printExceptionMessage(e);
+                        knowledge.debug_printExceptionMessage(e);
                         return false;
                     }
                 }
