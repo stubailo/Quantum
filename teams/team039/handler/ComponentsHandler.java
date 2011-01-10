@@ -1,7 +1,11 @@
-package team039.common;
+package team039.handler;
 
 import java.util.Arrays;
 
+import team039.common.BuildHandler;
+import team039.common.Knowledge;
+import team039.common.PathFinder;
+import team039.common.QuantumConstants;
 import team039.common.location.LocationType;
 import team039.common.util.Logger;
 
@@ -13,42 +17,36 @@ import battlecode.common.*;
  *
  */
 public class ComponentsHandler {
+    
+    private static final int BIG_INT = QuantumConstants.BIG_INT;
 
-    public static final boolean ATTACK_DEBRIS = false;
-
+    private static final boolean ATTACK_DEBRIS = QuantumConstants.ATTACK_DEBRIS;
     private final RobotController myRC;
     private final Knowledge knowledge;
     private final BuildHandler buildHandler;
+    
     /*** Controllers ***/
     private MovementController myMC;
     // Some code only uses one sensor... these should be expanded to use either all sensors
     // or the best sensor, depending on the application
-    private SensorController[] mySCs = new SensorController[4];
+    private SensorController[] mySensorSlots = new SensorController[4];
+    private SensorController[] mySCs;
     private BuilderController myBC;
-    private WeaponController[] myWCs = new WeaponController[18];
+    private WeaponController[] myWeaponSlots = new WeaponController[18];
+    private WeaponController[] myWCs;
     private BroadcastController myCC;
+    
+    /*** Handlers ***/
+    private SensorHandler mySH;
+    
     /*** Navigation ***/
     public         PathFinder           pathFinder;
+    
     /*** Controller info ***/
-
     public int numberOfSensors;
-
     public boolean hasBuilder = false;
     public int numberOfWeapons;
     public boolean hasComm = false;
-
-    /*** Navigation info ***/
-    private boolean bugNavigating;
-    private boolean tracking;
-    private boolean trackingCW;
-    private boolean moveOnNext;
-    private Direction trackingDirection;
-    private Direction trackingRefDirection;
-    private MapLocation bugGoal;
-    private MapLocation bugStart;
-    private MapLocation[] bugPrevLocations;
-    private Direction[] bugPrevDirections;
-    private int bugStep;
 
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
@@ -68,26 +66,39 @@ public class ComponentsHandler {
     
     /**
      * Looks for nearby mines, but only if just turned or just moved.
+     * @return      returns location of nearest unmined mine.
      */
-    public void senseNearbyMines() {
-        if(numberOfSensors == 0) return;
+    public MapLocation senseNearbyMines() {
+        if(numberOfSensors == 0) return null;
         
         if(knowledge.justTurned || knowledge.justMoved) {
+            Logger.debug_printHocho("sensing :)");
             // Bytecode count: at least 100 + 25 * (number of sensed mines)
             //            (plus another 25 * (number of sensed mines) if a robot is on it)
             try {
+                MapLocation nearestMine                = null;
+                int         nearestMineDistanceSquared = BIG_INT;
+                
                 for(SensorController sensor : mySCs) {
                     Mine[] nearbyMines = sensor.senseNearbyGameObjects(Mine.class);
+                    
                     for(Mine nearbyMine : nearbyMines) {
-                        MapLocation mineLocation = sensor.senseLocationOf(nearbyMine);
-                        Robot potentialBuilding = (Robot)
-                            sensor.senseObjectAtLocation(mineLocation, RobotLevel.ON_GROUND);
+                        MapLocation mineLocation = nearbyMine.getLocation();
+                        Robot potentialBuilding = (Robot) sensor.senseObjectAtLocation(mineLocation, RobotLevel.ON_GROUND);
+                        
                         if(potentialBuilding == null ||
-                           sensor.senseRobotInfo(potentialBuilding).chassis !=
-                               Chassis.BUILDING) {
+                           sensor.senseRobotInfo(potentialBuilding).chassis != Chassis.BUILDING) {
+                            
                             knowledge.locationMemory.setType(mineLocation,
                                                              LocationType.UNMINED_MINE,
                                                              knowledge.roundNum);
+                            
+                            int mineDistanceSquared = knowledge.myLocation.distanceSquaredTo(mineLocation);
+                            if(mineDistanceSquared < nearestMineDistanceSquared) {
+                                
+                                nearestMineDistanceSquared = mineDistanceSquared;
+                                nearestMine                = mineLocation;
+                            }
                         }
                         else {
                             if(potentialBuilding.getTeam() == knowledge.myTeam) {
@@ -97,17 +108,21 @@ public class ComponentsHandler {
                             }
                             else {
                                 knowledge.locationMemory.setType(mineLocation,
-                                        LocationType.OUR_MINE,
-                                        knowledge.roundNum);
+                                                                 LocationType.OUR_MINE,
+                                                                 knowledge.roundNum);
                             }
                         }
                     }
                 }
+                return nearestMine;
             }
             catch(Exception e) {
                 Logger.debug_printExceptionMessage(e);
+                return null;
             }
         }
+        Logger.debug_printHocho("not sensing...");
+        return null;
     }
 
     /**
@@ -162,7 +177,7 @@ public class ComponentsHandler {
         }
         Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
 
-        if( ComponentsHandler.ATTACK_DEBRIS )
+        if( QuantumConstants.ATTACK_DEBRIS )
         {
 
             for (Robot sensedRobot : sensedRobots) {
@@ -360,6 +375,8 @@ public class ComponentsHandler {
 
             boolean overcorrect = false;
             GameObject correctingObject = knowledge.myRobot;
+            
+            int numberOfUnminedMines = sensedMines.length - sensedRobots.length;
 
             // If we see all robots/mines, we record them.
             // Otherwise, depending on number of seen robots/mines, we cleverly turn
@@ -367,7 +384,7 @@ public class ComponentsHandler {
             switch (sensedRobots.length) {
 
                 case 0:
-                    switch (sensedMines.length) {
+                    switch (numberOfUnminedMines) {
 
                         case 0:
                             overcorrect = true;
@@ -384,12 +401,12 @@ public class ComponentsHandler {
 
                 case 1:
                     correctingObject = sensedRobots[0];
-                    if (sensedMines.length == 0) {
+                    if (numberOfUnminedMines == 0) {
                         overcorrect = true;
                     }
 
                 case 2:
-                    switch (sensedMines.length) {
+                    switch (numberOfUnminedMines) {
 
                         case 0:
                             correctingObject = sensedRobots[0];
@@ -423,25 +440,91 @@ public class ComponentsHandler {
 
             // Now we know we can sense everything, so we quickly jot it down.
             Robot recycler1 = sensedRobots[0], recycler2 = sensedRobots[1];
+            MapLocation recycler1Location = sensor.senseLocationOf(recycler1);
+            MapLocation recycler2Location = sensor.senseLocationOf(recycler2);
             if (recycler1.getID() < recycler2.getID()) {
-                knowledge.startingTurnedOnRecyclerLocation =
-                        sensor.senseLocationOf(recycler1);
+                knowledge.startingTurnedOnRecyclerLocation = recycler1Location;
             } else {
-                knowledge.startingTurnedOnRecyclerLocation =
-                        sensor.senseLocationOf(recycler2);
+                knowledge.startingTurnedOnRecyclerLocation = recycler2Location;
             }
 
-            MapLocation mine1Loc = sensor.senseLocationOf(sensedMines[0]),
-                    mine2Loc = sensor.senseLocationOf(sensedMines[1]);
-
-            if (knowledge.myLocation.distanceSquaredTo(mine1Loc)
-                    < knowledge.myLocation.distanceSquaredTo(mine2Loc)) {
-                knowledge.startingUnminedMineLocations[0] = mine1Loc;
-                knowledge.startingUnminedMineLocations[1] = mine2Loc;
-            } else {
-                knowledge.startingUnminedMineLocations[0] = mine2Loc;
-                knowledge.startingUnminedMineLocations[1] = mine1Loc;
+            int unminedMinesFound = 0;
+            int badSquares = 0;
+            
+            for(Mine mine : sensedMines) {
+                MapLocation mineLoc = mine.getLocation();
+                if(!(mineLoc.equals(recycler1Location) || mineLoc.equals(recycler2Location))) {
+                    if(unminedMinesFound == 0) {
+                        Direction addDirection = Direction.EAST;
+                        int potBadSquares = 0;
+                        for(int index = 0; index < 8; index ++) {
+                            MapLocation addLoc = mineLoc.add(addDirection);
+                            if((!addLoc.equals(recycler2Location)) &&
+                               (!addLoc.equals(recycler1Location)) &&
+                               (!addLoc.equals(knowledge.myLocation)) &&
+                               sensor.canSenseSquare(addLoc)) {
+                                TerrainTile tt = myRC.senseTerrainTile(addLoc);
+                                if(tt.equals(TerrainTile.LAND)) {
+                                    Robot potRob = (Robot) sensor.senseObjectAtLocation(addLoc, RobotLevel.ON_GROUND);
+                                    if(potRob == null) {
+                                        knowledge.startingUnminedMineLocations[0] = mineLoc;
+                                        unminedMinesFound = 1;
+                                    }
+                                    else {
+                                        potBadSquares++;
+                                    }
+                                }
+                                else {
+                                    potBadSquares++;
+                                }
+                            }
+                            addDirection = addDirection.rotateLeft();
+                        }
+                        knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        unminedMinesFound = -1;
+                        badSquares = potBadSquares;
+                    }
+                    else if(unminedMinesFound == 1) {
+                        knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        break;
+                    }
+                    else if(unminedMinesFound == -1) {
+                        Direction addDirection = Direction.EAST;
+                        int potBadSquares = 0;
+                        for(int index = 0; index < 8; index ++) {
+                            MapLocation addLoc = mineLoc.add(addDirection);
+                            if((!addLoc.equals(recycler2Location)) &&
+                               (!addLoc.equals(recycler1Location)) &&
+                               (!addLoc.equals(knowledge.myLocation)) &&
+                               sensor.canSenseSquare(addLoc)) {
+                                TerrainTile tt = myRC.senseTerrainTile(addLoc);
+                                if(tt.equals(TerrainTile.LAND)) {
+                                    Robot potRob = (Robot) sensor.senseObjectAtLocation(addLoc, RobotLevel.ON_GROUND);
+                                    if(potRob == null) {
+                                        knowledge.startingUnminedMineLocations[0] = mineLoc;
+                                        unminedMinesFound = 1;
+                                    }
+                                    else {
+                                        potBadSquares++;
+                                    }
+                                }
+                                else {
+                                    potBadSquares++;
+                                }
+                            }
+                            addDirection = addDirection.rotateLeft();
+                        }
+                        if(potBadSquares > badSquares) {
+                            knowledge.startingUnminedMineLocations[0] = knowledge.startingUnminedMineLocations[1];
+                            knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        } else {
+                            knowledge.startingUnminedMineLocations[0] = mineLoc;
+                        }
+                        break;
+                    }
+                }
             }
+
             return Direction.OMNI;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -581,7 +664,7 @@ public class ComponentsHandler {
             if( sensedRobot.getTeam()==myRC.getRobot().getTeam().opponent() )
             {
                 foundEnemy = sensedRobot;
-            } else if ( ComponentsHandler.ATTACK_DEBRIS && sensedRobot.getTeam() == Team.NEUTRAL )
+            } else if ( QuantumConstants.ATTACK_DEBRIS && sensedRobot.getTeam() == Team.NEUTRAL )
             {
                 foundDebris = sensedRobot;
                 Logger.debug_print("found debris");
@@ -666,10 +749,12 @@ public class ComponentsHandler {
                 case TELESCOPE:
                 case SIGHT:
                 case RADAR:
-
                 case BUILDING_SENSOR:
-                    mySCs[numberOfSensors] = (SensorController) newComp;
+                    //mySH.addSensor((SensorController) newComp);
+                    mySensorSlots[numberOfSensors] = (SensorController) newComp;
                     numberOfSensors += 1;
+                    mySCs = new SensorController[numberOfSensors];
+                    System.arraycopy(mySensorSlots, 0, mySCs, 0, numberOfSensors);
                     break;
 
                 case BLASTER:
@@ -679,8 +764,10 @@ public class ComponentsHandler {
                 case BEAM:
                 case MEDIC: // Should MEDIC be under weapons?
                     
-                    myWCs[numberOfWeapons] = (WeaponController) newComp;
+                    myWeaponSlots[numberOfWeapons] = (WeaponController) newComp;
                     numberOfWeapons += 1;
+                    myWCs = new WeaponController[numberOfWeapons];
+                    System.arraycopy(myWeaponSlots, 0, myWCs, 0, numberOfWeapons);
                     break;
 
                 case CONSTRUCTOR:
@@ -694,81 +781,5 @@ public class ComponentsHandler {
 
         
         return newCompTypes;
-    }
-
-    /**
-     * Looks at new components, sorts them, and returns the most interesting
-     * 
-     * @return        returns any component that might change the SpecificPlayer
-     */
-    public ComponentType oldUpdateComponents() {
-        ComponentController[] newComps = myRC.newComponents();
-
-        if (newComps.length == 0) {
-            return null;
-        }
-
-        ComponentType result = null;
-
-        for (ComponentController newComp : newComps) {
-            switch (newComp.type()) {
-
-                case BUILDING_MOTOR:
-                case SMALL_MOTOR:
-                case MEDIUM_MOTOR:
-                case LARGE_MOTOR:
-                case FLYING_MOTOR:
-                    myMC = (MovementController) newComp;
-                    break;
-
-                case ANTENNA:
-                case DISH:
-                case NETWORK:
-                    myCC = (BroadcastController) newComp;
-                    hasComm = true;
-                    break;
-
-                case SATELLITE:
-                case TELESCOPE:
-                case SIGHT:
-                case RADAR:
-                case BUILDING_SENSOR:
-                    mySCs[numberOfSensors] = (SensorController) newComp;
-                    numberOfSensors += 1;
-                    break;
-
-                case BLASTER:
-                    result = ComponentType.BLASTER;
-                case SMG:
-                case RAILGUN:
-                case HAMMER:
-                case BEAM:
-                case MEDIC: // Should MEDIC be under weapons?
-                    myWCs[numberOfWeapons] = (WeaponController) newComp;
-                    numberOfWeapons += 1;
-                    break;
-
-                case CONSTRUCTOR:
-                    result = ComponentType.CONSTRUCTOR;
-                    myBC = (BuilderController) newComp;
-                    break;
-
-                case RECYCLER:
-                    result = ComponentType.RECYCLER;
-                    myBC = (BuilderController) newComp;
-                    break;
-
-                case FACTORY:
-                    result = ComponentType.FACTORY;
-                    myBC = (BuilderController) newComp;
-                    break;
-
-                case ARMORY:
-                    result = ComponentType.ARMORY;
-                    myBC = (BuilderController) newComp;
-                    break;
-            }
-        }
-        return result;
     }
 }

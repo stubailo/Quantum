@@ -1,8 +1,6 @@
-package team039.common;
+package sprint.common;
 
-import team039.handler.ComponentsHandler;
 import battlecode.common.*;
-import team039.common.util.*;
 
 public class PathFinder {
 
@@ -44,7 +42,7 @@ public class PathFinder {
 		goal = knowledge.myLocation.add(exploreDirection, QuantumConstants.EXLPORE_GOAL_DISTANCE);
 	}
 	
-	public void explore () {
+	public void explore () throws GameActionException {
 		if(exploringPaused) {
 			exploreRound = knowledge.roundNum - savedExploreRound;
 			exploringPaused = false;
@@ -65,12 +63,7 @@ public class PathFinder {
 			initiateBugNavigation();
 		} 
 		
-		try {
-			step();
-		} catch(Exception e) {
-			Logger.debug_printExceptionMessage(e);
-		}
-		myRC.setIndicatorString(2, "exploreRound: " + exploreRound + " round Number: " + knowledge.roundNum);
+		step();
 		
 	}
 	
@@ -78,56 +71,6 @@ public class PathFinder {
 		exploringPaused = true;
 		savedExploreRound = (knowledge.roundNum - exploreRound) % QuantumConstants.EXPLORE_TIME;
 		savedExploreGoal = goal;
-	}
-	
-	public void zigZag() { 
-		if(myCH.motorActive())
-			return;
-		
-		Direction testRDir1 = knowledge.myDirection;
-		Direction testRDir2 = knowledge.myDirection.rotateRight();
-		Direction testLDir1 = knowledge.myDirection;
-		Direction testLDir2 = knowledge.myDirection.rotateLeft();
-		
-		try {
-			if(myCH.canMove(knowledge.myDirection)) {
-				myCH.moveForward();
-			} else {
-				//if path is blocked, find a direction to bounce in
-				Direction moveDir = Direction.NONE;
-				while(moveDir == Direction.NONE) {
-					testRDir1 = testRDir2;
-					testRDir2 = testRDir2.rotateRight();
-					moveDir = moveZigZagDir(testRDir1, testRDir2);
-					if(moveDir == Direction.NONE) {
-						testLDir1 = testLDir2;
-						testLDir2 = testLDir2.rotateLeft();
-						moveDir = moveZigZagDir(testLDir1, testLDir2);
-					}
-					
-					//if surrounded, do nothing.
-					if(testRDir1 == testLDir1)
-						break;
-				}
-				myCH.setDirection(moveDir);
-			}
-			
-		} catch(Exception e) {
-			Logger.debug_printExceptionMessage(e);
-		}
-	}
-	
-	private Direction moveZigZagDir(Direction dir1, Direction dir2) {
-		if(myCH.canMove(dir1)) {
-			if(dir2 == knowledge.myDirection.opposite())
-				return dir1;
-			else if(myCH.canMove(dir2)) 
-				return dir2;
-		    else 
-				return dir1;
-		} else {
-			return Direction.NONE;
-		}
 	}
 	
 	public void setNavigationAlgorithm(NavigationAlgorithm alg) {
@@ -173,6 +116,7 @@ public class PathFinder {
 		bugPrevLocations = new MapLocation [QuantumConstants.BUG_MEMORY_LENGTH];
 		bugPrevDirections = new Direction [QuantumConstants.BUG_MEMORY_LENGTH];
 		bugStep = 0;
+		myRC.setIndicatorString(2, "you are using pathFinder");
     }
     
     public void navigateBug() throws GameActionException {	
@@ -188,6 +132,7 @@ public class PathFinder {
     		return;
     	}
     	
+    	myRC.yield();
     	if(myCH.motorActive())
     		return;
     	
@@ -316,6 +261,11 @@ public class PathFinder {
     		}
     	}
     	
+    	myRC.setIndicatorString(0, "reference " + trackingRefDirection +
+    			" tracking " + trackingDirection);
+    	myRC.setIndicatorString(1,"tracking: " + tracking + 
+    			"; orientation is clockwise: " + trackingCW);
+    	myRC.setIndicatorString(2, "you are using pathFinder");
     	return action;
 
     }
@@ -332,7 +282,7 @@ public class PathFinder {
     	return action;
     }
 
-    public void navigateToAdjacent() {
+    public void navigateToAdjacent() throws GameActionException{
     	//must initiate bug navigation before calling.
     	if(!navigating)
     		return;
@@ -349,11 +299,7 @@ public class PathFinder {
     		}
     	}
     
-    	try {
-	    	navigateBug();
-    	} catch (Exception e) {
-    		Logger.debug_printExceptionMessage(e);
-    	}
+    	navigateBug();
 
     }
 }

@@ -1,12 +1,10 @@
-package team039.common;
+package sprint.common;
 
-import team039.building.*;
-import team039.building.recycler.*;
-import team039.building.BuildingPlayer;
-import team039.building.recycler.StartingBuildingPlayer;
-import team039.handler.ComponentsHandler;
-import team039.light.LightPlayer;
-import team039.light.StartingLightPlayer;
+import sprint.building.BuildingPlayer;
+import sprint.building.recycler.StartingBuildingPlayer;
+import sprint.common.ComponentsHandler;
+import sprint.light.LightPlayer;
+import sprint.light.StartingLightPlayer;
 import battlecode.common.*;
 
 public class SpecificPlayerImpl implements SpecificPlayer {
@@ -28,7 +26,6 @@ public class SpecificPlayerImpl implements SpecificPlayer {
     }
 
     public void doSpecificActions() {
-        beginningStateSwitches();
     }
 
     public void doSpecificFirstRoundActions() {
@@ -44,8 +41,6 @@ public class SpecificPlayerImpl implements SpecificPlayer {
         if(knowledge.roundNum == 0) {
             switch(myRC.getChassis()) {
             case BUILDING:
-                chassisTypePlayer = new RecyclerPlayer(myRC, knowledge, compHandler);
-                chassisTypePlayer.initialize();
                 chassisTypePlayer = new StartingBuildingPlayer(myRC, knowledge, compHandler);
                 chassisTypePlayer.initialize();
                 break;

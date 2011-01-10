@@ -1,9 +1,8 @@
-package team039.building;
+package sprint.building;
 
-import team039.building.recycler.RecyclerPlayer;
-import team039.common.*;
-import team039.common.util.Logger;
-import team039.handler.ComponentsHandler;
+import sprint.building.recycler.RecyclerPlayer;
+import sprint.common.*;
+import sprint.common.util.Logger;
 import battlecode.common.*;
 
 public class BuildingPlayer extends SpecificPlayerImpl {
@@ -25,7 +24,8 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     }
 
     public void doSpecificActions() {
-        super.doSpecificActions();
+
+        beginningStateSwitches();
 
         if (knowledge.myState == RobotState.BUILDING) {
             compHandler.build().step();
@@ -40,7 +40,6 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     }
 
     public void doSpecificFirstRoundActions() {
-        super.doSpecificFirstRoundActions();
     }
 
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {

@@ -1,8 +1,7 @@
-package team039.light;
+package sprint.light;
 
-import team039.common.*;
-import team039.common.util.Logger;
-import team039.handler.ComponentsHandler;
+import sprint.common.*;
+import sprint.common.util.Logger;
 import battlecode.common.*;
 
 public class LightPlayer extends SpecificPlayerImpl {
@@ -22,11 +21,11 @@ public class LightPlayer extends SpecificPlayerImpl {
     }
     
     public void doSpecificActions() {
-        super.doSpecificActions();
+        beginningStateSwitches();
     }
     
     public void doSpecificFirstRoundActions() {
-        super.doSpecificActions();
+        
     }
 
     public void beginningStateSwitches()

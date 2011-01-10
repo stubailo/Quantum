@@ -1,8 +1,7 @@
-package team039.light;
+package sprint.light;
 
-import team039.common.*;
-import team039.common.util.Logger;
-import team039.handler.ComponentsHandler;
+import sprint.common.*;
+import sprint.common.util.Logger;
 import battlecode.common.*;
 
 public class LightSoldierPlayer extends LightPlayer {
@@ -85,59 +84,13 @@ public class LightSoldierPlayer extends LightPlayer {
 
         } else {
 	        try {
-	            compHandler.pathFinder.zigZag();
+	            compHandler.pathFinder.explore();
 	        } catch (Exception e) {
 	        	Logger.debug_print("Robot " + myRC.getRobot().getID()
 	                    + " during round " + Clock.getRoundNum()
 	                    + " caught exception:");
 	            e.printStackTrace();
 	        }
-/*
-                if(knowledge.parentChanged)
-            {
-                Direction prefDirection;
-
-                MapLocation prefVector = knowledge.myRecyclerNode.getVector();
-                if( knowledge.oldRecyclerNode != null )
-                {
-                    MapLocation myMovementVector = knowledge.myLocation.add( -knowledge.oldRecyclerNode.myLocation.x, -knowledge.oldRecyclerNode.myLocation.y );
-                    prefVector = prefVector.add(myMovementVector.x, myMovementVector.y);
-                }
-
-                MapLocation origin = new MapLocation( 0, 0 );
-
-                prefDirection = origin.directionTo(prefVector);
-
-                int random = Clock.getRoundNum() + myRC.getRobot().getID();
-
-                Direction newDirection;
-
-                switch( random%14 )
-                {
-                    case 6:
-                    case 7:
-                    case 8:
-                        newDirection = prefDirection.rotateLeft();
-                        break;
-                    case 9:
-                    case 10:
-                    case 11:
-                        newDirection = prefDirection.rotateRight();
-                        break;
-                    case 12:
-                        newDirection = prefDirection.rotateLeft().rotateLeft();
-                        break;
-                    case 13:
-                        newDirection = prefDirection.rotateRight().rotateRight();
-                        break;
-                    default:
-                        newDirection = prefDirection;
-                }
-
-                compHandler.setDirection(newDirection);
-            }
- * 
- */
 
         }
     }

@@ -1,8 +1,8 @@
-package team039.building.recycler;
+package sprint.building.recycler;
 
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
-import team039.handler.ComponentsHandler;
+import sprint.common.ComponentsHandler;
+import sprint.common.Knowledge;
+import sprint.common.SpecificPlayer;
 import battlecode.common.*;
 
 public class RecyclerCommPlayer extends RecyclerPlayer {

@@ -1,12 +1,11 @@
-package team039;
+package sprint;
 
-import team039.building.BuildingPlayer;
-import team039.building.recycler.StartingBuildingPlayer;
-import team039.common.*;
-import team039.common.util.Logger;
-import team039.handler.ComponentsHandler;
-import team039.light.LightPlayer;
-import team039.light.StartingLightPlayer;
+import sprint.building.BuildingPlayer;
+import sprint.building.recycler.StartingBuildingPlayer;
+import sprint.common.*;
+import sprint.common.util.Logger;
+import sprint.light.LightPlayer;
+import sprint.light.StartingLightPlayer;
 import battlecode.common.*;
 
 public class RobotPlayer implements Runnable {
@@ -43,7 +42,6 @@ public class RobotPlayer implements Runnable {
         doCommonActions();
         specificPlayer.doSpecificFirstRoundActions();
         specificPlayer.doSpecificActions();
-        Logger.debug_printHocho("testing");
         while(true) {
             try {
                 debug_testSomething();
@@ -107,8 +105,8 @@ public class RobotPlayer implements Runnable {
      */
     public void debug_setStrings() { 
         myRC.setIndicatorString(0, knowledge.myLocation.toString());
-        myRC.setIndicatorString(1, String.valueOf(knowledge.deltaFlux) + " " + String.valueOf(knowledge.totalFlux));
-        myRC.setIndicatorString(2, knowledge.myState.toString());
+        myRC.setIndicatorString(1, String.valueOf(knowledge.deltaFlux));
+        myRC.setIndicatorString(2, String.valueOf(knowledge.totalFlux));
     }
     
     public static void debug_printGameConstants() {

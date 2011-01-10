@@ -1,8 +1,6 @@
-package team039.building.recycler;
+package sprint.building.recycler;
 
-import team039.common.*;
-import team039.common.util.*;
-import team039.handler.ComponentsHandler;
+import sprint.common.*;
 import battlecode.common.*;
 
 public class StartingBuildingPlayer extends RecyclerPlayer {
@@ -31,17 +29,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     public void doSpecificFirstRoundActions() {
         super.doSpecificFirstRoundActions();
 
-    }
-
-    @Override
-    public void initialize()
-    {
-        Logger.debug_printSashko("initializing intial constructor");
-        knowledge.myRecyclerNode = new RecyclerNode();
-        knowledge.myRecyclerNode.myLocation = myRC.getLocation();
-        knowledge.myRecyclerNode.myRobotID = myRC.getRobot().getID();
-        knowledge.myRecyclerNode.parentLocation = null;
-        knowledge.myRecyclerNode.parentRobotID = 0;
     }
 
     @Override

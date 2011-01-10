@@ -2,6 +2,7 @@ package team039.light;
 
 import team039.common.*;
 import team039.common.util.Logger;
+import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
 public class LightConstructorPlayer extends LightPlayer {
@@ -92,6 +93,7 @@ public class LightConstructorPlayer extends LightPlayer {
     public void explore() {
         if (compHandler.canIBuild()) {
             Mine[] sensedMines = compHandler.senseEmptyMines();
+            //MapLocation nearestMine = compHandler.senseNearbyMines();
 
             if (compHandler.canSenseEnemies()) {
                 if (knowledge.myRecyclerNode != null && knowledge.myRecyclerNode.parentLocation == null) {
@@ -107,21 +109,21 @@ public class LightConstructorPlayer extends LightPlayer {
             // TODO: else statement here?
 
             if (sensedMines != null) {
+            //if(nearestMine != null) {
                 buildRecyclerLocation = sensedMines[0].getLocation();
-                compHandler.pathFinder.pauseExploration();
+
+//                compHandler.pathFinder.pauseExploration();
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
+                buildRecycler();
             } else {
 
-                try {
-                    compHandler.pathFinder.explore();
-                } catch (Exception e) {
-                    System.out.println("Robot " + myRC.getRobot().getID()
-                            + " during round " + Clock.getRoundNum()
-                            + " caught exception:");
-                    e.printStackTrace();
-                }
+		        try {
+		            compHandler.pathFinder.zigZag();
+		        } catch (Exception e) {
+		            Logger.debug_printExceptionMessage(e);
+		        }
             }
 
             /*
@@ -177,8 +179,15 @@ public class LightConstructorPlayer extends LightPlayer {
     MapLocation buildRecyclerLocation;
 
     public void buildRecycler() {
-        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
 
+        if(knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation) <= 2 && 
+        		!compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
+        	knowledge.myState = RobotState.IDLE;
+        }
+        
+        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && 
+        		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
+            
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
             try {

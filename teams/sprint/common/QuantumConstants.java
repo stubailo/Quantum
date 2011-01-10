@@ -1,4 +1,4 @@
-package team039.common;
+package sprint.common;
 
 /**
  * Class for keeping adjustable constants for gameplay.  
@@ -22,16 +22,10 @@ public final class QuantumConstants {
 	public static final int LOCATION_HASH_SIZE = GameConstants.MAP_MAX_WIDTH +
 	                                             2 * FARTHEST_SENSOR_DISTANCE;
 	/** Number of rounds to navigate before setting a new exploration goal */
-	public static final int EXPLORE_TIME = 50;
+	public static final int EXPLORE_TIME = 100;
 	/** Distance to exploration goal */
 	public static final int EXLPORE_GOAL_DISTANCE = 15;
-
-        /** Number of soldiers per constructor */
-	public static final int SOLDIERS_PER_CONSTRUCTOR = 2;
-	/** Big integer */
-	public static final int BIG_INT = 65536;
-	/** Whether or not we attack debris */
-	public static final boolean ATTACK_DEBRIS = false;
+	
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

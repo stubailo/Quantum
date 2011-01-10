@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package team039.common;
+package sprint.common;
 
 import battlecode.common.*;
 
@@ -13,12 +13,11 @@ import battlecode.common.*;
  */
 public abstract class Prefab {
 
-    private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER };
+    private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA };
     public static BuildInstructions commRecycler = new BuildInstructions(Chassis.BUILDING, commRecyclerComponents);
 
-    private static final ComponentType[] lightSoldierComponents = {ComponentType.SIGHT, ComponentType.SHIELD, ComponentType.BLASTER, ComponentType.BLASTER};
+    private static final ComponentType[] lightSoldierComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.BLASTER, ComponentType.BLASTER};
     private static final ComponentType[] lightContructorComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.CONSTRUCTOR};
-
     public static BuildInstructions lightSoldier = new BuildInstructions(Chassis.LIGHT, lightSoldierComponents);
     public static BuildInstructions lightConstructor = new BuildInstructions(Chassis.LIGHT, lightContructorComponents);
 
