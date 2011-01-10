@@ -24,6 +24,7 @@ public class Knowledge {
     
     /*** Constants ***/
     public  final  Team                myTeam;
+    public  final  Team                enemyTeam;
     public  final  MapLocation         myStartLocation;
     public  final  int                 myRobotID;
     public  final  Robot               myRobot;
@@ -38,6 +39,7 @@ public class Knowledge {
     public         boolean             justTurned;
     public         double              previousFlux;
     public         double              deltaFlux;
+    public         double              totalFlux;
     public         int                 roundNum;
     
     /*** Sense information ***/
@@ -81,6 +83,7 @@ public class Knowledge {
     public Knowledge (RobotController rc) {
         myRC            = rc;
         myTeam          = myRC.getTeam();
+        enemyTeam       = myTeam.opponent();
         myStartLocation = myRC.getLocation();
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
@@ -101,8 +104,9 @@ public class Knowledge {
         // TODO: ignore delta's associated with building, etc.
         // TODO: recognize delta-delta flux that signifies loss of unit, creation of unit,
         //            creation of mine, etc.
-        deltaFlux = myRC.getTeamResources() - previousFlux;
-        previousFlux = deltaFlux + previousFlux;
+        totalFlux = myRC.getTeamResources();
+        deltaFlux = totalFlux - previousFlux;
+        previousFlux = totalFlux;
         
         roundNum = Clock.getRoundNum();
         
