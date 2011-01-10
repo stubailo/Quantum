@@ -19,9 +19,7 @@ public class RecyclerPlayer extends BuildingPlayer {
         knowledge   = know;
         compHandler = compHand;
 
-        knowledge.debug_printCustomErrorMessage("JASON!");
         compHandler.updateAlliedRecyclerInformation();
-        knowledge.debug_printCustomErrorMessage(String.valueOf(knowledge.lowestAlliedRecyclerID));
         if(knowledge.lowestAlliedRecyclerID < knowledge.myRobotID) {
             myRC.setIndicatorString(2, "turning off");
             myRC.turnOff();

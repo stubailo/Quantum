@@ -1,6 +1,7 @@
 package team039.light;
 
 import team039.common.*;
+import team039.common.util.Logger;
 import battlecode.common.*;
 
 public class LightConstructorPlayer extends LightPlayer {
@@ -49,7 +50,7 @@ public class LightConstructorPlayer extends LightPlayer {
     @Override
     public void beginningStateSwitches() {
         if (knowledge.myState == RobotState.JUST_BUILT) {
-            System.out.println("I called JUST_BUILT at round " + knowledge.roundNum);
+            Logger.debug_print("I called JUST_BUILT at round " + knowledge.roundNum);
             knowledge.myState = RobotState.IDLE;
         }
 
@@ -103,10 +104,7 @@ public class LightConstructorPlayer extends LightPlayer {
         try {
             compHandler.pathFinder.navigateBug();
         } catch (Exception e) {
-            System.out.println("Robot " + myRC.getRobot().getID()
-                    + " during round " + Clock.getRoundNum()
-                    + " caught exception:");
-            e.printStackTrace();
+            Logger.debug_printExceptionMessage(e);
         }
     }
     MapLocation buildRecyclerLocation;
@@ -118,10 +116,7 @@ public class LightConstructorPlayer extends LightPlayer {
             try {
                 compHandler.pathFinder.navigateToAdjacent();
             } catch (Exception e) {
-                System.out.println("Robot " + myRC.getRobot().getID()
-                        + " during round " + Clock.getRoundNum()
-                        + " caught exception:");
-                e.printStackTrace();
+                Logger.debug_printExceptionMessage(e);
             }
         }
     }

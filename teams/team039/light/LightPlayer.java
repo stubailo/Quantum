@@ -1,6 +1,7 @@
 package team039.light;
 
 import team039.common.*;
+import team039.common.util.Logger;
 import battlecode.common.*;
 
 public class LightPlayer extends SpecificPlayerImpl {
@@ -31,7 +32,7 @@ public class LightPlayer extends SpecificPlayerImpl {
     {
         if( knowledge.myState == RobotState.JUST_BUILT )
         {
-            System.out.println( "I called JUST_BUILT at round " + knowledge.roundNum  );
+            Logger.debug_print( "I called JUST_BUILT at round " + knowledge.roundNum  );
             knowledge.myState = RobotState.IDLE;
         }
     }
