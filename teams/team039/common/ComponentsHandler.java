@@ -529,7 +529,6 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        Logger.debug_print("Can I build here? range = " + myRC.getLocation().distanceSquaredTo(location));
         return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
     }
 
@@ -601,6 +600,7 @@ public class ComponentsHandler {
 
                     if (weapon.withinRange( enemyLocation ) ) {
                         weapon.attackSquare( enemyLocation , robotToShoot.getRobotLevel() );
+                        weaponsFired++;
                     } else {
                     }
                 } catch (Exception e) {

@@ -42,6 +42,7 @@ public class MessageWrapper {
 
     public static final String GO_TO_FACTORY = "gtf";
     public static final String RECYCLER_PING = "rp";
+    public static final String PARENT_DESIGNATION = "pd";
 
     public static final int subHeaderLength = 1; //how many indices are used for the header of each sub-message
 
@@ -63,6 +64,16 @@ public class MessageWrapper {
         broadcasterID = -1;
     }
 
+    public int getIntData( int index )
+    {
+        return ints[index + mainHeaderLength];
+    }
+    
+    public MapLocation getLocationData( int index )
+    {
+        return locations[index + mainHeaderLength];
+    }
+
     public void genGoToFactoryMsg( RobotController myRC, int arg_targetID, MapLocation factoryLocation )
     {
         broadcasterID = myRC.getRobot().getID();
@@ -77,14 +88,34 @@ public class MessageWrapper {
         encodeHeader();
     }
 
-    public void genRecyclerPing( RobotController myRC )
+    public void genDesignateMsg(  RobotController myRC, RecyclerNode myNode, int justBuiltID )
     {
         broadcasterID = myRC.getRobot().getID();
-        targetID = 0;
+        targetID = justBuiltID;
         numberOfMessages = 0;
 
         broadcasterLocation = myRC.getLocation();
         targetLocation = null;
+        passcode = broadcasterLocation.toString();
+        messageType = PARENT_DESIGNATION;
+
+        encodeHeader();
+
+        if( myNode != null )
+        {
+        locations[ mainHeaderLength ] = myNode.myLocation;
+        ints[ mainHeaderLength ] = myNode.myRobotID;
+        }
+    }
+
+    public void genRecyclerPing( RecyclerNode myNode )
+    {
+        broadcasterID = myNode.myRobotID;
+        targetID = myNode.parentRobotID;
+        numberOfMessages = 0;
+
+        broadcasterLocation = myNode.myLocation;
+        targetLocation = myNode.parentLocation;
         passcode = broadcasterLocation.toString();
         messageType = RECYCLER_PING;
 
@@ -130,9 +161,9 @@ public class MessageWrapper {
 
     private void encodeHeader()
     {
-        int[] t_ints = { broadcasterID, targetID, numberOfMessages  };
-        MapLocation[] t_mlocs = { broadcasterLocation, targetLocation };
-        String[] t_strings = { passcode, messageType };
+        int[] t_ints = { broadcasterID, targetID, numberOfMessages, 0  };
+        MapLocation[] t_mlocs = { broadcasterLocation, targetLocation, null,null };
+        String[] t_strings = { passcode, messageType, null, null };
 
         strings = t_strings;
         ints = t_ints;
@@ -178,6 +209,9 @@ public class MessageWrapper {
             ints = null;
             strings = null;
             locations = null;
+        } else if( messageType.equals(MessageWrapper.PARENT_DESIGNATION))
+        {
+            strings = null;
         }
 
         return messageType;

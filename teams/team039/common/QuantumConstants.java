@@ -25,7 +25,9 @@ public final class QuantumConstants {
 	public static final int EXPLORE_TIME = 100;
 	/** Distance to exploration goal */
 	public static final int EXLPORE_GOAL_DISTANCE = 15;
-	
+
+        /** Number of soldiers per constructor */
+	public static final int SOLDIERS_PER_CONSTRUCTOR = 2;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

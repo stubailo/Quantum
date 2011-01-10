@@ -116,7 +116,6 @@ public class PathFinder {
 		bugPrevLocations = new MapLocation [QuantumConstants.BUG_MEMORY_LENGTH];
 		bugPrevDirections = new Direction [QuantumConstants.BUG_MEMORY_LENGTH];
 		bugStep = 0;
-		myRC.setIndicatorString(2, "you are using pathFinder");
     }
     
     public void navigateBug() throws GameActionException {	
@@ -261,11 +260,6 @@ public class PathFinder {
     		}
     	}
     	
-    	myRC.setIndicatorString(0, "reference " + trackingRefDirection +
-    			" tracking " + trackingDirection);
-    	myRC.setIndicatorString(1,"tracking: " + tracking + 
-    			"; orientation is clockwise: " + trackingCW);
-    	myRC.setIndicatorString(2, "you are using pathFinder");
     	return action;
 
     }

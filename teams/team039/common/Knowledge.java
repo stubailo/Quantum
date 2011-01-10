@@ -1,6 +1,7 @@
 package team039.common;
 
-import team039.common.location.LocationMemory;
+import team039.common.util.*;
+import team039.common.location.*;
 import battlecode.common.*;
 
 /**
@@ -57,6 +58,8 @@ public class Knowledge {
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.
+    public RecyclerNode myRecyclerNode;
+
     public final LocationMemory locationMemory = new LocationMemory();
     /***public         MapLocation[]       unminedMineLocations     = new MapLocation[100];
     public         MapLocation[]       ourMineLocations         = new MapLocation[100];
@@ -128,11 +131,50 @@ public class Knowledge {
         else justTurned = false;
 
         myMsgHandler.receiveMessages();
-
     }
 
-    public void recordRecyclerLocation( int r_id, MapLocation r_loc, int r_timestamp )
+    public boolean parentChanged = false;
+    public RecyclerNode oldRecyclerNode;
+    public void recordRecyclerLocation( int r_id, int par_id, MapLocation r_loc, MapLocation par_loc )
     {
+        Logger.debug_printSashko( "knowledge got pinged"  );
+
+        Logger.debug_printSashko( "wtf???: " + r_id + " " + par_id );
+
+        if( myRecyclerNode==null )
+        {
+            myRecyclerNode = new RecyclerNode();
+            myRecyclerNode.myRobotID = r_id;
+            myRecyclerNode.parentRobotID = par_id;
+            myRecyclerNode.parentLocation = par_loc;
+            myRecyclerNode.myLocation = r_loc;
+        } else if( r_id!=myRecyclerNode.myRobotID )
+        {
+            Logger.debug_printSashko( "new node: " + r_id + " " + par_id );
+
+            oldRecyclerNode = myRecyclerNode;
+            myRecyclerNode = new RecyclerNode();
+            myRecyclerNode.myRobotID = r_id;
+            myRecyclerNode.parentRobotID = par_id;
+            myRecyclerNode.parentLocation = par_loc;
+            myRecyclerNode.myLocation = r_loc;
+            parentChanged = true;
+
+
+
+            Logger.debug_printSashko( "my new direction is: " + myRecyclerNode.getVector().x + ", " + myRecyclerNode.getVector().y  );
+        }
+    }
+
+    public void receiveDesignation( int par_id, MapLocation par_loc )
+    {
+        myRecyclerNode = new RecyclerNode();
+        myRecyclerNode.myRobotID = myRC.getRobot().getID();
+        myRecyclerNode.parentRobotID = par_id;
+        myRecyclerNode.parentLocation = par_loc;
+        myRecyclerNode.myLocation = myLocation;
+
+        Logger.debug_printSashko( "received designation; parent: " + par_id );
     }
 
     public MessageHandler msg()
