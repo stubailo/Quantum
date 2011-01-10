@@ -11,6 +11,8 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     private final Knowledge knowledge;
     private final ComponentsHandler compHandler;
 
+    public BuildOrder buildOrder;
+
     public BuildingPlayer(RobotController rc,
             Knowledge know,
             ComponentsHandler compHand) {
@@ -47,6 +49,7 @@ public class BuildingPlayer extends SpecificPlayerImpl {
         switch (compType) {
             case RECYCLER:
                 result = new RecyclerPlayer(myRC, knowledge, compHandler);
+                result.initialize();
                 break;
         }
         return result;

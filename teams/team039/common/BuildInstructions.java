@@ -26,7 +26,7 @@ public class BuildInstructions {
      */
     public BuildInstructions( Chassis chassis, ComponentType[] components) {
 
-        instructions = new ComponentType[10];
+        instructions = new ComponentType[20];
         totalCost = chassis.cost;
         baseChassis = chassis;
 

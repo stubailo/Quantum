@@ -20,4 +20,7 @@ public abstract class Prefab {
     private static final ComponentType[] lightContructorComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.CONSTRUCTOR};
     public static BuildInstructions lightSoldier = new BuildInstructions(Chassis.LIGHT, lightSoldierComponents);
     public static BuildInstructions lightConstructor = new BuildInstructions(Chassis.LIGHT, lightContructorComponents);
+
+    public static BuildInstructions[] startingRecyclerUnits = { Prefab.commRecycler, Prefab.lightSoldier };
+    public static BuildOrder startingRecyclerBuildOrder = new BuildOrder( startingRecyclerUnits );
 }

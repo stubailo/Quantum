@@ -87,7 +87,6 @@ public class LightConstructorPlayer extends LightPlayer {
             Mine[] sensedMines = compHandler.senseEmptyMines();
 
             if (compHandler.canSenseEnemies()) {
-                knowledge.myState = RobotState.FLEEING;
             }
 
 
