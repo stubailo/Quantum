@@ -671,6 +671,12 @@ public class ComponentsHandler {
             }
         }
 
+        if(sensedRobots.length == 0)
+        {
+            return false;
+
+        }
+        
         for (int index = 0; index < numberOfWeapons; index++) {
             WeaponController weapon = myWCs[index];
             if (weapon.isActive()) {
