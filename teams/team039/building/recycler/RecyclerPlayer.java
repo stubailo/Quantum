@@ -83,7 +83,7 @@ public class RecyclerPlayer extends BuildingPlayer {
         {
             compHandler.build().autoBuildRobot(Prefab.lightConstructor);
             haveBuiltConstructor = true;
-        } else if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300-(myRC.getRobot().getID()/5)) {
+        } else if (numberOfSoldiersBuilt <= QuantumConstants.SOLDIERS_PER_CONSTRUCTOR && knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300-(myRC.getRobot().getID()/5)) {
             compHandler.build().autoBuildRobot(Prefab.lightSoldier);
             numberOfSoldiersBuilt++;
         }

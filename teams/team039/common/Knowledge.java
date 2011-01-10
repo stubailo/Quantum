@@ -162,7 +162,7 @@ public class Knowledge {
 
 
 
-            Logger.debug_printSashko( "my new direction is: " + myRecyclerNode.getVector().x + ", " + myRecyclerNode.getVector().y  );
+            //Logger.debug_printSashko( "my new direction is: " + myRecyclerNode.getVector().x + ", " + myRecyclerNode.getVector().y  );
         }
     }
 
