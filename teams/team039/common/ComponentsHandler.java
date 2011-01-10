@@ -438,6 +438,7 @@ public class ComponentsHandler {
     }
 
     /***************************** MOVEMENT METHODS *******************************/
+
     public boolean setDirection(Direction direction) {
         try {
             if (myMC.isActive()) {
@@ -473,6 +474,8 @@ public class ComponentsHandler {
     	myMC.moveBackward();
     }
     
+    
+    
     /***************************** BROADCAST METHODS *******************************/
     //this method is called by doCommonEndTurnActions() in RobotPlayer
     public boolean broadcast(Message composedMessage) {
@@ -496,6 +499,7 @@ public class ComponentsHandler {
     }
 
     /***************************** BUILDING METHODS *******************************/
+    //TODO:  really?
     public BuildHandler build() {
         return buildHandler;
     }
@@ -747,46 +751,5 @@ public class ComponentsHandler {
             }
         }
         return result;
-    }
-
-    /**
-     * This doesn't really seem useful.  Just keeping it around until we have a better 
-     * sensor method.  
-     * @param location
-     * @throws GameActionException
-     */
-    private Direction[] findAdjacentOpenDirections(MapLocation location) throws GameActionException {
-
-        /** easier to just use the canMove() method.  */
-        SensorController sensor = mySCs[0];
-        Direction[] open = new Direction[8];
-        boolean[] blocked = new boolean[8];
-        Arrays.fill(blocked, false);
-        int i = 0;
-
-        //sense nearby robots
-        Robot[] nearBots = getSensedRobots();
-
-        //find adjacent robots and record their direction as blocked
-        RobotInfo nearBotInfo;
-        for (Robot r : nearBots) {
-            if (r.getRobotLevel() == RobotLevel.ON_GROUND) {
-                nearBotInfo = sensor.senseRobotInfo(r);
-                if (location.distanceSquaredTo(nearBotInfo.location) <= 2) {
-                    blocked[location.directionTo(nearBotInfo.location).ordinal()] = true;
-                }
-            }
-        }
-
-        //sense the adjacent terrain tiles, and record the open ones.
-        for (Direction d : Direction.values()) {
-            if (!blocked[d.ordinal()] && myRC.senseTerrainTile(location.add(d)) == TerrainTile.LAND) {
-                open[i] = d;
-                i++;
-            }
-        }
-
-        // TODO:  not sure if this is the best way to trim the array...
-        return (Direction[]) Arrays.asList(open).subList(0, i - 1).toArray();
     }
 }

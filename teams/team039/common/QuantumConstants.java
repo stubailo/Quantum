@@ -21,6 +21,10 @@ public final class QuantumConstants {
 	//   to handle that.
 	public static final int LOCATION_HASH_SIZE = GameConstants.MAP_MAX_WIDTH +
 	                                             2 * FARTHEST_SENSOR_DISTANCE;
+	/** Number of rounds to navigate before setting a new exploration goal */
+	public static final int EXPLORE_TIME = 100;
+	/** Distance to exploration goal */
+	public static final int EXLPORE_GOAL_DISTANCE = 30;
 	
 	
 	/** Planck's constant */
