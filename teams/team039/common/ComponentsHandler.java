@@ -14,8 +14,6 @@ import battlecode.common.*;
  */
 public class ComponentsHandler {
 
-    public static final boolean ATTACK_DEBRIS = false;
-
     private final RobotController myRC;
     private final Knowledge knowledge;
     private final BuildHandler buildHandler;
@@ -36,19 +34,6 @@ public class ComponentsHandler {
     public boolean hasBuilder = false;
     public int numberOfWeapons;
     public boolean hasComm = false;
-
-    /*** Navigation info ***/
-    private boolean bugNavigating;
-    private boolean tracking;
-    private boolean trackingCW;
-    private boolean moveOnNext;
-    private Direction trackingDirection;
-    private Direction trackingRefDirection;
-    private MapLocation bugGoal;
-    private MapLocation bugStart;
-    private MapLocation[] bugPrevLocations;
-    private Direction[] bugPrevDirections;
-    private int bugStep;
 
     public ComponentsHandler(RobotController rc, Knowledge know) {
         myRC = rc;
@@ -162,7 +147,7 @@ public class ComponentsHandler {
         }
         Robot[] sensedRobots = mySCs[0].senseNearbyGameObjects(Robot.class);
 
-        if( ComponentsHandler.ATTACK_DEBRIS )
+        if( QuantumConstants.ATTACK_DEBRIS )
         {
 
             for (Robot sensedRobot : sensedRobots) {
@@ -582,7 +567,7 @@ public class ComponentsHandler {
             if( sensedRobot.getTeam()==myRC.getRobot().getTeam().opponent() )
             {
                 foundEnemy = sensedRobot;
-            } else if ( ComponentsHandler.ATTACK_DEBRIS && sensedRobot.getTeam() == Team.NEUTRAL )
+            } else if ( QuantumConstants.ATTACK_DEBRIS && sensedRobot.getTeam() == Team.NEUTRAL )
             {
                 foundDebris = sensedRobot;
                 Logger.debug_print("found debris");

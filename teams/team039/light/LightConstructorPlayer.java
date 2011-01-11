@@ -96,14 +96,14 @@ public class LightConstructorPlayer extends LightPlayer {
 
             if (sensedMines != null) {
                 buildRecyclerLocation = sensedMines[0].getLocation();
-                compHandler.pathFinder.pauseExploration();
+//                compHandler.pathFinder.pauseExploration();
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
             } else {
 
 		        try {
-		            compHandler.pathFinder.explore();
+		            compHandler.pathFinder.zigZag();
 		        } catch (Exception e) {
 		            System.out.println("Robot " + myRC.getRobot().getID()
 		                    + " during round " + Clock.getRoundNum()
