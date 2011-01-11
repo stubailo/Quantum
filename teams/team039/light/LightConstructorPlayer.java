@@ -10,9 +10,6 @@ public class LightConstructorPlayer extends LightPlayer {
     private final RobotController myRC;
     private final Knowledge knowledge;
     private final ComponentsHandler compHandler;
-    private MapLocation goal;
-    private boolean atGoal = true;
-    private int goalSqDist;
 
     public LightConstructorPlayer(RobotController rc,
             Knowledge know,
@@ -44,10 +41,10 @@ public class LightConstructorPlayer extends LightPlayer {
             case JUST_BUILT:
                 break;
             case IDLE:
-            	knowledge.myState = RobotState.EXPLORING;
+                knowledge.myState = RobotState.EXPLORING;
                 break;
         }
-        
+
         myRC.setIndicatorString(2, knowledge.myState.toString());
     }
 
@@ -80,10 +77,17 @@ public class LightConstructorPlayer extends LightPlayer {
         SpecificPlayer result = this;
         return result;
     }
+    private MapLocation fleeTarget = null;
 
-    public void flee()
-    {
-        compHandler.pathFinder.setGoal( knowledge.startingTurnedOnRecyclerLocation );
+    public void flee() {
+        try {
+            compHandler.pathFinder.navigateBug();
+        } catch (Exception e) {
+        }
+        ;
+        if (myRC.getLocation().distanceSquaredTo(fleeTarget) < 3) {
+            knowledge.myState = RobotState.EXPLORING;
+        }
     }
 
     public void explore() {
@@ -92,6 +96,14 @@ public class LightConstructorPlayer extends LightPlayer {
             //MapLocation nearestMine = compHandler.senseNearbyMines();
 
             if (compHandler.canSenseEnemies()) {
+                if (knowledge.myRecyclerNode != null && knowledge.myRecyclerNode.parentLocation == null) {
+                    fleeTarget = knowledge.myRecyclerNode.myLocation;
+                    compHandler.pathFinder.setGoal(knowledge.myRecyclerNode.myLocation);
+                } else {
+                    fleeTarget = knowledge.myRecyclerNode.parentLocation;
+                    compHandler.pathFinder.setGoal(knowledge.myRecyclerNode.parentLocation);
+                }
+                knowledge.myState = RobotState.FLEEING;
             }
 
             // TODO: else statement here?
@@ -114,12 +126,60 @@ public class LightConstructorPlayer extends LightPlayer {
 		        }
             }
 
-        } 
+            /*
+            if(knowledge.parentChanged)
+            {
+                Direction prefDirection;
+
+                MapLocation prefVector = knowledge.myRecyclerNode.getVector();
+                if( knowledge.oldRecyclerNode != null )
+                {
+                    MapLocation myMovementVector = knowledge.myLocation.add( -knowledge.oldRecyclerNode.myLocation.x, -knowledge.oldRecyclerNode.myLocation.y );
+                    prefVector = prefVector.add(myMovementVector.x, myMovementVector.y);
+                }
+
+                MapLocation origin = new MapLocation( 0, 0 );
+
+                prefDirection = origin.directionTo(prefVector);
+
+                int random = Clock.getRoundNum() + myRC.getRobot().getID();
+
+                Direction newDirection;
+
+                switch( random%14 )
+                {
+                    case 6:
+                    case 7:
+                    case 8:
+                        newDirection = prefDirection.rotateLeft();
+                        break;
+                    case 9:
+                    case 10:
+                    case 11:
+                        newDirection = prefDirection.rotateRight();
+                        break;
+                    case 12:
+                        newDirection = prefDirection.rotateLeft().rotateLeft();
+                        break;
+                    case 13:
+                        newDirection = prefDirection.rotateRight().rotateRight();
+                        break;
+                    default:
+                        newDirection = prefDirection;
+                }
+
+                compHandler.setDirection(newDirection);
+            }
+             
+             */
+
+        }
 
     }
-    
     MapLocation buildRecyclerLocation;
+
     public void buildRecycler() {
+
         if(knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation) <= 2 && 
         		!compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
         	knowledge.myState = RobotState.IDLE;
@@ -127,7 +187,6 @@ public class LightConstructorPlayer extends LightPlayer {
         
         if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && 
         		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
-            
             
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {

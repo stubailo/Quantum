@@ -316,10 +316,6 @@ public class PathFinder {
     		}
     	}
     	
-    	myRC.setIndicatorString(0, "reference " + trackingRefDirection +
-    			" tracking " + trackingDirection);
-    	myRC.setIndicatorString(1,"tracking: " + tracking + 
-    			"; orientation is clockwise: " + trackingCW);
     	return action;
 
     }

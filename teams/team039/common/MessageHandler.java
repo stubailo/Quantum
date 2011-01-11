@@ -4,6 +4,7 @@
  */
 package team039.common;
 import battlecode.common.*;
+import team039.common.util.*;
 
 /**
  *
@@ -39,8 +40,14 @@ public class MessageHandler {
 
             if( messageType.equals( MessageWrapper.RECYCLER_PING ) )
             {
-                knowledge.recordRecyclerLocation( newMsgWrapper.getBroadcasterID(), newMsgWrapper.getBroadcasterLocation(), Clock.getRoundNum() );
+                knowledge.recordRecyclerLocation(newMsgWrapper.getBroadcasterID(), newMsgWrapper.getTargetID(), newMsgWrapper.getBroadcasterLocation(), newMsgWrapper.getTargetLocation());
+            } else if ( messageType.equals( MessageWrapper.PARENT_DESIGNATION ) )
+            {
+                if( newMsgWrapper.getTargetID() == myRC.getRobot().getID() )
+                knowledge.receiveDesignation( newMsgWrapper.getIntData(0), newMsgWrapper.getLocationData(0) );
+
             }
+            
 
         }
     }

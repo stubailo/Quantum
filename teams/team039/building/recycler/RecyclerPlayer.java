@@ -2,6 +2,7 @@ package team039.building.recycler;
 
 import team039.building.BuildingPlayer;
 import team039.common.*;
+import team039.common.util.*;
 import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
@@ -30,6 +31,8 @@ public class RecyclerPlayer extends BuildingPlayer {
             myRC.turnOff();
         }
 
+        
+
         if( compHandler.canIBuild()) compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
     }
     
@@ -37,10 +40,16 @@ public class RecyclerPlayer extends BuildingPlayer {
     public void doSpecificActions() {
         super.doSpecificActions();
 
-        MessageWrapper ping = new MessageWrapper();
-        ping.genRecyclerPing(myRC);
+        if( knowledge.myRecyclerNode != null )
+        {
+            
+            MessageWrapper ping = new MessageWrapper();
+            ping.genRecyclerPing( knowledge.myRecyclerNode );
 
-        knowledge.msg().addToQueue(ping);
+            Logger.debug_printSashko("pinging: " + knowledge.myRecyclerNode.myRobotID + " " + knowledge.myRecyclerNode.parentRobotID);
+
+            knowledge.msg().addToQueue(ping);
+        }
     }
     
     @Override
@@ -65,6 +74,8 @@ public class RecyclerPlayer extends BuildingPlayer {
 
 
     private boolean haveBuiltConstructor = false;
+
+    int numberOfSoldiersBuilt = 0;
     @Override
     public void beginningStateSwitches() {
         super.beginningStateSwitches();
@@ -73,10 +84,14 @@ public class RecyclerPlayer extends BuildingPlayer {
         {
             compHandler.build().autoBuildRobot(Prefab.lightConstructor);
             haveBuiltConstructor = true;
-        } else if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300) {
+        } else if (numberOfSoldiersBuilt <= QuantumConstants.SOLDIERS_PER_CONSTRUCTOR && knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300-(myRC.getRobot().getID()/5)) {
             compHandler.build().autoBuildRobot(Prefab.lightSoldier);
-        //}else if (knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 100 && Clock.getRoundNum() > 2000) {
-          //  compHandler.build().autoBuildRobot(Prefab.lightSoldier);
+            numberOfSoldiersBuilt++;
+        }
+        else if (numberOfSoldiersBuilt > QuantumConstants.SOLDIERS_PER_CONSTRUCTOR && knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightSoldier.getTotalCost() + 300-(myRC.getRobot().getID()/5)) {
+            compHandler.build().autoBuildRobot(Prefab.lightConstructor);
+            Logger.debug_printSashko("building another constructor");
+            numberOfSoldiersBuilt = 0;
         }
     }
 

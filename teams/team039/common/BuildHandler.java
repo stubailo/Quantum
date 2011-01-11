@@ -110,6 +110,12 @@ public class BuildHandler {
      * Called after a successful build process... anything to activate the just-built robot should go here
      */
     private void finishBuilding() {
+
+        MessageWrapper designate = new MessageWrapper();
+            designate.genDesignateMsg( myRC, knowledge.myRecyclerNode, buildTarget.getID() );
+
+            knowledge.msg().addToQueue(designate);
+
         buildTarget = null;
         buildStep = 0;
         buildInstructions = null;
