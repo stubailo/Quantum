@@ -638,7 +638,10 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
+
+        return myMC.canMove(myRC.getLocation().directionTo(location)) && 
+                myRC.getLocation().distanceSquaredTo(location) <= 2;
+
     }
 
     public boolean buildComponent(ComponentType component,

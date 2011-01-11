@@ -31,7 +31,7 @@ public class PathFinder {
     private        MapLocation []       bugPrevLocations;
     private        Direction []         bugPrevDirections;
     private        int                  bugStep;
-    private        enum                 BugState { ROTATE, MOVE_FORWARD, MOVE_BACKWARD };
+    private        enum                 BugState { ROTATE, MOVE_FORWARD, MOVE_BACKWARD, NONE };
 	
 	public PathFinder(RobotController rc, ComponentsHandler comp, Knowledge know) {
 		myRC = rc;
@@ -218,6 +218,9 @@ public class PathFinder {
 		    		stopTracking = false;
 		    	}
 		    	break; 
+		    	
+		    case NONE:
+		    	break;
     	}
    	
     }
@@ -316,6 +319,7 @@ public class PathFinder {
     		}
     	}
     	
+
     	return action;
 
     }
@@ -338,15 +342,37 @@ public class PathFinder {
     		return;
     	
     	MapLocation location = knowledge.myLocation;
+    	int distanceSquaredToGoal = location.distanceSquaredTo(goal);
     	
-    	if(location.distanceSquaredTo(goal) <= 2) {
-    		if(myCH.motorActive()) {
-    			return;
-    		} else {
-    			navigating = false;
-    			myCH.setDirection(location.directionTo(goal));
-    			return;
+		if(myCH.motorActive()) {
+			return;
+		} else if(distanceSquaredToGoal == 0) {
+    		Direction moveDir = knowledge.myDirection;
+    		for(int i = 0; i < 8; i++){
+    			if(myCH.canMove(moveDir))
+    				break;
+    			
+    			moveDir.rotateRight();
+    			
+    			if(moveDir == knowledge.myDirection)
+    				moveDir = Direction.NONE;
     		}
+    		
+    		try {
+    		if(moveDir == knowledge.myDirection)
+    			myCH.moveForward();
+    		else if(moveDir == knowledge.myDirection.opposite())
+    			myCH.moveBackward();
+    		else if(moveDir != Direction.NONE)
+    			myCH.setDirection(moveDir);
+    		} catch(Exception e) {
+    			Logger.debug_printExceptionMessage(e);
+    		}
+    		
+    	} else if(distanceSquaredToGoal <= 2) {
+			navigating = false;
+			myCH.setDirection(location.directionTo(goal));
+			return;
     	}
     
     	try {
