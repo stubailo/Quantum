@@ -31,18 +31,25 @@ public class BuildHandler {
 
     public void step() {
         //build actions
-        if (!compHandler.builderActive() && buildTarget != null) {
-            //skip components that this building can't build
-            while (buildStep != buildInstructions.getNumSteps() && !compHandler.canIBuildThis(buildInstructions.getComponent(buildStep))) {
-                buildStep++;
+    	//TODO: Don't need to check for buildTarget != null.  Sometimes the lightConstructors
+    	//      don't see the chassis they just built, and so buildTarget is automatically null.
+    	//      This still works with a null buildTarget.
+        if (!compHandler.builderActive() /*&& buildTarget != null*/) {
+            //skip components that this robot can't build
+            while (buildStep != buildInstructions.getNumSteps() && 
+            		!compHandler.canIBuildThis(buildInstructions.getComponent(buildStep))) {
+                
+            	buildStep++;
             }
-
+            
             if (buildStep < buildInstructions.getNumSteps()) {
+
                 if (!compHandler.buildComponent(buildInstructions.getComponent(buildStep), buildLocation, buildHeight)) {
                 } else {
                     buildStep++;
                 }
             } else {
+            	myRC.setIndicatorString(1, "done building");
                 finishBuilding();
             }
         }
@@ -85,6 +92,7 @@ public class BuildHandler {
      */
     public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height) {
         //first, find the robot
+    	//TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
         buildTarget = compHandler.senseARobot(location, height);
         buildStep = 0;
         buildInstructions = instructions;
