@@ -53,7 +53,7 @@ public abstract class MessageCoder {
         outputStrings[1] = msgType;
         outputInts[1] = roundNum;
 
-        for (int i = 0; i < bodyLength - FOOTER_LENGTH; i++) {
+        for (int i = 0; i < bodyLength; i++) {
             int offsetI = i + HEADER_LENGTH;
             outputStrings[offsetI] = bodyStrings[i];
             outputInts[offsetI] = bodyInts[i];

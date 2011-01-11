@@ -46,12 +46,15 @@ public class RecyclerNode {
     {
         int[] ints = new int[1];
         MapLocation[] locations = new MapLocation[1];
+        String[] strings = new String[1];
+
+        strings[0] = "";
 
         ints[0] = parentRobotID;
 
         locations[0] = parentLocation;
 
-        return MessageCoder.encodeMessage(MessageCoder.RECYCLER_PING, myRobotID, myLocation, Clock.getRoundNum(), false, null, ints, locations);
+        return MessageCoder.encodeMessage(MessageCoder.RECYCLER_PING, myRobotID, myLocation, Clock.getRoundNum(), false, strings, ints, locations);
     }
 
     public Message generateDesignation()
@@ -74,6 +77,9 @@ public class RecyclerNode {
 
         output.myRobotID = MessageCoder.getBroadcasterID(ping);
         output.myLocation = MessageCoder.getBroadcasterLocation(ping);
+
+        output.parentRobotID = MessageCoder.getIntFromBody(ping, 0);
+        output.parentLocation = MessageCoder.getLocationFromBody(ping, 0);
 
         return output;
     }

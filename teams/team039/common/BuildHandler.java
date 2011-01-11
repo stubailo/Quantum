@@ -141,7 +141,6 @@ public class BuildHandler {
         if( compHandler.canIBuildThis(ComponentType.RECYCLER) && buildInstructions.equals( Prefab.commRecycler ) )
         {
             knowledge.msg().addToQueue( knowledge.myRecyclerNode.generateDesignation() );
-            System.out.println("Just built a recycler lolol");
         }
 
         currentlyBuilding = false;

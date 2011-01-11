@@ -34,7 +34,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
         MapLocation startingLight = compHandler.getStartingLightConstructorLocation();
         if(startingLight != null)
         {
-            System.out.println("oooooooo");
             compHandler.build().startBuildingComponents( Prefab.startingConstructor , startingLight, RobotLevel.ON_GROUND, RobotState.BUILD_ANTENNA_ON_SELF);
         }
 

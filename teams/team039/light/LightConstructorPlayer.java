@@ -70,6 +70,7 @@ public class LightConstructorPlayer extends LightPlayer {
 //        compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
 //        compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH, 13));
 //        compHandler.pathFinder.initiateBugNavigation();
+
     }
 
     @Override
