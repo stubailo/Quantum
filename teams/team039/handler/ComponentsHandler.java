@@ -684,11 +684,11 @@ public class ComponentsHandler {
                 case SIGHT:
                 case RADAR:
                 case BUILDING_SENSOR:
-                    mySH.addSensor((SensorController) newComp);
-                    //mySensorSlots[numberOfSensors] = (SensorController) newComp;
-                    //numberOfSensors += 1;
-                    //mySCs = new SensorController[numberOfSensors];
-                    //System.arraycopy(mySensorSlots, 0, mySCs, 0, numberOfSensors);
+                    //mySH.addSensor((SensorController) newComp);
+                    mySensorSlots[numberOfSensors] = (SensorController) newComp;
+                    numberOfSensors += 1;
+                    mySCs = new SensorController[numberOfSensors];
+                    System.arraycopy(mySensorSlots, 0, mySCs, 0, numberOfSensors);
                     break;
 
                 case BLASTER:

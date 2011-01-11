@@ -88,18 +88,18 @@ public class LightConstructorPlayer extends LightPlayer {
 
     public void explore() {
         if (compHandler.canIBuild()) {
-            //Mine[] sensedMines = compHandler.senseEmptyMines();
-            MapLocation nearestMine = compHandler.senseNearbyMines();
+            Mine[] sensedMines = compHandler.senseEmptyMines();
+            //MapLocation nearestMine = compHandler.senseNearbyMines();
 
             if (compHandler.canSenseEnemies()) {
             }
 
             // TODO: else statement here?
 
-            //if (sensedMines != null) {
-            if(nearestMine != null) {
-                //buildRecyclerLocation = sensedMines[0].getLocation();
-                buildRecyclerLocation = nearestMine;
+            if (sensedMines != null) {
+            //if(nearestMine != null) {
+                buildRecyclerLocation = sensedMines[0].getLocation();
+                //buildRecyclerLocation = nearestMine;
                 compHandler.pathFinder.pauseExploration();
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();

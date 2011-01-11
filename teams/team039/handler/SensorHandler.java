@@ -10,9 +10,9 @@ public class SensorHandler {
     
     
     /*** Controller ***/
-    private final SensorController[] mySensorSlots
-    private final SensorController[] mySCs
-    private final int                numberOfSensors;
+    //private final SensorController[] mySensorSlots
+    //private final SensorController[] mySCs
+    //private final int                numberOfSensors;
 
     public SensorHandler(RobotController rc, Knowledge know) {
         
