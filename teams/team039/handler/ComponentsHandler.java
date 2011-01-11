@@ -612,7 +612,6 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        Logger.debug_print("Can I build here? range = " + myRC.getLocation().distanceSquaredTo(location));
         return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
     }
 
@@ -624,7 +623,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(component, location, height);
+            //if(knowledge.totalFlux > component.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(component, location, height);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -638,7 +639,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(chassis, location);
+            //if(mySCs[0].senseObjectAtLocation(location, RobotLevel.ON_GROUND) == null && knowledge.totalFlux > chassis.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(chassis, location);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -672,6 +675,12 @@ public class ComponentsHandler {
             }
         }
 
+        if(sensedRobots.length == 0)
+        {
+            return false;
+
+        }
+        
         for (int index = 0; index < numberOfWeapons; index++) {
             WeaponController weapon = myWCs[index];
             if (weapon.isActive()) {
@@ -684,6 +693,7 @@ public class ComponentsHandler {
 
                     if (weapon.withinRange( enemyLocation ) ) {
                         weapon.attackSquare( enemyLocation , robotToShoot.getRobotLevel() );
+                        weaponsFired++;
                     } else {
                     }
                 } catch (Exception e) {

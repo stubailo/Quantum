@@ -110,6 +110,7 @@ public class BuildHandler {
      * Called after a successful build process... anything to activate the just-built robot should go here
      */
     private void finishBuilding() {
+
         buildTarget = null;
         buildStep = 0;
         buildInstructions = null;

@@ -1,5 +1,7 @@
 package team039.common;
 
+import team039.building.*;
+import team039.building.recycler.*;
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
 import team039.handler.ComponentsHandler;
@@ -42,6 +44,8 @@ public class SpecificPlayerImpl implements SpecificPlayer {
         if(knowledge.roundNum == 0) {
             switch(myRC.getChassis()) {
             case BUILDING:
+                chassisTypePlayer = new RecyclerPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
                 chassisTypePlayer = new StartingBuildingPlayer(myRC, knowledge, compHandler);
                 chassisTypePlayer.initialize();
                 break;

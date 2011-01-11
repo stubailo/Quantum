@@ -18,6 +18,7 @@ public abstract class Prefab {
 
     private static final ComponentType[] lightSoldierComponents = {ComponentType.SIGHT, ComponentType.SHIELD, ComponentType.BLASTER, ComponentType.BLASTER};
     private static final ComponentType[] lightContructorComponents = {ComponentType.SIGHT, ComponentType.SHIELD, ComponentType.CONSTRUCTOR};
+
     public static BuildInstructions lightSoldier = new BuildInstructions(Chassis.LIGHT, lightSoldierComponents);
     public static BuildInstructions lightConstructor = new BuildInstructions(Chassis.LIGHT, lightContructorComponents);
 
