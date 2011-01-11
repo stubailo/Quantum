@@ -77,7 +77,6 @@ public class StartingLightPlayer extends LightConstructorPlayer {
             }
             else if(desiredDirection != Direction.NONE) {
                 compHandler.setDirection(desiredDirection);
-                knowledge.myState = RobotState.SCOUTING_STARTING_LOCATION;
             }
             else {
                 Logger.debug_printHocho("first round sensing broke");

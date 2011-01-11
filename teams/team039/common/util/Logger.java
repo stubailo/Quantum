@@ -49,5 +49,12 @@ public class Logger {
     public static void debug_printExceptionMessage(Exception e) {
         e.printStackTrace();
     }
+    
+    /**
+     * Prints bytecode count.
+     */
+    public static void debug_printBytecodeNumber() {
+        System.out.println("bytecodes: " + String.valueOf(Clock.getBytecodeNum()));
+    }
 
 }

@@ -1,7 +1,6 @@
 package team039.building.recycler;
 
-import team039.common.Knowledge;
-import team039.common.SpecificPlayer;
+import team039.common.*;
 import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
@@ -24,6 +23,19 @@ public class RecyclerCommPlayer extends RecyclerPlayer {
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
+
+        if( knowledge.myRecyclerNode == null)
+        {
+            knowledge.myRecyclerNode = new RecyclerNode();
+            knowledge.myRecyclerNode.myLocation = myRC.getLocation();
+            knowledge.myRecyclerNode.myRobotID = myRC.getRobot().getID();
+            knowledge.myRecyclerNode.parentLocation = null;
+            knowledge.myRecyclerNode.parentRobotID = 0;
+        }
+
+        knowledge.msg().addToQueue( knowledge.myRecyclerNode.generatePing() );
+
+        myRC.setIndicatorString(1, knowledge.myRecyclerNode.toString() );
     }
     
     @Override

@@ -106,9 +106,6 @@ public class RobotPlayer implements Runnable {
      * Indicator string use should be contained within this method.
      */
     public void debug_setStrings() { 
-        myRC.setIndicatorString(0, knowledge.myLocation.toString());
-        myRC.setIndicatorString(1, String.valueOf(knowledge.deltaFlux) + " " + String.valueOf(knowledge.totalFlux));
-        myRC.setIndicatorString(2, knowledge.myState.toString());
     }
     
     public static void debug_printGameConstants() {

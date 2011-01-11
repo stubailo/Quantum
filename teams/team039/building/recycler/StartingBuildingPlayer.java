@@ -29,14 +29,22 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
 
     @Override
     public void doSpecificFirstRoundActions() {
-        super.doSpecificFirstRoundActions();
+        
 
+        MapLocation startingLight = compHandler.getStartingLightConstructorLocation();
+        if(startingLight != null)
+        {
+            System.out.println("oooooooo");
+            compHandler.build().startBuildingComponents( Prefab.startingConstructor , startingLight, RobotLevel.ON_GROUND, RobotState.BUILD_ANTENNA_ON_SELF);
+        }
+
+        super.doSpecificFirstRoundActions();
     }
 
     @Override
     public void initialize()
     {
-        Logger.debug_printSashko("initializing intial constructor");
+        
         knowledge.myRecyclerNode = new RecyclerNode();
         knowledge.myRecyclerNode.myLocation = myRC.getLocation();
         knowledge.myRecyclerNode.myRobotID = myRC.getRobot().getID();
@@ -47,6 +55,14 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
     @Override
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer result = this;
+
+        switch(compType) {
+        case ANTENNA:
+        case DISH:
+        case NETWORK:
+            result = new RecyclerCommPlayer(myRC, knowledge, compHandler);
+            break;
+        }
         return result;
     }
 

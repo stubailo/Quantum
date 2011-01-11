@@ -254,6 +254,31 @@ public class ComponentsHandler {
         return mySCs[0].senseNearbyGameObjects(Robot.class);
     }
 
+    public MapLocation getStartingLightConstructorLocation()
+    {
+        Robot[] nearbyRobots = getSensedRobots();
+
+        if(nearbyRobots==null)
+        {
+            return null;
+        }
+
+        for( Robot robot:nearbyRobots )
+        {
+            try {
+            RobotInfo info = mySCs[0].senseRobotInfo(robot);
+            if( info.chassis.equals(Chassis.LIGHT) )
+            {
+                return info.location;
+            }
+            } catch ( Exception e ) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Returns the first empty location that is sensed at the appropriate height.
      * @return        One empty location
@@ -357,6 +382,18 @@ public class ComponentsHandler {
             return false;
         }
     }
+    
+    public void debug_printRobotLocations(SensorController sensor, Robot[] robots) {
+        try {
+            for(int i = 0; i < robots.length; i ++) {
+                Robot robot = robots[i];
+                if(robot != null) Logger.debug_printHocho(String.valueOf(i) + "'s location: " + sensor.senseLocationOf(robot).toString());
+            }
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+        }
+    }
 
     /**
      * Designed for use by starting light, records locations of recyclers and mines
@@ -373,15 +410,27 @@ public class ComponentsHandler {
             Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
             Mine[] sensedMines = sensor.senseNearbyGameObjects(Mine.class);
 
+            Robot[] sensedRecyclers = new Robot[sensedRobots.length];
+            int numberOfSensedRecyclers = 0;
+            
+            for(Robot sensedRobot : sensedRobots) {
+                if(sensedRobot.getTeam() != Team.NEUTRAL) {
+                    sensedRecyclers[numberOfSensedRecyclers] = sensedRobot;
+                    numberOfSensedRecyclers++;
+                }
+            }
+             
+            int numberOfUnminedMines = sensedMines.length - numberOfSensedRecyclers;
             boolean overcorrect = false;
             GameObject correctingObject = knowledge.myRobot;
             
-            int numberOfUnminedMines = sensedMines.length - sensedRobots.length;
-
+            debug_printRobotLocations(sensor, sensedRecyclers);
+            Logger.debug_printHocho("number of unmined mines sensed: " + String.valueOf(numberOfUnminedMines));
+            
             // If we see all robots/mines, we record them.
             // Otherwise, depending on number of seen robots/mines, we cleverly turn
             //    towards them.
-            switch (sensedRobots.length) {
+            switch (numberOfSensedRecyclers) {
 
                 case 0:
                     switch (numberOfUnminedMines) {
@@ -400,7 +449,7 @@ public class ComponentsHandler {
                     break;
 
                 case 1:
-                    correctingObject = sensedRobots[0];
+                    correctingObject = sensedRecyclers[0];
                     if (numberOfUnminedMines == 0) {
                         overcorrect = true;
                     }
@@ -409,7 +458,7 @@ public class ComponentsHandler {
                     switch (numberOfUnminedMines) {
 
                         case 0:
-                            correctingObject = sensedRobots[0];
+                            correctingObject = sensedRecyclers[0];
                             break;
                         case 1:
                             correctingObject = sensedMines[0];
@@ -419,7 +468,7 @@ public class ComponentsHandler {
             }
             // We can sense some objects but not all... so we turn towards correcting object
             if (!correctingObject.equals(knowledge.myRobot)) {
-                MapLocation sensedLoc = sensor.senseLocationOf(sensedRobots[0]);
+                MapLocation sensedLoc = sensor.senseLocationOf(sensedRecyclers[0]);
                 Direction sensedDir = knowledge.myLocation.directionTo(sensedLoc);
 
                 // If overcorrect is true then we turn twice in the direction of the object
@@ -439,7 +488,7 @@ public class ComponentsHandler {
             }
 
             // Now we know we can sense everything, so we quickly jot it down.
-            Robot recycler1 = sensedRobots[0], recycler2 = sensedRobots[1];
+            Robot recycler1 = sensedRecyclers[0], recycler2 = sensedRecyclers[1];
             MapLocation recycler1Location = sensor.senseLocationOf(recycler1);
             MapLocation recycler2Location = sensor.senseLocationOf(recycler2);
             if (recycler1.getID() < recycler2.getID()) {
@@ -450,6 +499,8 @@ public class ComponentsHandler {
 
             int unminedMinesFound = 0;
             int badSquares = 0;
+            
+            Logger.debug_printHocho("bytecodes used: " + String.valueOf(Clock.getBytecodeNum()));
             
             for(Mine mine : sensedMines) {
                 MapLocation mineLoc = mine.getLocation();
@@ -586,6 +637,7 @@ public class ComponentsHandler {
                 return false;
             }
             myCC.broadcast(composedMessage);
+            
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -612,7 +664,10 @@ public class ComponentsHandler {
     }
 
     public boolean canBuildBuildingHere(MapLocation location) {
-        return myMC.canMove(myRC.getLocation().directionTo(location)) && myRC.getLocation().distanceSquaredTo(location) <= 2;
+
+        return myMC.canMove(myRC.getLocation().directionTo(location)) && 
+                myRC.getLocation().distanceSquaredTo(location) <= 2;
+
     }
 
     public boolean buildComponent(ComponentType component,
@@ -623,7 +678,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(component, location, height);
+            //if(knowledge.totalFlux > component.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(component, location, height);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -637,7 +694,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(chassis, location);
+            //if(mySCs[0].senseObjectAtLocation(location, RobotLevel.ON_GROUND) == null && knowledge.totalFlux > chassis.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(chassis, location);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);

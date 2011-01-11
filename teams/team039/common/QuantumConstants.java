@@ -33,6 +33,8 @@ public final class QuantumConstants {
 	/** Whether or not we attack debris */
 	public static final boolean ATTACK_DEBRIS = false;
 	
+	public static final double SMALL_BUFFER = 1;
+	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;
 	/** Reduced Planck's constant */

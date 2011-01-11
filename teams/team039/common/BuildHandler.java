@@ -13,8 +13,7 @@ import battlecode.common.*;
  */
 public class BuildHandler {
 
-    private boolean haveBuildController = false;
-    private Robot buildTarget = null;
+    private boolean currentlyBuilding;
     private MapLocation buildLocation = null;
     private RobotLevel buildHeight = null;
     private BuildInstructions buildInstructions = null;
@@ -28,32 +27,44 @@ public class BuildHandler {
         myRC = rc;
         compHandler = ch;
         knowledge = know;
+
+        currentlyBuilding = false;
     }
 
     public void step() {
-        //build actions
-        if (!compHandler.builderActive() && buildTarget != null) {
-            //skip components that this building can't build
-            while (buildStep != buildInstructions.getNumSteps() && !compHandler.canIBuildThis(buildInstructions.getComponent(buildStep))) {
+
+        //don't do anything if it's currently waiting for the builder to recharge
+        if (compHandler.builderActive()) {
+            return;
+        }
+
+        //skip things I can't build
+        while (buildStep != buildInstructions.getNumSteps()
+                && !compHandler.canIBuildThis(buildInstructions.getComponent(buildStep))) {
+            buildStep++;
+        }
+
+
+        if (buildStep < buildInstructions.getNumSteps()) {
+
+            if (compHandler.buildComponent(buildInstructions.getComponent(buildStep), buildLocation, buildHeight)) {
                 buildStep++;
             }
 
-            if (buildStep < buildInstructions.getNumSteps()) {
-                if (!compHandler.buildComponent(buildInstructions.getComponent(buildStep), buildLocation, buildHeight)) {
-                } else {
-                    buildStep++;
-                }
-            } else {
-                finishBuilding();
-            }
+        } else {
+            myRC.setIndicatorString(1, "done building");
+            finishBuilding();
         }
     }
 
+    /*
+     * Finds an empty location to build in, then tries to build there.
+     */
     public Boolean autoBuildRobot(BuildInstructions instructions) {
         if (myRC.getTeamResources() < instructions.getTotalCost()) {
             return false;
         }
-        if (buildTarget == null) {
+        if ( !currentlyBuilding ) {
             Chassis chassis = instructions.getBaseChassis();
             MapLocation location = compHandler.getAdjacentEmptySpot(chassis.level);
             if (location == null) {
@@ -97,7 +108,8 @@ public class BuildHandler {
      */
     public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height) {
         //first, find the robot
-        buildTarget = compHandler.senseARobot(location, height);
+    	//TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
+        currentlyBuilding = true;
         buildStep = 0;
         buildInstructions = instructions;
         buildLocation = location;
@@ -106,12 +118,33 @@ public class BuildHandler {
         knowledge.myState = RobotState.BUILDING;
     }
 
+    public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height, RobotState givenState) {
+        //first, find the robot
+    	//TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
+        currentlyBuilding = true;
+        buildStep = 0;
+        buildInstructions = instructions;
+        buildLocation = location;
+        buildHeight = height;
+
+        knowledge.myState = RobotState.BUILDING;
+
+        stateToReturnTo = RobotState.BUILD_ANTENNA_ON_SELF;
+    }
+
     /**
      * Called after a successful build process... anything to activate the just-built robot should go here
      */
     private void finishBuilding() {
 
-        buildTarget = null;
+        //check if you just built a recycler (and are not, yourself, a recycler)
+        if( compHandler.canIBuildThis(ComponentType.RECYCLER) && buildInstructions.equals( Prefab.commRecycler ) )
+        {
+            knowledge.msg().addToQueue( knowledge.myRecyclerNode.generateDesignation() );
+            System.out.println("Just built a recycler lolol");
+        }
+
+        currentlyBuilding = false;
         buildStep = 0;
         buildInstructions = null;
         buildLocation = null;
@@ -130,7 +163,8 @@ public class BuildHandler {
      * Only called if something went wrong - erase all evidence of target
      */
     public void abortBuilding() {
-        buildTarget = null;
+
+        currentlyBuilding = false;
         buildStep = 0;
         buildInstructions = null;
         buildLocation = null;

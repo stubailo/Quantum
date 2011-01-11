@@ -33,10 +33,7 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     }
 
     public void beginningStateSwitches() {
-        if (knowledge.myState == RobotState.JUST_BUILT) {
-            Logger.debug_printSashko("I called JUST_BUILT at round " + knowledge.roundNum);
-            knowledge.myState = RobotState.IDLE;
-        }
+        
     }
 
     public void doSpecificFirstRoundActions() {

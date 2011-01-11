@@ -13,7 +13,7 @@ import team039.common.util.*;
 public class MessageHandler {
 
     private RobotController myRC;
-    private MessageWrapper[] messageQueue;
+    private Message[] messageQueue;
 
     private Knowledge knowledge;
 
@@ -35,20 +35,25 @@ public class MessageHandler {
         newMessages = myRC.getAllMessages();
 
         for (Message currentMessage : newMessages) {
-            MessageWrapper newMsgWrapper = new MessageWrapper();
-            String messageType = newMsgWrapper.decode(currentMessage);
 
-            if( messageType.equals( MessageWrapper.RECYCLER_PING ) )
+            if( MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_PING ) && !knowledge.myRC.getChassis().equals(Chassis.BUILDING) )
             {
-                knowledge.recordRecyclerLocation(newMsgWrapper.getBroadcasterID(), newMsgWrapper.getTargetID(), newMsgWrapper.getBroadcasterLocation(), newMsgWrapper.getTargetLocation());
-            } else if ( messageType.equals( MessageWrapper.PARENT_DESIGNATION ) )
+                knowledge.recordRecyclerLocation( RecyclerNode.getFromPing(currentMessage) );
+            } else if( MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_DESIGNATION ) 
+                    && knowledge.myRC.getChassis().equals(Chassis.BUILDING)
+                    && (knowledge.myRecyclerNode==null || !knowledge.myRecyclerNode.hasParent() ) )
             {
-                if( newMsgWrapper.getTargetID() == myRC.getRobot().getID() )
-                knowledge.receiveDesignation( newMsgWrapper.getIntData(0), newMsgWrapper.getLocationData(0) );
+                if( knowledge.myRobotID != MessageCoder.getBroadcasterID(currentMessage) )
+                {
+                knowledge.myRecyclerNode = new RecyclerNode();
+                knowledge.myRecyclerNode.myRobotID = knowledge.myRobotID;
+                knowledge.myRecyclerNode.myLocation = knowledge.myLocation;
+                knowledge.myRecyclerNode.parentRobotID = MessageCoder.getBroadcasterID(currentMessage);
+                knowledge.myRecyclerNode.parentLocation = MessageCoder.getBroadcasterLocation(currentMessage);
 
+                System.out.println( "designated? " + knowledge.myRecyclerNode );
+                }
             }
-            
-
         }
     }
 
@@ -56,12 +61,13 @@ public class MessageHandler {
      * In the future there will be capability to send more than one message per turn.
      * right now, every message added to the queue replaces the previous one.
      */
-    public void addToQueue(MessageWrapper msgToAdd) {
+    public void addToQueue(Message msgToAdd) {
 
         if (messageQueue == null) {
-            messageQueue = new MessageWrapper[10];
+            messageQueue = new Message[10];
         }
         messageQueue[0] = msgToAdd;
+        
     }
 
     public void emptyQueue() {
@@ -70,9 +76,10 @@ public class MessageHandler {
 
     public Message composeMessage() {
         if (messageQueue != null) {
-            Message output = new Message();
-            output = messageQueue[0].getMessage();
-            return output;
+
+            
+            return messageQueue[0];
+
         } else {
             return null;
 

@@ -16,7 +16,7 @@ import battlecode.common.*;
  */
 public class Knowledge {
     
-    private final RobotController myRC;
+    public final RobotController myRC;
 
     private final MessageHandler myMsgHandler;
 
@@ -135,34 +135,17 @@ public class Knowledge {
 
     public boolean parentChanged = false;
     public RecyclerNode oldRecyclerNode;
-    public void recordRecyclerLocation( int r_id, int par_id, MapLocation r_loc, MapLocation par_loc )
+    public void recordRecyclerLocation( RecyclerNode newParent )
     {
-        Logger.debug_printSashko( "knowledge got pinged"  );
-
-        Logger.debug_printSashko( "wtf???: " + r_id + " " + par_id );
-
         if( myRecyclerNode==null )
         {
-            myRecyclerNode = new RecyclerNode();
-            myRecyclerNode.myRobotID = r_id;
-            myRecyclerNode.parentRobotID = par_id;
-            myRecyclerNode.parentLocation = par_loc;
-            myRecyclerNode.myLocation = r_loc;
-        } else if( r_id!=myRecyclerNode.myRobotID )
+            myRecyclerNode = newParent;
+        } else if( newParent.myRobotID!=myRecyclerNode.myRobotID )
         {
-            Logger.debug_printSashko( "new node: " + r_id + " " + par_id );
-
+            System.out.println("new node? " + newParent);
             oldRecyclerNode = myRecyclerNode;
-            myRecyclerNode = new RecyclerNode();
-            myRecyclerNode.myRobotID = r_id;
-            myRecyclerNode.parentRobotID = par_id;
-            myRecyclerNode.parentLocation = par_loc;
-            myRecyclerNode.myLocation = r_loc;
+            myRecyclerNode = newParent;
             parentChanged = true;
-
-
-
-            //Logger.debug_printSashko( "my new direction is: " + myRecyclerNode.getVector().x + ", " + myRecyclerNode.getVector().y  );
         }
     }
 

@@ -31,24 +31,17 @@ public class RecyclerPlayer extends BuildingPlayer {
             myRC.turnOff();
         }
 
-        
 
-        if( compHandler.canIBuild()) compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
+        
     }
     
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
 
-        if( knowledge.myRecyclerNode != null )
+        if( knowledge.myState == RobotState.BUILD_ANTENNA_ON_SELF) 
         {
-            
-            MessageWrapper ping = new MessageWrapper();
-            ping.genRecyclerPing( knowledge.myRecyclerNode );
-
-            Logger.debug_printSashko("pinging: " + knowledge.myRecyclerNode.myRobotID + " " + knowledge.myRecyclerNode.parentRobotID);
-
-            knowledge.msg().addToQueue(ping);
+            compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
         }
     }
     
@@ -79,6 +72,11 @@ public class RecyclerPlayer extends BuildingPlayer {
     @Override
     public void beginningStateSwitches() {
         super.beginningStateSwitches();
+
+        if (knowledge.myState == RobotState.JUST_BUILT) {
+            Logger.debug_printSashko("I called JUST_BUILT at round " + knowledge.roundNum);
+            knowledge.myState = RobotState.BUILD_ANTENNA_ON_SELF;
+        }
 
         if( haveBuiltConstructor == false && knowledge.myState == RobotState.IDLE && compHandler.canIBuild() && myRC.getTeamResources() > Prefab.lightConstructor.getTotalCost() + 100 )
         {
