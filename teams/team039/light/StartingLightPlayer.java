@@ -46,7 +46,7 @@ public class StartingLightPlayer extends LightConstructorPlayer {
     public void beginningStateSwitches() {
         if (knowledge.myState == RobotState.JUST_BUILT) {
             Logger.debug_print("I called JUST_BUILT at round " + knowledge.roundNum);
-            knowledge.myState = RobotState.IDLE;
+            knowledge.myState = RobotState.SCOUTING_STARTING_LOCATION;
         }
 
         if (knowledge.myState == RobotState.IDLE) {
@@ -77,7 +77,6 @@ public class StartingLightPlayer extends LightConstructorPlayer {
             }
             else if(desiredDirection != Direction.NONE) {
                 compHandler.setDirection(desiredDirection);
-                knowledge.myState = RobotState.SCOUTING_STARTING_LOCATION;
             }
             else {
                 Logger.debug_printHocho("first round sensing broke");
