@@ -37,6 +37,56 @@ public class LightPlayer extends SpecificPlayerImpl {
             knowledge.myState = RobotState.IDLE;
         }
     }
+
+    public void deflect() {
+
+        if( !knowledge.myRecyclerNode.hasParent() )
+        {
+            return;
+        }
+
+        
+            Direction prefDirection;
+
+            MapLocation prefVector = knowledge.myRecyclerNode.getVector();
+            /*if (knowledge.oldRecyclerNode != null) {
+                MapLocation myMovementVector = knowledge.myLocation.add(-knowledge.oldRecyclerNode.myLocation.x, -knowledge.oldRecyclerNode.myLocation.y);
+                prefVector = prefVector.add(myMovementVector.x, myMovementVector.y);
+            }*/
+
+            MapLocation origin = new MapLocation(0, 0);
+
+            prefDirection = origin.directionTo(prefVector);
+
+            int random = Clock.getRoundNum() + myRC.getRobot().getID();
+
+            Direction newDirection;
+
+            switch (random % 14) {
+                case 6:
+                case 7:
+                case 8:
+                    newDirection = prefDirection.rotateLeft();
+                    break;
+                case 9:
+                case 10:
+                case 11:
+                    newDirection = prefDirection.rotateRight();
+                    break;
+                case 12:
+                    newDirection = prefDirection.rotateLeft().rotateLeft();
+                    break;
+                case 13:
+                    newDirection = prefDirection.rotateRight().rotateRight();
+                    break;
+                default:
+                    newDirection = prefDirection;
+            }
+
+            compHandler.setDirection(newDirection);
+            System.out.println( "deflecting: " + newDirection );
+
+    }
     
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer result = this;

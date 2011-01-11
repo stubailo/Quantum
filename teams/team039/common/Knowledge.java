@@ -137,15 +137,16 @@ public class Knowledge {
     public RecyclerNode oldRecyclerNode;
     public void recordRecyclerLocation( RecyclerNode newParent )
     {
+        parentChanged = false;
         if( myRecyclerNode==null )
         {
             myRecyclerNode = newParent;
+            parentChanged = true;
         } else if( newParent.myRobotID!=myRecyclerNode.myRobotID )
         {
-            System.out.println("new node? " + newParent);
+            parentChanged = true;
             oldRecyclerNode = myRecyclerNode;
             myRecyclerNode = newParent;
-            parentChanged = true;
         }
     }
 

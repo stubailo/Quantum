@@ -25,6 +25,16 @@ public abstract class MessageCoder {
     public static final String RECYCLER_PING = "rp";
     public static final String RECYCLER_DESIGNATION = "rd";
 
+    public static boolean isValid( Message input )
+    {
+        if( input.ints == null || input.strings == null || input.locations == null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     /*
      * Takes a series of arguments, any of which can be null, and generates a
      * valid single message.

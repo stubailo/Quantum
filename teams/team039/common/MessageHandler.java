@@ -33,11 +33,13 @@ public class MessageHandler {
         Message[] newMessages;
 
         newMessages = myRC.getAllMessages();
-
+boolean haveGottenPinged = false;
         for (Message currentMessage : newMessages) {
 
-            if( MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_PING ) && !knowledge.myRC.getChassis().equals(Chassis.BUILDING) )
+            
+            if( haveGottenPinged==false && MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_PING ) && !knowledge.myRC.getChassis().equals(Chassis.BUILDING) )
             {
+                haveGottenPinged = true;
                 knowledge.recordRecyclerLocation( RecyclerNode.getFromPing(currentMessage) );
             } else if( MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_DESIGNATION ) 
                     && knowledge.myRC.getChassis().equals(Chassis.BUILDING)
