@@ -107,7 +107,7 @@ public class LightConstructorPlayer extends LightPlayer {
             } else {
 
 		        try {
-		            compHandler.pathFinder.explore();
+		            compHandler.pathFinder.zigZag();
 		        } catch (Exception e) {
 		            Logger.debug_printExceptionMessage(e);
 		        }

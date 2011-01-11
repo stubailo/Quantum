@@ -94,21 +94,22 @@ public class PathFinder {
 				myCH.moveForward();
 			} else {
 				//if path is blocked, find a direction to bounce in
-				boolean moved = false;
-				while(!moved) {
+				Direction moveDir = Direction.NONE;
+				while(moveDir == Direction.NONE) {
 					testRDir1 = testRDir2;
 					testRDir2 = testRDir2.rotateRight();
-					moved = moveZigZagDir(testRDir1, testRDir2);
-					if(!moved) {
+					moveDir = moveZigZagDir(testRDir1, testRDir2);
+					if(moveDir == Direction.NONE) {
 						testLDir1 = testLDir2;
 						testLDir2 = testLDir2.rotateLeft();
-						moved = moveZigZagDir(testLDir1, testLDir2);
+						moveDir = moveZigZagDir(testLDir1, testLDir2);
 					}
+					
 					//if surrounded, do nothing.
-					if(testRDir1 == testRDir2)
+					if(testRDir1 == testLDir1)
 						break;
 				}
-				
+				myCH.setDirection(moveDir);
 			}
 			
 		} catch(Exception e) {
@@ -116,17 +117,16 @@ public class PathFinder {
 		}
 	}
 	
-	private boolean moveZigZagDir(Direction dir1, Direction dir2) {
+	private Direction moveZigZagDir(Direction dir1, Direction dir2) {
 		if(myCH.canMove(dir1)) {
-			if(myCH.canMove(dir2)) {
-				myCH.setDirection(dir2);
-				return true;
-			} else {
-				myCH.setDirection(dir1);
-				return true;
-			}
+			if(dir2 == knowledge.myDirection.opposite())
+				return dir1;
+			else if(myCH.canMove(dir2)) 
+				return dir2;
+		    else 
+				return dir1;
 		} else {
-			return false;
+			return Direction.NONE;
 		}
 	}
 	

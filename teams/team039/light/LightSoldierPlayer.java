@@ -85,7 +85,7 @@ public class LightSoldierPlayer extends LightPlayer {
 
         } else {
 	        try {
-	            compHandler.pathFinder.explore();
+	            compHandler.pathFinder.zigZag();
 	        } catch (Exception e) {
 	        	Logger.debug_print("Robot " + myRC.getRobot().getID()
 	                    + " during round " + Clock.getRoundNum()
