@@ -1,9 +1,9 @@
 package team039.light;
 
-import team039.common.ComponentsHandler;
 import team039.common.Knowledge;
 import team039.common.SpecificPlayer;
 import team039.common.util.Logger;
+import team039.handler.ComponentsHandler;
 
 import battlecode.common.*;
 

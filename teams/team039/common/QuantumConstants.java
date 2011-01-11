@@ -24,8 +24,11 @@ public final class QuantumConstants {
 	/** Number of rounds to navigate before setting a new exploration goal */
 	public static final int EXPLORE_TIME = 100;
 	/** Distance to exploration goal */
-	public static final int EXLPORE_GOAL_DISTANCE = 30;
-	
+	public static final int EXLPORE_GOAL_DISTANCE = 15;
+	/** Big integer */
+	public static final int BIG_INT = 65536;
+	/** Whether or not we attack debris */
+	public static final boolean ATTACK_DEBRIS = false;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

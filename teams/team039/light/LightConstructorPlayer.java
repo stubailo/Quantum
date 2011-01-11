@@ -2,6 +2,7 @@ package team039.light;
 
 import team039.common.*;
 import team039.common.util.Logger;
+import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
 public class LightConstructorPlayer extends LightPlayer {
@@ -87,15 +88,18 @@ public class LightConstructorPlayer extends LightPlayer {
 
     public void explore() {
         if (compHandler.canIBuild()) {
-            Mine[] sensedMines = compHandler.senseEmptyMines();
+            //Mine[] sensedMines = compHandler.senseEmptyMines();
+            MapLocation nearestMine = compHandler.senseNearbyMines();
 
             if (compHandler.canSenseEnemies()) {
             }
 
             // TODO: else statement here?
 
-            if (sensedMines != null) {
-                buildRecyclerLocation = sensedMines[0].getLocation();
+            //if (sensedMines != null) {
+            if(nearestMine != null) {
+                //buildRecyclerLocation = sensedMines[0].getLocation();
+                buildRecyclerLocation = nearestMine;
                 compHandler.pathFinder.pauseExploration();
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
@@ -105,10 +109,7 @@ public class LightConstructorPlayer extends LightPlayer {
 		        try {
 		            compHandler.pathFinder.explore();
 		        } catch (Exception e) {
-		            System.out.println("Robot " + myRC.getRobot().getID()
-		                    + " during round " + Clock.getRoundNum()
-		                    + " caught exception:");
-		            e.printStackTrace();
+		            Logger.debug_printExceptionMessage(e);
 		        }
             }
 

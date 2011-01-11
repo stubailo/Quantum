@@ -3,6 +3,7 @@ package team039.building;
 import team039.building.recycler.RecyclerPlayer;
 import team039.common.*;
 import team039.common.util.Logger;
+import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
 public class BuildingPlayer extends SpecificPlayerImpl {

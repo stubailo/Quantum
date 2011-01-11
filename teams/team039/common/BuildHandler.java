@@ -4,6 +4,7 @@
  */
 package team039.common;
 
+import team039.handler.ComponentsHandler;
 import battlecode.common.*;
 
 /**

@@ -2,7 +2,7 @@ package team039.common;
 
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
-import team039.common.ComponentsHandler;
+import team039.handler.ComponentsHandler;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
