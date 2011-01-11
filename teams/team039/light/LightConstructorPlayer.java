@@ -99,8 +99,8 @@ public class LightConstructorPlayer extends LightPlayer {
             if (sensedMines != null) {
             //if(nearestMine != null) {
                 buildRecyclerLocation = sensedMines[0].getLocation();
-                //buildRecyclerLocation = nearestMine;
-                compHandler.pathFinder.pauseExploration();
+
+//                compHandler.pathFinder.pauseExploration();
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
@@ -108,7 +108,7 @@ public class LightConstructorPlayer extends LightPlayer {
             } else {
 
 		        try {
-		            compHandler.pathFinder.explore();
+		            compHandler.pathFinder.zigZag();
 		        } catch (Exception e) {
 		            Logger.debug_printExceptionMessage(e);
 		        }
