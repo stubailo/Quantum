@@ -95,17 +95,6 @@ public class LightConstructorPlayer extends LightPlayer {
             Mine[] sensedMines = compHandler.senseEmptyMines();
             //MapLocation nearestMine = compHandler.senseNearbyMines();
 
-            if (compHandler.canSenseEnemies()) {
-                if (knowledge.myRecyclerNode != null && knowledge.myRecyclerNode.parentLocation == null) {
-                    fleeTarget = knowledge.myRecyclerNode.myLocation;
-                    compHandler.pathFinder.setGoal(knowledge.myRecyclerNode.myLocation);
-                } else {
-                    fleeTarget = knowledge.myRecyclerNode.parentLocation;
-                    compHandler.pathFinder.setGoal(knowledge.myRecyclerNode.parentLocation);
-                }
-                knowledge.myState = RobotState.FLEEING;
-            }
-
             // TODO: else statement here?
 
             if (sensedMines != null) {
