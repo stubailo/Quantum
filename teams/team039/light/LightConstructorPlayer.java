@@ -36,7 +36,7 @@ public class LightConstructorPlayer extends LightPlayer {
                 flee();
                 break;
             case BUILDING:
-                compHandler.build().step();
+            	build();
                 break;
             case JUST_BUILT:
                 break;
@@ -45,7 +45,7 @@ public class LightConstructorPlayer extends LightPlayer {
                 break;
         }
 
-        myRC.setIndicatorString(2, knowledge.myState.toString());
+        myRC.setIndicatorString(0, knowledge.myState.toString());
     }
 
     @Override
@@ -168,22 +168,25 @@ public class LightConstructorPlayer extends LightPlayer {
     MapLocation buildRecyclerLocation;
 
     public void buildRecycler() {
-
-        if(knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation) <= 2 && 
+    	int distanceToLocation = knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation);
+    	if(distanceToLocation == 0) {
+    		compHandler.pathFinder.navigateToAdjacent();
+    	} else if(distanceToLocation <= 2 && 
         		!compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
         	knowledge.myState = RobotState.IDLE;
         }
         
         if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && 
         		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
-            
+
+        	//changes to state BUILDING if the chassis is successfully built.
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
-            try {
-                compHandler.pathFinder.navigateToAdjacent();
-            } catch (Exception e) {
-                Logger.debug_printExceptionMessage(e);
-            }
+            compHandler.pathFinder.navigateToAdjacent();
         }
+    }
+    
+    private void build() {
+        compHandler.build().step();
     }
 }
