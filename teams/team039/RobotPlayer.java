@@ -106,6 +106,7 @@ public class RobotPlayer implements Runnable {
     public void debug_setStrings() { 
         myRC.setIndicatorString(0, knowledge.myLocation.toString());
         myRC.setIndicatorString(1, String.valueOf(knowledge.deltaFlux));
+        myRC.setIndicatorString(2, String.valueOf(knowledge.totalFlux));
     }
     
     public static void debug_printGameConstants() {
