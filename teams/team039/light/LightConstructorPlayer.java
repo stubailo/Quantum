@@ -120,7 +120,14 @@ public class LightConstructorPlayer extends LightPlayer {
     
     MapLocation buildRecyclerLocation;
     public void buildRecycler() {
-        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
+        if(knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation) <= 2 && 
+        		!compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
+        	knowledge.myState = RobotState.IDLE;
+        }
+        
+        if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && 
+        		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
+            
             
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {

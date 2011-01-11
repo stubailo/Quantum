@@ -336,7 +336,7 @@ public class PathFinder {
     	return action;
     }
 
-    public void navigateToAdjacent() throws GameActionException{
+    public void navigateToAdjacent() {
     	//must initiate bug navigation before calling.
     	if(!navigating)
     		return;
@@ -353,7 +353,11 @@ public class PathFinder {
     		}
     	}
     
-    	navigateBug();
+    	try {
+	    	navigateBug();
+    	} catch (Exception e) {
+    		Logger.debug_printExceptionMessage(e);
+    	}
 
     }
 }
