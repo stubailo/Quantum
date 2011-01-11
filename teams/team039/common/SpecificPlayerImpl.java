@@ -26,6 +26,7 @@ public class SpecificPlayerImpl implements SpecificPlayer {
     }
 
     public void doSpecificActions() {
+        beginningStateSwitches();
     }
 
     public void doSpecificFirstRoundActions() {

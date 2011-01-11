@@ -22,11 +22,11 @@ public class LightPlayer extends SpecificPlayerImpl {
     }
     
     public void doSpecificActions() {
-        beginningStateSwitches();
+        super.doSpecificActions();
     }
     
     public void doSpecificFirstRoundActions() {
-        
+        super.doSpecificActions();
     }
 
     public void beginningStateSwitches()

@@ -104,6 +104,7 @@ public class LightConstructorPlayer extends LightPlayer {
                 compHandler.pathFinder.setGoal(buildRecyclerLocation);
                 compHandler.pathFinder.initiateBugNavigation();
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
+                buildRecycler();
             } else {
 
 		        try {

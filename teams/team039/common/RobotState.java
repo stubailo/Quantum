@@ -30,6 +30,13 @@ public enum RobotState {
      * The JUST_BUILT state is given to robots when they are built.
      */
     JUST_BUILT,
+    
+    /*
+     * StartingLightPlayer builds first two mines.
+     */
+    SCOUTING_STARTING_LOCATION,
+    BUILDING_FIRST_MINE,
+    BUILDING_SECOND_MINE,
 
     /*
      * When a robot is waiting to acquire a state, it is in IDLE.  When a robot stops

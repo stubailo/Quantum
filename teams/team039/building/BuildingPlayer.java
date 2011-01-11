@@ -25,8 +25,7 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     }
 
     public void doSpecificActions() {
-
-        beginningStateSwitches();
+        super.doSpecificActions();
 
         if (knowledge.myState == RobotState.BUILDING) {
             compHandler.build().step();
@@ -41,6 +40,7 @@ public class BuildingPlayer extends SpecificPlayerImpl {
     }
 
     public void doSpecificFirstRoundActions() {
+        super.doSpecificFirstRoundActions();
     }
 
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {

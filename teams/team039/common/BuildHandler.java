@@ -22,6 +22,7 @@ public class BuildHandler {
     private ComponentsHandler compHandler;
     private RobotController myRC;
     private Knowledge knowledge;
+    private RobotState stateToReturnTo = null;
 
     public BuildHandler(RobotController rc, ComponentsHandler ch, Knowledge know) {
         myRC = rc;
@@ -79,6 +80,17 @@ public class BuildHandler {
             return false;
         }
     }
+    
+    public Boolean buildChassisAndThenComponents(BuildInstructions instructions, MapLocation location, RobotState givenState) {
+        Chassis chassis = instructions.getBaseChassis();
+        stateToReturnTo = givenState;
+        if (compHandler.buildChassis(chassis, location)) {
+            startBuildingComponents(instructions, location, chassis.level);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Initiates component build process by setting all of the required variables
@@ -104,7 +116,13 @@ public class BuildHandler {
         buildLocation = null;
         buildHeight = null;
 
-        knowledge.myState = RobotState.IDLE;
+        if(stateToReturnTo == null) {
+            knowledge.myState = RobotState.IDLE;
+        }
+        else {
+            knowledge.myState = stateToReturnTo;
+            stateToReturnTo = null;
+        }
     }
 
     /**
@@ -117,6 +135,12 @@ public class BuildHandler {
         buildLocation = null;
         buildHeight = null;
 
-        knowledge.myState = RobotState.IDLE;
+        if(stateToReturnTo == null) {
+            knowledge.myState = RobotState.IDLE;
+        }
+        else {
+            knowledge.myState = stateToReturnTo;
+            stateToReturnTo = null;
+        }
     }
 }

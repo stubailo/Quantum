@@ -377,6 +377,8 @@ public class ComponentsHandler {
 
             boolean overcorrect = false;
             GameObject correctingObject = knowledge.myRobot;
+            
+            int numberOfUnminedMines = sensedMines.length - sensedRobots.length;
 
             // If we see all robots/mines, we record them.
             // Otherwise, depending on number of seen robots/mines, we cleverly turn
@@ -384,7 +386,7 @@ public class ComponentsHandler {
             switch (sensedRobots.length) {
 
                 case 0:
-                    switch (sensedMines.length) {
+                    switch (numberOfUnminedMines) {
 
                         case 0:
                             overcorrect = true;
@@ -401,12 +403,12 @@ public class ComponentsHandler {
 
                 case 1:
                     correctingObject = sensedRobots[0];
-                    if (sensedMines.length == 0) {
+                    if (numberOfUnminedMines == 0) {
                         overcorrect = true;
                     }
 
                 case 2:
-                    switch (sensedMines.length) {
+                    switch (numberOfUnminedMines) {
 
                         case 0:
                             correctingObject = sensedRobots[0];
@@ -440,25 +442,91 @@ public class ComponentsHandler {
 
             // Now we know we can sense everything, so we quickly jot it down.
             Robot recycler1 = sensedRobots[0], recycler2 = sensedRobots[1];
+            MapLocation recycler1Location = sensor.senseLocationOf(recycler1);
+            MapLocation recycler2Location = sensor.senseLocationOf(recycler2);
             if (recycler1.getID() < recycler2.getID()) {
-                knowledge.startingTurnedOnRecyclerLocation =
-                        sensor.senseLocationOf(recycler1);
+                knowledge.startingTurnedOnRecyclerLocation = recycler1Location;
             } else {
-                knowledge.startingTurnedOnRecyclerLocation =
-                        sensor.senseLocationOf(recycler2);
+                knowledge.startingTurnedOnRecyclerLocation = recycler2Location;
             }
 
-            MapLocation mine1Loc = sensor.senseLocationOf(sensedMines[0]),
-                    mine2Loc = sensor.senseLocationOf(sensedMines[1]);
-
-            if (knowledge.myLocation.distanceSquaredTo(mine1Loc)
-                    < knowledge.myLocation.distanceSquaredTo(mine2Loc)) {
-                knowledge.startingUnminedMineLocations[0] = mine1Loc;
-                knowledge.startingUnminedMineLocations[1] = mine2Loc;
-            } else {
-                knowledge.startingUnminedMineLocations[0] = mine2Loc;
-                knowledge.startingUnminedMineLocations[1] = mine1Loc;
+            int unminedMinesFound = 0;
+            int badSquares = 0;
+            
+            for(Mine mine : sensedMines) {
+                MapLocation mineLoc = mine.getLocation();
+                if(!(mineLoc.equals(recycler1Location) || mineLoc.equals(recycler2Location))) {
+                    if(unminedMinesFound == 0) {
+                        Direction addDirection = Direction.EAST;
+                        int potBadSquares = 0;
+                        for(int index = 0; index < 8; index ++) {
+                            MapLocation addLoc = mineLoc.add(addDirection);
+                            if((!addLoc.equals(recycler2Location)) &&
+                               (!addLoc.equals(recycler1Location)) &&
+                               (!addLoc.equals(knowledge.myLocation)) &&
+                               sensor.canSenseSquare(addLoc)) {
+                                TerrainTile tt = myRC.senseTerrainTile(addLoc);
+                                if(tt.equals(TerrainTile.LAND)) {
+                                    Robot potRob = (Robot) sensor.senseObjectAtLocation(addLoc, RobotLevel.ON_GROUND);
+                                    if(potRob == null) {
+                                        knowledge.startingUnminedMineLocations[0] = mineLoc;
+                                        unminedMinesFound = 1;
+                                    }
+                                    else {
+                                        potBadSquares++;
+                                    }
+                                }
+                                else {
+                                    potBadSquares++;
+                                }
+                            }
+                            addDirection = addDirection.rotateLeft();
+                        }
+                        knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        unminedMinesFound = -1;
+                        badSquares = potBadSquares;
+                    }
+                    else if(unminedMinesFound == 1) {
+                        knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        break;
+                    }
+                    else if(unminedMinesFound == -1) {
+                        Direction addDirection = Direction.EAST;
+                        int potBadSquares = 0;
+                        for(int index = 0; index < 8; index ++) {
+                            MapLocation addLoc = mineLoc.add(addDirection);
+                            if((!addLoc.equals(recycler2Location)) &&
+                               (!addLoc.equals(recycler1Location)) &&
+                               (!addLoc.equals(knowledge.myLocation)) &&
+                               sensor.canSenseSquare(addLoc)) {
+                                TerrainTile tt = myRC.senseTerrainTile(addLoc);
+                                if(tt.equals(TerrainTile.LAND)) {
+                                    Robot potRob = (Robot) sensor.senseObjectAtLocation(addLoc, RobotLevel.ON_GROUND);
+                                    if(potRob == null) {
+                                        knowledge.startingUnminedMineLocations[0] = mineLoc;
+                                        unminedMinesFound = 1;
+                                    }
+                                    else {
+                                        potBadSquares++;
+                                    }
+                                }
+                                else {
+                                    potBadSquares++;
+                                }
+                            }
+                            addDirection = addDirection.rotateLeft();
+                        }
+                        if(potBadSquares > badSquares) {
+                            knowledge.startingUnminedMineLocations[0] = knowledge.startingUnminedMineLocations[1];
+                            knowledge.startingUnminedMineLocations[1] = mineLoc;
+                        } else {
+                            knowledge.startingUnminedMineLocations[0] = mineLoc;
+                        }
+                        break;
+                    }
+                }
             }
+
             return Direction.OMNI;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
