@@ -1,7 +1,8 @@
-package team039.common;
+package team039.player;
 
 import team039.building.BuildingPlayer;
 import team039.building.recycler.StartingBuildingPlayer;
+import team039.common.Knowledge;
 import team039.handler.ComponentsHandler;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;

@@ -48,6 +48,12 @@ public class Knowledge {
     public         MapLocation         lowestAlliedRecyclerIDLocation;
     public         MapLocation         startingTurnedOnRecyclerLocation;
     public         MapLocation[]       startingUnminedMineLocations = new MapLocation[2];
+    
+    public         MapLocation         nearestUnminedMineLocation;
+    public         int                 nearestUnminedMineDistanceSquared;
+    
+    public         MapLocation         weakestNearbyDebrisLocation;
+    public         double              weakestNearbyDebrisHP;
 
     /* Each piece of data should be time stamped somehow.  Otherwise, when a
      * robot receives two conflicting pieces of information it won't know
@@ -57,7 +63,7 @@ public class Knowledge {
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.
-    public final LocationMemory locationMemory = new LocationMemory();
+    public final LocationMemory locationMemory = new LocationMemory(this);
     /***public         MapLocation[]       unminedMineLocations     = new MapLocation[100];
     public         MapLocation[]       ourMineLocations         = new MapLocation[100];
     public         MapLocation[]       theirMineLocations       = new MapLocation[100];

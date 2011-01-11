@@ -1,6 +1,7 @@
-package team039.building.recycler;
+package team039.player.building.recycler;
 
-import team039.building.BuildingPlayer;
+import team039.player.SpecificPlayer;
+import team039.player.building.BuildingPlayer;
 import team039.common.*;
 import team039.handler.ComponentsHandler;
 import battlecode.common.*;

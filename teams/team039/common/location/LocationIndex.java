@@ -2,7 +2,6 @@ package team039.common.location;
 
 import battlecode.common.*;
 import team039.common.QuantumConstants;
-import static battlecode.common.GameConstants.*;
 
 /**
  * This class stores a positive integer for each map location, and uses a hash to keep track of
