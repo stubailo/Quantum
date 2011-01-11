@@ -46,7 +46,7 @@ public class StartingLightPlayer extends LightConstructorPlayer {
     public void beginningStateSwitches() {
         if (knowledge.myState == RobotState.JUST_BUILT) {
             Logger.debug_print("I called JUST_BUILT at round " + knowledge.roundNum);
-            knowledge.myState = RobotState.SCOUTING_STARTING_LOCATION;
+            knowledge.myState = RobotState.IDLE;
         }
 
         if (knowledge.myState == RobotState.IDLE) {

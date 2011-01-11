@@ -624,7 +624,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(component, location, height);
+            //if(knowledge.totalFlux > component.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(component, location, height);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -638,7 +640,9 @@ public class ComponentsHandler {
         }
 
         try {
-            myBC.build(chassis, location);
+            //if(mySCs[0].senseObjectAtLocation(location, RobotLevel.ON_GROUND) == null && knowledge.totalFlux > chassis.cost + QuantumConstants.SMALL_BUFFER) {
+                myBC.build(chassis, location);
+            //}
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
