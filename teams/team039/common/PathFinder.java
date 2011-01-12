@@ -148,30 +148,38 @@ public class PathFinder {
 		return navigating;
 	}
 	
-	public void step() throws GameActionException {
+	public void step() {
 		//do nothing if the motor is active or you are not navigating
     	if(!navigating)
     		return;
     	if(myCH.motorActive())
     		return;
-		
-		myRC.setIndicatorString(1, "stepping? " + navAlg.toString());
 
-		switch(navAlg) {
-			case BUG:
-				navigateBug();
-				break;
-			case A_STAR:
-				break;
-		}		
+    	try {
+			switch(navAlg) {
+				case BUG:
+					navigateBug();
+					break;
+				case ZIG_ZAG:
+					zigZag();
+					break;
+			}
+    	} catch(Exception e) {
+    		Logger.debug_printExceptionMessage(e);
+    	}
 	}
 	
 	public boolean reachedGoal() {		
 		return knowledge.myLocation.equals(goal);
 	}
 	
-    public void initiateBugNavigation() {
+	public void initiateBugNavigation() {
+		initiateBugNavigation(goal);
+	}
+	
+    public void initiateBugNavigation(MapLocation newGoal) {
 //    	bugNavigating = true;
+    	goal = newGoal;
     	navAlg = NavigationAlgorithm.BUG;
     	navigating = true;
     	tracking = false;
@@ -186,11 +194,10 @@ public class PathFinder {
 		bugState = BugState.ROTATE;
     }
     
-    public void navigateBug() throws GameActionException {	
+    public void navigateBug()  {	
  	
     	MapLocation location = knowledge.myLocation;
     	Direction directionToGoal = location.directionTo(goal);
-//    	Direction myDirection = knowledge.myDirection;
     	int bugPos = bugStep % QuantumConstants.BUG_MEMORY_LENGTH;
     	    	
     	//stop navigating once you have reached your goal
@@ -201,48 +208,46 @@ public class PathFinder {
 
     	if(myCH.motorActive())
     		return;
-    	
-//    	bugState = determineBugState();
-    	//no extraneous rotation
-//    	if(!tracking && knowledge.myDirection == directionToGoal)
-//    		bugState = BugState.MOVE_FORWARD;
-//    	
-//    	myRC.setIndicatorString(1, bugState.toString());
+
     	BugState action = determineBugState();
     	
-    	switch(action) {
-	    	case ROTATE:
-	    		if(tracking)
-	    			myCH.setDirection(trackingDirection);
-	    		else
-	    			myCH.setDirection(directionToGoal);
-		    	break;
-		    
-		    case MOVE_FORWARD:
-		    	myCH.moveForward();
-		    	prevDirectionToGoal = directionToGoal;
-		    	prevTrackingDirection = trackingDirection;
-		    	
-		    	if(stopTracking){
-		    		tracking = false;
-		    		stopTracking = false;
-		    	}
-		    	break;
-		    	
-		    case MOVE_BACKWARD:
-		    	myCH.moveBackward();
-		    	prevDirectionToGoal = directionToGoal;
-		    	prevTrackingDirection = trackingDirection;
-		    	
-		    	if(stopTracking){
-		    		tracking = false;
-		    		stopTracking = false;
-		    	}
-		    	break; 
-		    	
-		    case NONE:
-		    	break;
-    	}   	
+    	try {
+	    	switch(action) {
+		    	case ROTATE:
+		    		if(tracking)
+		    			myCH.setDirection(trackingDirection);
+		    		else
+		    			myCH.setDirection(directionToGoal);
+			    	break;
+			    
+			    case MOVE_FORWARD:
+			    	myCH.moveForward();
+			    	prevDirectionToGoal = directionToGoal;
+			    	prevTrackingDirection = trackingDirection;
+			    	
+			    	if(stopTracking){
+			    		tracking = false;
+			    		stopTracking = false;
+			    	}
+			    	break;
+			    	
+			    case MOVE_BACKWARD:
+			    	myCH.moveBackward();
+			    	prevDirectionToGoal = directionToGoal;
+			    	prevTrackingDirection = trackingDirection;
+			    	
+			    	if(stopTracking){
+			    		tracking = false;
+			    		stopTracking = false;
+			    	}
+			    	break; 
+			    	
+			    case NONE:
+			    	break;
+	    	}
+    	} catch(Exception e) {
+    		Logger.debug_printExceptionMessage(e);
+    	}
     }
     
     private BugState determineBugState() {
@@ -280,6 +285,7 @@ public class PathFinder {
     				testDirection = testDirection.rotateRight();
     			}
     			
+    			//update turning number
     			turningNumber++;
     			
     			if(myCH.canMove(testDirection)){

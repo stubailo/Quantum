@@ -7,6 +7,7 @@ public enum NavigationAlgorithm {
 	 * be used.  
 	 */
 	BUG,
+	ZIG_ZAG,
 	A_STAR,
 	NONE
 }
