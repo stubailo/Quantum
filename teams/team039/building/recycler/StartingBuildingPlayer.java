@@ -42,15 +42,6 @@ public class StartingBuildingPlayer extends RecyclerPlayer {
         knowledge.myRecyclerNode.myRobotID = myRC.getRobot().getID();
         knowledge.myRecyclerNode.parentLocation = null;
         knowledge.myRecyclerNode.parentRobotID = 0;
-
-        Message message = MessageCoder.encodeMessage("msg1", knowledge.myRobotID, knowledge.myLocation, knowledge.roundNum, false, null, null, null);
-        Message message2 = MessageCoder.encodeMessage("msg2", knowledge.myRobotID, knowledge.myLocation, knowledge.roundNum, false, null, null, null);
-        Message [] messages = {message, message2};
-
-        Message message_merge = MessageCoder.mergeMessages( messages );
-        Message[] messages_split = MessageCoder.splitMessages(message_merge);
-
-        System.out.println("lolol: " + MessageCoder.getMessageType(messages_split[0]));
     }
 
     @Override
