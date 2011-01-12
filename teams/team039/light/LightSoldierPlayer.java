@@ -68,9 +68,8 @@ public class LightSoldierPlayer extends LightPlayer {
 
     public void attack()
     {
-
+        
         if (compHandler.attackVisible()) {
-                Logger.debug_print("Attacking!");
         } else {
             Logger.debug_print("Can't see anyone.");
             knowledge.myState = RobotState.IDLE;
@@ -79,6 +78,7 @@ public class LightSoldierPlayer extends LightPlayer {
 
     public void explore() {
         if (compHandler.canSenseEnemies() && compHandler.hasWeapons()) {
+            Logger.debug_printSashko("Attacking!");
             knowledge.myState = RobotState.ATTACKING;
             compHandler.pathFinder.pauseExploration();
             attack();

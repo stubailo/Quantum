@@ -8,6 +8,7 @@ import team039.handler.ComponentsHandler;
 import team039.light.LightPlayer;
 import team039.light.StartingLightPlayer;
 import battlecode.common.*;
+import team039.common.util.*;
 
 public class SpecificPlayerImpl implements SpecificPlayer {
 
@@ -41,11 +42,12 @@ public class SpecificPlayerImpl implements SpecificPlayer {
     public SpecificPlayer determineSpecificPlayer(ComponentType compType) {
         SpecificPlayer chassisTypePlayer = this;
 
-        if(knowledge.roundNum == 0) {
+        if(Clock.getRoundNum() == 0) {
             switch(myRC.getChassis()) {
             case BUILDING:
                 chassisTypePlayer = new RecyclerPlayer(myRC, knowledge, compHandler);
                 chassisTypePlayer.initialize();
+                
                 chassisTypePlayer = new StartingBuildingPlayer(myRC, knowledge, compHandler);
                 chassisTypePlayer.initialize();
                 break;
@@ -58,6 +60,7 @@ public class SpecificPlayerImpl implements SpecificPlayer {
         else {
             switch (myRC.getChassis()) {
             case BUILDING:
+                Logger.debug_printSashko("initializing initial constructor");
                 chassisTypePlayer = new BuildingPlayer(myRC, knowledge, compHandler);
                 break;
                 

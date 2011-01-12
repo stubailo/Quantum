@@ -31,25 +31,12 @@ public class RecyclerPlayer extends BuildingPlayer {
             myRC.turnOff();
         }
 
-        
-
         if( compHandler.canIBuild()) compHandler.build().startBuildingComponents(Prefab.commRecycler, myRC.getLocation(), RobotLevel.ON_GROUND);
     }
     
     @Override
     public void doSpecificActions() {
         super.doSpecificActions();
-
-        if( knowledge.myRecyclerNode != null )
-        {
-            
-            MessageWrapper ping = new MessageWrapper();
-            ping.genRecyclerPing( knowledge.myRecyclerNode );
-
-            Logger.debug_printSashko("pinging: " + knowledge.myRecyclerNode.myRobotID + " " + knowledge.myRecyclerNode.parentRobotID);
-
-            knowledge.msg().addToQueue(ping);
-        }
     }
     
     @Override

@@ -13,23 +13,6 @@ import battlecode.common.*;
  */
 public class MessageWrapper {
 
-    /*
-     * THIS CLASS IS NOT DONE YET
-     *
-     *  MESSAGE STRUCTURE
-     *  MapLocations[0] is the location of broadcaster
-     *  Int[0] is the robot ID of the broadcaster
-     *  String[0] is the passcode of the team (some sort of hash of the round number?
-     * this is important to check if the message is a. from our team and b. not fake)
-     *
-     *  Each message type should strive to use an equal number of ints, strings, and MapLocations.
-     *  That way they are in coherent blocks. Also, it is optimal if the data points
-     * with the same index are related (example: int is timestamp of most recent sighting,
-     * MapLocation is a location, and String is the type of incident found; 347, loc, "our recycler")
-     *
-     *  This structure is capable of putting together and separating messages for rebroadcast.
-     *
-     */
 
     public static final int mainHeaderLength = 3; //how many initial indices are used for the header
 
