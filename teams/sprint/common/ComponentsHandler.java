@@ -465,25 +465,25 @@ public class ComponentsHandler {
     }
     
     public boolean motorActive () {
-    	return myMC.isActive();
+        return myMC.isActive();
     }
     
     public boolean canMove(Direction dir) {
-    	return myMC.canMove(dir);
+        return myMC.canMove(dir);
     }
     
     public void moveForward() throws GameActionException {
-    	if(!myMC.canMove(knowledge.myDirection))
-    		return;
-    	
-    	myMC.moveForward();
+        if(!myMC.canMove(knowledge.myDirection))
+            return;
+        
+        myMC.moveForward();
     }
     
     public void moveBackward() throws GameActionException {
-    	if(!myMC.canMove(knowledge.myDirection.opposite()))
-    		return;
-    	
-    	myMC.moveBackward();
+        if(!myMC.canMove(knowledge.myDirection.opposite()))
+            return;
+        
+        myMC.moveBackward();
     }
     
     
