@@ -25,6 +25,7 @@ public class LightConstructorPlayer extends LightPlayer {
     public void doSpecificActions() {
         super.doSpecificActions();
 
+        Logger.debug_printAntony("testing....");
         switch (knowledge.myState) {
             case EXPLORING:
                 explore();

@@ -9,7 +9,9 @@ public class Logger {
      * @param s     string to be printed.
      */
     public static void debug_print(String s) {
-        System.out.println(s);
+        if(LoggerConfigs.OLD_STRINGS) {
+            System.out.println(s);
+        }
     }
     
     /**

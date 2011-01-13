@@ -194,6 +194,12 @@ public class PathFinder {
     }
     
     public void navigateBug()  {    
+  
+        TerrainTile terrainTile = myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection, 4));
+        Logger.debug_printAntony(terrainTile == null ? "null" : terrainTile.toString());
+        myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection,4));
+//        myRC.setIndicatorString(2, myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection,4)).toString());
+        Logger.debug_printAntony(String.valueOf(myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection))));
      
         MapLocation location = knowledge.myLocation;
         Direction directionToGoal = location.directionTo(goal);
@@ -302,7 +308,7 @@ public class PathFinder {
             }
             
             action = getBugAction(trackingDirection);
-            myRC.setIndicatorString(2, "CW? " + trackingCW + "turning num: " + turningNumber);
+//            myRC.setIndicatorString(2, "CW? " + trackingCW + "turning num: " + turningNumber);
             
         } else {
             //not tracking, so check if you can move towards the goal
@@ -350,7 +356,7 @@ public class PathFinder {
                 turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
 //                prevDirectionToGoal = directionToGoal;
                 action = getBugAction(trackingDirection);
-                myRC.setIndicatorString(2, "turning = " + turningNumber);
+//                myRC.setIndicatorString(2, "turning = " + turningNumber);
             }
         }
         
@@ -397,17 +403,14 @@ public class PathFinder {
         
         if(myCH.motorActive()) {
             return;
-        } else if(distanceSquaredToGoal == 0) {
+        }
+        
+        if(distanceSquaredToGoal == 0) {
             Direction moveDir = knowledge.myDirection;
             boolean searching = true;
             myRC.setIndicatorString(2, "we are at goal");
-            //Logger.debug_printAntony("printing is turned on");
-            //for(int garbage = 0; garbage < 8; garbage++) {
-            //    Logger.debug_printAntony("can move in direction " + moveDir.toString() + "? " + String.valueOf(myCH.canMove(moveDir)));
-            //    moveDir = moveDir.rotateRight();
-            //}
+
             while(searching){
-                //Logger.debug_printAntony("checking direction: " + moveDir.toString());
                 if(myCH.canMove(moveDir)) {
                     searching = false;
                 } else {
@@ -420,14 +423,13 @@ public class PathFinder {
                 }
             }
             myRC.setIndicatorString(1, "finished loop");
-            //Logger.debug_printAntony("going for direction: " + moveDir.toString());
             try {
-            if(moveDir == knowledge.myDirection)
-                myCH.moveForward();
-            else if(moveDir == knowledge.myDirection.opposite())
-                myCH.moveBackward();
-            else if(moveDir != Direction.NONE)
-                myCH.setDirection(moveDir);
+                if(moveDir == knowledge.myDirection)
+                    myCH.moveForward();
+                else if(moveDir == knowledge.myDirection.opposite())
+                    myCH.moveBackward();
+                else if(moveDir != Direction.NONE)
+                    myCH.setDirection(moveDir);
             } catch(Exception e) {
                 Logger.debug_printExceptionMessage(e);
             }
