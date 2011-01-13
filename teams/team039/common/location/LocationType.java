@@ -9,11 +9,9 @@ public enum LocationType {
     OUR_MINE,
     ENEMY_MINE, // actually "enemy building on mine"
     OUR_RECYCLER,
-    ENEMY_RECYClER,
     OUR_FACTORY,
-    ENEMY_FACTORY,
     OUR_ARMORY,
-    ENEMY_ARMORY,
+    ENEMY_BUILDING,
     DEBRIS,
     DESTROYED_DEBRIS,
     // default "null" should be considered "UNKNOWN"

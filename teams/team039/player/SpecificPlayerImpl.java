@@ -1,12 +1,12 @@
-package team039.common;
+package team039.player;
 
 import team039.building.*;
-import team039.building.recycler.*;
-import team039.building.BuildingPlayer;
-import team039.building.recycler.StartingBuildingPlayer;
+import team039.player.building.recycler.*;
+import team039.player.building.BuildingPlayer;
+import team039.common.Knowledge;
 import team039.handler.ComponentsHandler;
-import team039.light.LightPlayer;
-import team039.light.StartingLightPlayer;
+import team039.player.light.LightPlayer;
+import team039.player.light.StartingLightPlayer;
 import battlecode.common.*;
 import team039.common.util.*;
 

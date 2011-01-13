@@ -1,6 +1,8 @@
-package team039.building;
+package team039.player.building;
 
-import team039.building.recycler.RecyclerPlayer;
+import team039.player.SpecificPlayer;
+import team039.player.SpecificPlayerImpl;
+import team039.player.building.recycler.RecyclerPlayer;
 import team039.common.*;
 import team039.common.util.Logger;
 import team039.handler.ComponentsHandler;
