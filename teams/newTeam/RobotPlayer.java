@@ -8,7 +8,7 @@ import newTeam.common.Knowledge;
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
 import newTeam.handler.BroadcastHandler;
-import newTeam.handler.BuildHandler;
+import newTeam.handler.BuilderHandler;
 import newTeam.handler.MovementHandler;
 import newTeam.handler.SensorHandler;
 import newTeam.handler.WeaponHandler;
@@ -40,7 +40,7 @@ public class RobotPlayer implements Runnable {
 
         myK  = new Knowledge(rc);
         myCH = new ComponentsHandler(new BroadcastHandler(),
-                                     new BuildHandler(),
+                                     new BuilderHandler(),
                                      new MovementHandler(),
                                      new SensorHandler(myRC, myK),
                                      new WeaponHandler());

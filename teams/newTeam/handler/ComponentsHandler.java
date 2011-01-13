@@ -13,7 +13,7 @@ import battlecode.common.WeaponController;
 public class ComponentsHandler {
     
     public  final BroadcastHandler  myBCH;
-    public  final BuildHandler      myBH;
+    public  final BuilderHandler    myBH;
     public  final MovementHandler   myMH;
     public  final SensorHandler     mySH;
     public  final WeaponHandler     myWH;
@@ -22,7 +22,7 @@ public class ComponentsHandler {
     
     
     public ComponentsHandler(BroadcastHandler bch,
-                             BuildHandler     bh,
+                             BuilderHandler   bh,
                              MovementHandler  mh,
                              SensorHandler    sh,
                              WeaponHandler    wh) {

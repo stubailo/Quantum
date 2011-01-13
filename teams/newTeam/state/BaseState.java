@@ -3,7 +3,7 @@ package newTeam.state;
 import battlecode.common.*;
 
 import newTeam.handler.BroadcastHandler;
-import newTeam.handler.BuildHandler;
+import newTeam.handler.BuilderHandler;
 import newTeam.handler.ComponentsHandler;
 import newTeam.handler.MovementHandler;
 import newTeam.handler.SensorHandler;
@@ -17,7 +17,7 @@ public class BaseState {
     protected final ComponentsHandler   myCH;
     
     protected final BroadcastHandler    myBCH;
-    protected final BuildHandler        myBH;
+    protected final BuilderHandler      myBH;
     protected final MovementHandler     myMH;
     protected final SensorHandler       mySH;
     protected final WeaponHandler       myWH;
