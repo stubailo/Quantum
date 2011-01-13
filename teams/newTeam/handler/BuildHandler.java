@@ -75,20 +75,6 @@ public class BuildHandler {
         
     }
 
-    public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height, RobotState givenState) {
-
-        if( IAmABuilding )
-        {
-
-        }
-
-        currentlyBuilding = true;
-        buildStep = 0;
-        buildInstructions = instructions;
-        buildLocation = location;
-        buildHeight = height;
-    }
-
 
 
 }

@@ -25,6 +25,7 @@ public class LightConstructorPlayer extends LightPlayer {
     public void doSpecificActions() {
         super.doSpecificActions();
 
+        Logger.debug_printAntony("testing....");
         switch (knowledge.myState) {
             case EXPLORING:
                 explore();
@@ -36,7 +37,7 @@ public class LightConstructorPlayer extends LightPlayer {
                 flee();
                 break;
             case BUILDING:
-            	build();
+                build();
                 break;
             case JUST_BUILT:
                 break;
@@ -65,7 +66,7 @@ public class LightConstructorPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-//        	compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+//            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
 //            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
 //            compHandler.pathFinder.initiateBugNavigation();
 //            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
@@ -127,11 +128,19 @@ public class LightConstructorPlayer extends LightPlayer {
                     Direction newDirection = deflect();
                 }
 
+<<<<<<< HEAD
 		        try {
 		            compHandler.pathFinder.step();
 		        } catch (Exception e) {
 		            Logger.debug_printExceptionMessage(e);
 		        }
+=======
+                try {
+                    compHandler.pathFinder.zigZag();
+                } catch (Exception e) {
+                    Logger.debug_printExceptionMessage(e);
+                }
+>>>>>>> bf62e3e964c3e8901f06ecd19c648f0706c9cee4
             }
 
         
@@ -143,18 +152,18 @@ public class LightConstructorPlayer extends LightPlayer {
     MapLocation buildRecyclerLocation;
 
     public void buildRecycler() {
-    	int distanceToLocation = knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation);
-    	if(distanceToLocation == 0) {
-    		compHandler.pathFinder.navigateToAdjacent();
-    	} else if(distanceToLocation <= 2 && 
-        		!compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
-        	knowledge.myState = RobotState.IDLE;
+        int distanceToLocation = knowledge.myLocation.distanceSquaredTo(buildRecyclerLocation);
+        if(distanceToLocation == 0) {
+            compHandler.pathFinder.navigateToAdjacent();
+        } else if(distanceToLocation <= 2 && 
+                !compHandler.canMove(knowledge.myLocation.directionTo(buildRecyclerLocation))) {
+            knowledge.myState = RobotState.IDLE;
         }
         
         if (compHandler.canBuildBuildingHere(buildRecyclerLocation) && 
-        		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
+                myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
 
-        	//changes to state BUILDING if the chassis is successfully built.
+            //changes to state BUILDING if the chassis is successfully built.
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
         } else {
             compHandler.pathFinder.navigateToAdjacent();
