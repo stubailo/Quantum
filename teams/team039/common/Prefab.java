@@ -16,6 +16,9 @@ public abstract class Prefab {
     private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA };
     public static BuildInstructions commRecycler = new BuildInstructions(Chassis.BUILDING, commRecyclerComponents);
 
+    private static final ComponentType[] commFactoryComponents = { ComponentType.FACTORY, ComponentType.ANTENNA };
+    public static BuildInstructions commFactory = new BuildInstructions(Chassis.BUILDING, commFactoryComponents);
+
     private static final ComponentType[] lightSoldierComponents = {ComponentType.SHIELD, ComponentType.SIGHT, ComponentType.BLASTER, ComponentType.BLASTER};
     private static final ComponentType[] lightContructorComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.CONSTRUCTOR};
     private static final ComponentType[] startingConstructorComponents = {ComponentType.ANTENNA};

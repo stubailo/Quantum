@@ -43,6 +43,9 @@ public class LightConstructorPlayer extends LightPlayer {
             case IDLE:
                 knowledge.myState = RobotState.EXPLORING;
                 break;
+            case BUILDING_FACTORY:
+                buildFactory();
+                break;
         }
 
         myRC.setIndicatorString(0, knowledge.myState.toString());
@@ -55,13 +58,25 @@ public class LightConstructorPlayer extends LightPlayer {
             knowledge.myState = RobotState.IDLE;
         }
 
+        if (knowledge.myState == RobotState.JUST_BUILT_FACTORY)
+        {
+            buildFactoryLocation = null;
+            knowledge.myState = RobotState.IDLE;
+        }
+
         if (knowledge.myState == RobotState.IDLE) {
 //        	compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
 //            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
 //            compHandler.pathFinder.initiateBugNavigation();
 //            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
+            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.ZIG_ZAG);
             knowledge.myState = RobotState.EXPLORING;
         }
+    }
+
+    @Override
+    public void initialize() {
+        knowledge.amIALightConstructor = true;
     }
 
     @Override
@@ -109,11 +124,11 @@ public class LightConstructorPlayer extends LightPlayer {
                 buildRecycler();
             } else {
                 if (knowledge.parentChanged) {
-                    deflect();
+                    Direction newDirection = deflect();
                 }
 
 		        try {
-		            compHandler.pathFinder.zigZag();
+		            compHandler.pathFinder.step();
 		        } catch (Exception e) {
 		            Logger.debug_printExceptionMessage(e);
 		        }
@@ -141,6 +156,33 @@ public class LightConstructorPlayer extends LightPlayer {
 
         	//changes to state BUILDING if the chassis is successfully built.
             compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildRecyclerLocation);
+        } else {
+            compHandler.pathFinder.navigateToAdjacent();
+        }
+    }
+
+    MapLocation buildFactoryLocation;
+
+    public void buildFactory() {
+
+        if(buildFactoryLocation == null)
+        {
+            buildFactoryLocation = knowledge.myRecyclerNode.myLocation.add(Direction.NORTH, 3);
+        }
+
+    	int distanceToLocation = knowledge.myLocation.distanceSquaredTo(buildFactoryLocation);
+    	if(distanceToLocation == 0) {
+    		compHandler.pathFinder.navigateToAdjacent();
+    	} else if(distanceToLocation <= 2 &&
+        		!compHandler.canMove(knowledge.myLocation.directionTo(buildFactoryLocation))) {
+        	knowledge.myState = RobotState.IDLE;
+        }
+
+        if (compHandler.canBuildBuildingHere(buildFactoryLocation) &&
+        		myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 1) {
+
+        	//changes to state BUILDING if the chassis is successfully built.
+            compHandler.build().buildChassisAndThenComponents(Prefab.commRecycler, buildFactoryLocation, RobotState.JUST_BUILT_FACTORY);
         } else {
             compHandler.pathFinder.navigateToAdjacent();
         }

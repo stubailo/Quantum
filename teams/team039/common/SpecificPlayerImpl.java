@@ -2,11 +2,8 @@ package team039.common;
 
 import team039.building.*;
 import team039.building.recycler.*;
-import team039.building.BuildingPlayer;
-import team039.building.recycler.StartingBuildingPlayer;
 import team039.handler.ComponentsHandler;
-import team039.light.LightPlayer;
-import team039.light.StartingLightPlayer;
+import team039.light.*;
 import battlecode.common.*;
 import team039.common.util.*;
 
@@ -53,7 +50,14 @@ public class SpecificPlayerImpl implements SpecificPlayer {
                 break;
                 
             case LIGHT:
+                chassisTypePlayer = new LightPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
+
+                chassisTypePlayer = new LightConstructorPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
+
                 chassisTypePlayer = new StartingLightPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
                 break;
             }
         }
@@ -66,6 +70,7 @@ public class SpecificPlayerImpl implements SpecificPlayer {
                 
             case LIGHT:
                 chassisTypePlayer = new LightPlayer(myRC, knowledge, compHandler);
+                chassisTypePlayer.initialize();
                 break;
             }
             // TODO: add other chassis types

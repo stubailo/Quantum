@@ -38,6 +38,8 @@ public enum RobotState {
     BUILDING_FIRST_MINE,
     BUILDING_SECOND_MINE,
     BUILD_ANTENNA_ON_SELF,
+    BUILDING_FACTORY,
+    JUST_BUILT_FACTORY,
 
     /*
      * When a robot is waiting to acquire a state, it is in IDLE.  When a robot stops

@@ -55,6 +55,7 @@ public class Knowledge {
      * which one to choose. Clearly, the more up-to-date info is more important.
      */
 
+     public boolean amIALightConstructor = false;
 
     /*** Locations of fixed objects ***/
     // I feel that they should be uncommented as they come into use.

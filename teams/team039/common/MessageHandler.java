@@ -36,6 +36,13 @@ public class MessageHandler {
 boolean haveGottenPinged = false;
         for (Message currentMessage : newMessages) {
 
+            if( knowledge.amIALightConstructor )
+            {
+                if(MessageCoder.getMessageType(currentMessage).equals(MessageCoder.FACTORY_REQUEST))
+                {
+                    knowledge.myState = RobotState.BUILDING_FACTORY;
+                }
+            }
             
             if( haveGottenPinged==false && MessageCoder.getMessageType(currentMessage).equals( MessageCoder.RECYCLER_PING ) && !knowledge.myRC.getChassis().equals(Chassis.BUILDING) )
             {

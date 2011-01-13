@@ -47,7 +47,7 @@ public class LightSoldierPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-//            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+             compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.ZIG_ZAG);
 //            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
 //            compHandler.pathFinder.initiateBugNavigation();
 //            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
@@ -75,7 +75,8 @@ public class LightSoldierPlayer extends LightPlayer {
             knowledge.myState = RobotState.IDLE;
         }
     }
-
+    private boolean deflecting = false;
+    private int numOfTurnsBugged = 0;
     public void explore() {
         if (compHandler.canSenseEnemies() && compHandler.hasWeapons()) {
             Logger.debug_printSashko("Attacking!");
@@ -84,12 +85,32 @@ public class LightSoldierPlayer extends LightPlayer {
             attack();
 
         } else {
+            /*
             if (knowledge.parentChanged) {
-                    deflect();
+                    Direction newDirection = deflect();
+                    if(newDirection != Direction.NONE)
+                    {
+                        System.out.println("deflecting: " + newDirection);
+                        deflecting = true;
+                        numOfTurnsBugged = 0;
+                        compHandler.pathFinder.initiateBugNavigation(knowledge.myLocation.add(newDirection, QuantumConstants.DEFLECT_BUG_DISTANCE));
+                    }
                 }
 
+            if( deflecting && (compHandler.pathFinder.reachedGoal() || numOfTurnsBugged >= QuantumConstants.DEFLECT_NUM_TURNS) )
+            {
+                compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.ZIG_ZAG);
+                deflecting = false;
+            }
+
+            if(deflecting)
+            {
+                numOfTurnsBugged++;
+                System.out.println("bugging turn " + numOfTurnsBugged );
+            } */
+
 	        try {
-	            compHandler.pathFinder.zigZag();
+	            compHandler.pathFinder.step();
 	        } catch (Exception e) {
 	        	Logger.debug_print("Robot " + myRC.getRobot().getID()
 	                    + " during round " + Clock.getRoundNum()

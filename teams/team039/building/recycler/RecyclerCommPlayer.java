@@ -33,7 +33,13 @@ public class RecyclerCommPlayer extends RecyclerPlayer {
             knowledge.myRecyclerNode.parentRobotID = 0;
         }
 
+        if( Clock.getRoundNum()%QuantumConstants.MESSAGE_CYCLE == 0 )
         knowledge.msg().addToQueue( knowledge.myRecyclerNode.generatePing() );
+
+        if( !knowledge.myRecyclerNode.hasParent() && Clock.getRoundNum()%QuantumConstants.MESSAGE_CYCLE == 1 )
+        {
+            knowledge.msg().addToQueue( knowledge.myRecyclerNode.generateFactoryRequest() );
+        }
 
         myRC.setIndicatorString(1, knowledge.myRecyclerNode.toString() );
     }

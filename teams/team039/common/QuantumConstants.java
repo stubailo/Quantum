@@ -22,10 +22,13 @@ public final class QuantumConstants {
 	public static final int LOCATION_HASH_SIZE = GameConstants.MAP_MAX_WIDTH +
 	                                             2 * FARTHEST_SENSOR_DISTANCE;
 	/** Number of rounds to navigate before setting a new exploration goal */
-	public static final int EXPLORE_TIME = 50;
+	public static final int EXPLORE_TIME = 200;
 	/** Distance to exploration goal */
-	public static final int EXLPORE_GOAL_DISTANCE = 15;
+	public static final int EXPLORE_GOAL_DISTANCE = 20;
+        /* Distance that it bugs when deflecting before returning to bouncing */
+        public static final int DEFLECT_BUG_DISTANCE = 10;
 
+        public static final int DEFLECT_NUM_TURNS = 3;
         /** Number of soldiers per constructor */
 	public static final int SOLDIERS_PER_CONSTRUCTOR = 4;
 	/** Big integer */
@@ -34,6 +37,9 @@ public final class QuantumConstants {
 	public static final boolean ATTACK_DEBRIS = false;
 	
 	public static final double SMALL_BUFFER = 1;
+
+        /* Messages are split by round%this number: */
+        public static final int MESSAGE_CYCLE = 4;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

@@ -38,11 +38,11 @@ public class LightPlayer extends SpecificPlayerImpl {
         }
     }
 
-    public void deflect() {
+    public Direction deflect() {
 
         if( !knowledge.myRecyclerNode.hasParent() )
         {
-            return;
+            return Direction.NONE;
         }
 
         
@@ -83,8 +83,7 @@ public class LightPlayer extends SpecificPlayerImpl {
                     newDirection = prefDirection;
             }
 
-            compHandler.setDirection(newDirection);
-            System.out.println( "deflecting: " + newDirection );
+            return( newDirection );
 
     }
     
@@ -96,9 +95,11 @@ public class LightPlayer extends SpecificPlayerImpl {
         switch(compType) {
         case CONSTRUCTOR:
             result = new LightConstructorPlayer(myRC, knowledge, compHandler);
+            result.initialize();
             break;
         case BLASTER:
             result = new LightSoldierPlayer(myRC, knowledge, compHandler);
+            result.initialize();
             break;
         }
         

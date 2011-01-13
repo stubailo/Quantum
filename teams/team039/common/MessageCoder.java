@@ -24,6 +24,8 @@ public abstract class MessageCoder {
     //message types
     public static final String RECYCLER_PING = "rp";
     public static final String RECYCLER_DESIGNATION = "rd";
+    public static final String FACTORY_REQUEST = "fr";
+    public static final String FACTORY_DESIGNATION = "fd";
 
     public static boolean isValid( Message input )
     {

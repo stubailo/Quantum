@@ -22,9 +22,8 @@ public class RecyclerNode {
     @Override
     public String toString()
     {
-        return "RecyclerNode [id: " + myRobotID + " location: (" + myLocation.x +
-                ", " + myLocation.y + ") " + "parent id: " + parentRobotID + (parentLocation!=null? " parent location: (" +
-                parentLocation.x + ", " + parentLocation.y + ") ]":"");
+        return "RecyclerNode [id: " + myRobotID + " parent id: " + parentRobotID + (parentLocation!=null? " vector: (" +
+                getVector().x + ", " + getVector().y + ") ]":"");
     }
 
     public boolean hasParent()
@@ -69,6 +68,24 @@ public class RecyclerNode {
 
 
         return MessageCoder.encodeMessage(MessageCoder.RECYCLER_DESIGNATION, myRobotID, myLocation, Clock.getRoundNum(), false, strings, ints, locations);
+    }
+
+    public Message generateFactoryDesignation( )
+    {
+        int[] ints = new int[2];
+        MapLocation[] locations = new MapLocation[2];
+        String strings[] = new String[2];
+
+        ints[0] = myRobotID;
+        locations[0] = myLocation;
+
+
+        return MessageCoder.encodeMessage(MessageCoder.FACTORY_DESIGNATION, myRobotID, myLocation, Clock.getRoundNum(), false, strings, ints, locations);
+    }
+
+    public Message generateFactoryRequest()
+    {
+        return MessageCoder.encodeMessage(MessageCoder.FACTORY_REQUEST, myRobotID, myLocation, Clock.getRoundNum(), false, null, null, null);
     }
 
     public static RecyclerNode getFromPing( Message ping )
