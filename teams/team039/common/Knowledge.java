@@ -142,7 +142,7 @@ public class Knowledge {
             myRecyclerNode = newParent;
         } else if( newParent.myRobotID!=myRecyclerNode.myRobotID )
         {
-            System.out.println("new node? " + newParent);
+            Logger.debug_printSashko("new node? " + newParent);
             oldRecyclerNode = myRecyclerNode;
             myRecyclerNode = newParent;
             parentChanged = true;

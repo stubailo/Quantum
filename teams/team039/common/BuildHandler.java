@@ -108,7 +108,7 @@ public class BuildHandler {
      */
     public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height) {
         //first, find the robot
-    	//TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
+        //TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
         currentlyBuilding = true;
         buildStep = 0;
         buildInstructions = instructions;
@@ -120,7 +120,7 @@ public class BuildHandler {
 
     public void startBuildingComponents(BuildInstructions instructions, MapLocation location, RobotLevel height, RobotState givenState) {
         //first, find the robot
-    	//TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
+        //TODO:  we need to make sure to know how to handle this if the senseARobot returns null.
         currentlyBuilding = true;
         buildStep = 0;
         buildInstructions = instructions;

@@ -43,7 +43,7 @@ public class LightConstructorPlayer extends LightPlayer {
             case JUST_BUILT:
                 break;
             case IDLE:
-            	knowledge.myState = RobotState.EXPLORING;
+                knowledge.myState = RobotState.EXPLORING;
                 break;
         }
         
@@ -58,7 +58,7 @@ public class LightConstructorPlayer extends LightPlayer {
         }
 
         if (knowledge.myState == RobotState.IDLE) {
-//        	compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
+//            compHandler.pathFinder.setNavigationAlgorithm(NavigationAlgorithm.BUG);
 //            compHandler.pathFinder.setGoal(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
 //            compHandler.pathFinder.initiateBugNavigation();
 //            compHandler.initiateBugNavigation(myRC.getLocation().add(Direction.SOUTH_EAST, 100));
@@ -102,14 +102,14 @@ public class LightConstructorPlayer extends LightPlayer {
                 knowledge.myState = RobotState.BUILDING_RECYCLER;
             } else {
 
-		        try {
-		            compHandler.pathFinder.explore();
-		        } catch (Exception e) {
-		            System.out.println("Robot " + myRC.getRobot().getID()
-		                    + " during round " + Clock.getRoundNum()
-		                    + " caught exception:");
-		            e.printStackTrace();
-		        }
+                try {
+                    compHandler.pathFinder.explore();
+                } catch (Exception e) {
+                    System.out.println("Robot " + myRC.getRobot().getID()
+                            + " during round " + Clock.getRoundNum()
+                            + " caught exception:");
+                    e.printStackTrace();
+                }
             }
 
         } 

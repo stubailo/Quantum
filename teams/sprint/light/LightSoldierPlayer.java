@@ -83,14 +83,14 @@ public class LightSoldierPlayer extends LightPlayer {
             attack();
 
         } else {
-	        try {
-	            compHandler.pathFinder.explore();
-	        } catch (Exception e) {
-	        	Logger.debug_print("Robot " + myRC.getRobot().getID()
-	                    + " during round " + Clock.getRoundNum()
-	                    + " caught exception:");
-	            e.printStackTrace();
-	        }
+            try {
+                compHandler.pathFinder.explore();
+            } catch (Exception e) {
+                Logger.debug_print("Robot " + myRC.getRobot().getID()
+                        + " during round " + Clock.getRoundNum()
+                        + " caught exception:");
+                e.printStackTrace();
+            }
 
         }
     }

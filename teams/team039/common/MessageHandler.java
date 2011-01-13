@@ -51,7 +51,7 @@ public class MessageHandler {
                 knowledge.myRecyclerNode.parentRobotID = MessageCoder.getBroadcasterID(currentMessage);
                 knowledge.myRecyclerNode.parentLocation = MessageCoder.getBroadcasterLocation(currentMessage);
 
-                System.out.println( "designated? " + knowledge.myRecyclerNode );
+                Logger.debug_printSashko( "designated? " + knowledge.myRecyclerNode );
                 }
             }
         }
