@@ -1,9 +1,8 @@
-package team039.player.building.recycler;
+package team039.building.recycler;
 
 import team039.common.*;
 import team039.common.util.*;
 import team039.handler.ComponentsHandler;
-import team039.player.SpecificPlayer;
 import battlecode.common.*;
 
 public class StartingBuildingPlayer extends RecyclerPlayer {

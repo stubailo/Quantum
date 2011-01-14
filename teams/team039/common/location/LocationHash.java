@@ -2,6 +2,7 @@ package team039.common.location;
 
 import battlecode.common.*;
 import team039.common.QuantumConstants;
+import static battlecode.common.GameConstants.*;
 
 /**
  * This class stores for every map location either a true or false value, default false; it

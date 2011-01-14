@@ -1,10 +1,8 @@
-package team039.player.light;
+package team039.light;
 
 import team039.common.*;
 import team039.common.util.Logger;
 import team039.handler.ComponentsHandler;
-import team039.player.SpecificPlayer;
-import team039.player.SpecificPlayerImpl;
 import battlecode.common.*;
 
 public class LightPlayer extends SpecificPlayerImpl {
