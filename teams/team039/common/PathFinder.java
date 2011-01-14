@@ -194,13 +194,7 @@ public class PathFinder {
     }
     
     public void navigateBug()  {    
-  
-        TerrainTile terrainTile = myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection, 4));
-        Logger.debug_printAntony(terrainTile == null ? "null" : terrainTile.toString());
-        myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection,4));
-//        myRC.setIndicatorString(2, myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection,4)).toString());
-        Logger.debug_printAntony(String.valueOf(myRC.senseTerrainTile(knowledge.myLocation.add(knowledge.myDirection))));
-     
+
         MapLocation location = knowledge.myLocation;
         Direction directionToGoal = location.directionTo(goal);
         int bugPos = bugStep % QuantumConstants.BUG_MEMORY_LENGTH;
