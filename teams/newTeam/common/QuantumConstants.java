@@ -13,6 +13,10 @@ public final class QuantumConstants {
 	public static final int BUG_MEMORY_LENGTH = 15;
 	/** Bug distance increase before trying different path */
 	public static final double BUG_DISTANCE_SWITCH = 1.2;
+	/** Maximum number of moves to remember doing tangent bug */
+	public static final int TANGENT_BUG_PATH_LENGTH = 200;
+	/** Maximum number of virtual bugs in the tangent bug algorithm */
+	public static final int NUMBER_OF_VIRTUAL_BUGS = 10;
 	/** Farthest sensor distance... assumed to be the satellite **/
 	public static final int FARTHEST_SENSOR_DISTANCE = ComponentType.SATELLITE.range;
 	/** Size of map location hashes used **/

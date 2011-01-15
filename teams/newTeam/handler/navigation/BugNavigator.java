@@ -106,6 +106,10 @@ public class BugNavigator implements Navigator {
         initiateNavigation(goal);
     }
     
+    public void pauseNavigation() {
+        
+    }
+    
     /******************* Private Methods ********************/
 
     private MovementAction navigateBug() {

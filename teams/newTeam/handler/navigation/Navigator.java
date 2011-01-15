@@ -21,4 +21,6 @@ public interface Navigator {
     
     public void initiateNavigation();
     
+    public void pauseNavigation();
+    
 }
