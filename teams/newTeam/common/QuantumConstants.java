@@ -6,7 +6,9 @@ package newTeam.common;
 import battlecode.common.*;
 
 public final class QuantumConstants {
-    
+
+        /* Number of messages a robot stores in its outgoing message queue. */
+        public static final int MESSAGE_QUEUE_LENGTH = 10;
 	/** Total flux needed to explore for more mines */
 	public static final int TOTAL_FLUX_EXPLORE = 120;
 	/** Number of locations to remember for bug navigation */
