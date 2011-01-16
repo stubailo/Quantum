@@ -9,10 +9,6 @@ import newTeam.state.exploring.*;
 
 public class Idling extends BaseState {
     
-    public Idling(RobotController rc, Knowledge know, ComponentsHandler ch) {
-        super(rc, know, ch);
-    }
-    
     public Idling(BaseState state) {
         super(state);
     }

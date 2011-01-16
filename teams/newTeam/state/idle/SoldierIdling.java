@@ -8,10 +8,6 @@ import newTeam.state.BaseState;
 
 public class SoldierIdling extends Idling {
     
-    public SoldierIdling(RobotController rc, Knowledge know, ComponentsHandler ch) {
-        super(rc, know, ch);
-    }
-    
     public SoldierIdling(BaseState state) {
         super(state);
     }

@@ -1,8 +1,10 @@
 package newTeam.handler;
 
 import battlecode.common.*;
-import newTeam.common.*;
-import newTeam.common.util.*;
+
+import newTeam.common.Knowledge;
+import newTeam.common.QuantumConstants;
+import newTeam.common.util.Logger;
 
 public class BroadcastHandler {
 

@@ -9,7 +9,7 @@ public class SensorHandler {
     
     
     private final RobotController myRC;
-    private final Knowledge       knowledge;
+    private final Knowledge       myK;
     
     
     /*** Controller ***/
@@ -36,17 +36,28 @@ public class SensorHandler {
      * 
      * 
      */
-    private final   Robot[] sensableRobots          = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private         int     numberOfSensableRobots  = 0;
-    private final   Mine[]  sensableMines           = new Mine[MAX_NUMBER_OF_SENSED_THINGS];
-    private         int     numberOfSensableMines   = 0;
+    private final   Robot[]     sensableRobots              = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
+    private         int         numberOfSensableRobots      = 0;
+    private final   Mine[]      sensableMines               = new Mine[MAX_NUMBER_OF_SENSED_THINGS];
+    private         int         numberOfSensableMines       = 0;
+    
+    public          MapLocation startingTurnedOnRecyclerLocation,
+                                startingFirstMineToBeBuiltLocation,
+                                startingSecondMineToBeBuiltLocation,
+                                startingIdealBuildingLocation;
+    
+    
+    
+    
+    
+    
 
     
     
     public SensorHandler(RobotController rc, Knowledge know) {
         
         myRC      = rc;
-        knowledge = know;
+        myK = know;
     }
     
     
@@ -70,7 +81,7 @@ public class SensorHandler {
         lastRoundRefreshed = Clock.getRoundNum();
         
         robotsSensed = false;
-        if(knowledge.justMoved || knowledge.justTurned) {
+        if(myK.justMoved || myK.justTurned) {
             minesSensed = false;
             buildingsSensed = false;
         }
@@ -140,4 +151,95 @@ public class SensorHandler {
         }
         return numberOfSensableMines;
     }
+    
+    
+    /**
+    * Designed for use by starting light on round 0, 1, or 2, records locations of recyclers and mines
+    * @return      direction to turn in, OMNI to proceed, NONE if error occurs
+    */
+    public Direction senseStartingLightConstructorSurroundings() {
+      try {
+          SensorController sensor      = mySCs[0];
+          MapLocation      myLocation  = myK.myLocation;
+          Direction        myDirection = myK.myDirection;
+              
+          Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
+              
+          Direction otherDirection          = Direction.NONE,
+                    usefulDirection1        = Direction.NONE,
+                    usefulDirection2        = Direction.NONE;
+          int       numberOfSensedRecyclers = 0,
+                    lowestRecyclerID        = QuantumConstants.BIG_INT;
+          for(Robot sensedRobot : sensedRobots) {
+              if(sensedRobot.getTeam() != Team.NEUTRAL) { // We must check that it's not debris.
+                  if(numberOfSensedRecyclers == 0) {
+                      startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
+                      lowestRecyclerID = sensedRobot.getID();
+                      otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
+                      numberOfSensedRecyclers++;
+                  }
+                  else {
+                      if(sensedRobot.getID() < lowestRecyclerID) {
+                          startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
+                          if(myDirection == otherDirection) {
+                              otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
+                          }
+                      }
+                      else {
+                          if(myDirection == otherDirection) {
+                              otherDirection = myLocation.directionTo(sensor.senseLocationOf(sensedRobot));
+                          }
+                      }
+                      numberOfSensedRecyclers++;
+                      break;
+                  }
+              }
+          }
+          
+          if(numberOfSensedRecyclers == 0) return myDirection.opposite();
+          
+          if(myDirection.rotateRight() == otherDirection) {
+              usefulDirection1 = myDirection.rotateRight();
+              usefulDirection2 = usefulDirection1.rotateRight();
+              
+          }
+          else {
+              usefulDirection1 = myDirection.rotateLeft();
+              usefulDirection2 = usefulDirection1.rotateLeft();
+          }
+          
+          if(myDirection.ordinal() % 2 == 1) { // myDirection is diagonal
+              if(numberOfSensedRecyclers == 1) {
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1, 2);
+                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1).add(usefulDirection2);
+                  startingIdealBuildingLocation       = myLocation.add(usefulDirection1, 3);
+              }
+              else {
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection, 2);
+                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection).add(myDirection);
+                  startingIdealBuildingLocation       = myLocation.add(otherDirection, 3);
+              }
+          }
+          else { // myDirection is not diagonal
+              if(numberOfSensedRecyclers == 1) {
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection2, 2);
+                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1).add(usefulDirection2);
+                  startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
+              }
+              else {
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(myDirection, 2);
+                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection).add(myDirection);
+                  startingIdealBuildingLocation       = myLocation.add(myDirection, 3);
+              }
+          }
+          
+          return Direction.OMNI;
+      }
+      catch(Exception e) {
+          Logger.debug_printExceptionMessage(e);
+          return Direction.NONE;
+      }
+  }
+    
+
 }
