@@ -3,13 +3,15 @@ package newTeam.handler.navigation;
 import newTeam.common.QuantumConstants;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 public class VirtualBug {
     
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
 //    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
+    private final MapLocation goal;
+    private final RobotController myRC;
     
-    private        MapLocation          goal;
     private        boolean              tracking;
     private        boolean              trackingCW;
     private        boolean              startTracking;
@@ -19,6 +21,9 @@ public class VirtualBug {
     private        MapLocation          prevLocation;
     private        int                  turningNumber;
     private        Direction            movementDirection = Direction.NONE;
+    /* moves lists the path to take in order, beginning with an index 0 corresponding to 
+     * the first adjacent square.
+     */
     private        MapLocation []       moves;
     private        int                  moveIndex;
     
@@ -26,12 +31,17 @@ public class VirtualBug {
     private        int                  turnsAlongPath;
     private        int                  pathWeight;
 
-    public VirtualBug(MapLocation g) {
+    public VirtualBug(MapLocation g, RobotController rc) {
         goal = g;
+        myRC = rc;
         moves = new MapLocation [MAX_MOVES];
+        tracking = false;
+        moveIndex = 0;
+        
     }
     
     public VirtualBug(MapLocation g,
+                      RobotController rc,
                       boolean track,
                       boolean trackCW,
                       boolean stTracking,
@@ -46,6 +56,7 @@ public class VirtualBug {
                       int alongPath,
                       int pw) {
         goal = g;
+        myRC = rc;
         tracking = track;
         trackingCW = trackCW;
         trackingDirection = trackingDir;
@@ -62,6 +73,7 @@ public class VirtualBug {
     
     public VirtualBug clone() {
         return new VirtualBug(goal,
+                              myRC,
                               tracking,
                               trackingCW,
                               startTracking,
@@ -98,10 +110,14 @@ public class VirtualBug {
     }
     
     public boolean shouldBranch() {
-        return false;
-    }
-    
-    public boolean shouldCheckSecondaryGoal() {
+        if(tracking) {
+            return false;
+        }
+        
+        Direction directionToGoal;
+        if(moveIndex == 0) {
+            directionToGoal = startLocation.directionTo(goal);
+        }
         return false;
     }
     
@@ -114,6 +130,12 @@ public class VirtualBug {
         
         
         return null;
+    }
+    
+    /******************* Private Methods ********************/
+
+    private void updatePathWeight() {
+        turnsToGoal = 
     }
 }
 
