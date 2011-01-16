@@ -49,7 +49,7 @@ public class TangentBug implements Navigator {
         mySH = sh;
         
         goal = newGoal;
-        currentVB = new VirtualBug(goal, myRC);
+        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
         myVBs = new VirtualBug [MAX_BUGS];
         myVBs[0] = currentVB;
         currentPathWeight = 0;
@@ -59,6 +59,7 @@ public class TangentBug implements Navigator {
         virtualBugIndex = 0;
         stepIndex = 0;
         goingToSecondaryGoal = false;
+        numberOfBugs = 1;
     }
 
     public MovementAction getNextAction() {
@@ -77,12 +78,17 @@ public class TangentBug implements Navigator {
         
         movementDirection = myK.myLocation.directionTo(move);
         MovementAction action;
-        if(myK.myDirection == movementDirection) {
-            action = MovementAction.MOVE_FORWARD;
-//      } else if(knowledge.myDirection == dir.opposite()) {
-//           action = MovementAction.MOVE_BACKWARD;
+        if(myMC.canMove(movementDirection)) {
+            if(myK.myDirection == movementDirection) {
+                action = MovementAction.MOVE_FORWARD;
+//          } else if(knowledge.myDirection == dir.opposite()) {
+//               action = MovementAction.MOVE_BACKWARD;
+            } else {
+                action = MovementAction.ROTATE;
+            }
         } else {
-            action = MovementAction.ROTATE;
+            //TODO: probably will have to deal with this by bugging to the next move on the list.
+            action = MovementAction.PATH_BLOCKED;
         }
 
         return action;
@@ -136,12 +142,17 @@ public class TangentBug implements Navigator {
         int remainingBytecodes = Clock.getBytecodesLeft();
         int count = 0;
         
+        VirtualBug branchBug;
         while(remainingBytecodes > MIN_BYTECODES) {
 
             //check if we need to branch bugs
             if(currentVB.shouldBranch()) {
-                myVBs[numberOfBugs] = currentVB.clone();
-                pathWeights[numberOfBugs] = myVBs[numberOfBugs].getPathWeight();
+                branchBug = currentVB.clone();
+                branchBug.setOrientationClockwise(false);
+                myVBs[numberOfBugs] = branchBug;
+                pathWeights[numberOfBugs] = branchBug.getPathWeight();
+                numberOfBugs++;
+                //TODO: deal with having too many virtual bugs
             }
             
             //calculate next step, and check if we need to explore a secondary goal.
@@ -172,8 +183,7 @@ public class TangentBug implements Navigator {
                         secondaryPathWeight = weight;
                         secondaryBugIndex = i;
                     }
-                }
-                
+                }               
             }
             
             count++;
@@ -182,5 +192,4 @@ public class TangentBug implements Navigator {
             }
         }
     }
-
 }
