@@ -408,7 +408,7 @@ public class ComponentsHandler {
             SensorController sensor = mySCs[0];
 
             Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
-            Mine[] sensedMines = sensor.senseNearbyGameObjects(Mine.class);
+            Mine[]  sensedMines = sensor.senseNearbyGameObjects(Mine.class);
 
             Robot[] sensedRecyclers = new Robot[sensedRobots.length];
             int numberOfSensedRecyclers = 0;

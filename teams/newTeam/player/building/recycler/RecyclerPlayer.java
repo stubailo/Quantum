@@ -12,11 +12,14 @@ public class RecyclerPlayer extends BuildingPlayer {
         super(state);
     }
     
-    public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState state) {
-        return state;
+    @Override
+    public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
+        return oldState;
     }
     
-    public BasePlayer determineSpecificPlayer(ComponentType compType, BaseState state) {
+    @Override
+    public BasePlayer determineSpecificPlayerGivenNewComponent(ComponentType compType,
+                                                               BaseState state) {
 
         switch(compType) {
         case ANTENNA:

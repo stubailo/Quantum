@@ -36,12 +36,28 @@ public class BugNavigator implements Navigator {
     private        boolean []           bugPrevCW;
     private        int                  bugStep;
     
-    public BugNavigator(RobotController rc, Knowledge know, MovementController mc) {
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation, boolean navigatingToAdjacent) {
         myRC = rc;
         myK = know;
         myMC = mc;
-        
-        //TODO: set goal in the constructor.
+        goal = goalLocation;
+        navigating = true;
+        tracking = false;
+        startTracking = false;
+        bugStart = myK.myLocation;
+        prevLocation = myK.myLocation;
+        prevDirectionToGoal = bugStart.directionTo(goal);
+        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
+        bugPrevDirections = new Direction [MEMORY_LENGTH];
+        bugPrevCW = new boolean [MEMORY_LENGTH];
+        bugStep = 0;
+        goingToAdjacent = navigatingToAdjacent;
+    }
+    
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation) {
+        this(rc, know, mc, goalLocation, false);
     }
 
     public MovementAction getNextAction() {
@@ -77,10 +93,10 @@ public class BugNavigator implements Navigator {
 //        }
     }
 
-    public void setGoal(MapLocation g) {
-        goal = g;
-    }
-
+//    public void setGoal(MapLocation g) {
+//        goal = g;
+//    }
+//
     public boolean reachedGoal() {
         return goal.equals(myK.myLocation);
     }
@@ -93,23 +109,24 @@ public class BugNavigator implements Navigator {
         goingToAdjacent = b;
     }
     
-    public void initiateNavigation(MapLocation newGoal) {
-        goal = newGoal;
-        navigating = true;
-        tracking = false;
-        startTracking = false;
-        bugStart = myK.myLocation;
-        prevDirectionToGoal = bugStart.directionTo(goal);
-        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
-        bugPrevDirections = new Direction [MEMORY_LENGTH];
-        bugPrevCW = new boolean [MEMORY_LENGTH];
-        bugStep = 0;
-    }
-    
-    public void initiateNavigation() {
-        initiateNavigation(goal);
-    }
-    
+//    public void initiateNavigation(MapLocation newGoal) {
+//        goal = newGoal;
+//        navigating = true;
+//        tracking = false;
+//        startTracking = false;
+//        bugStart = myK.myLocation;
+//        prevLocation = myK.myLocation;
+//        prevDirectionToGoal = bugStart.directionTo(goal);
+//        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
+//        bugPrevDirections = new Direction [MEMORY_LENGTH];
+//        bugPrevCW = new boolean [MEMORY_LENGTH];
+//        bugStep = 0;
+//    }
+//    
+//    public void initiateNavigation() {
+//        initiateNavigation(goal);
+//    }
+//    
     public void pauseNavigation() {
         
     }
@@ -119,6 +136,7 @@ public class BugNavigator implements Navigator {
     private MovementAction navigateBug() {
         MapLocation location = myK.myLocation;
         Direction directionToGoal = location.directionTo(goal);
+        myRC.setIndicatorString(1, directionToGoal.toString());
         int bugPos = bugStep % MEMORY_LENGTH;
         MovementAction action;
         
@@ -127,14 +145,16 @@ public class BugNavigator implements Navigator {
         if(!prevLocation.equals(location)) {
             prevTrackingDirection = prevLocation.directionTo(location);
             prevDirectionToGoal = prevLocation.directionTo(goal);
+            startTracking = false;
         }
-        
+        myRC.setIndicatorString(2, prevDirectionToGoal.toString());
         if(tracking) {
 
             if(directionToGoal != prevDirectionToGoal) {
                 // changing goal contributes negatively to the turning number.
                 turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
             }
+            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
             
             //set the initial direction to begin testing from.
             Direction startDirection = prevTrackingDirection.opposite();
@@ -226,7 +246,7 @@ public class BugNavigator implements Navigator {
                 action = getBugAction(trackingDirection);
             }
         }
-        
+        myRC.setIndicatorString(0, "turningNumber: " + String.valueOf(turningNumber));
         return action;
     }
     
@@ -241,6 +261,7 @@ public class BugNavigator implements Navigator {
                 testDir = testDir.rotateRight();
             }
         }
+        Logger.debug_printHocho(String.valueOf(turn));
         return turn;
     }
     

@@ -2,8 +2,8 @@ package newTeam.handler;
 
 import battlecode.common.*;
 
-import newTeam.common.*;
-import newTeam.common.util.*;
+import newTeam.handler.building.BuildInstructions;
+import newTeam.common.util.Logger;
 
 public class BuilderHandler {
 
