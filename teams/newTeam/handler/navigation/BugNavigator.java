@@ -40,11 +40,15 @@ public class BugNavigator implements Navigator {
         myRC = rc;
         myK = know;
         myMC = mc;
+        
+        //TODO: set goal in the constructor.
     }
 
     public MovementAction getNextAction() {
         // do nothing if the motor is active or you are not navigating
-        if(!navigating || myMC.isActive()) {
+        if(!navigating) {
+            return MovementAction.AT_GOAL;
+        } else if(myMC.isActive()) {
             return MovementAction.NONE;
         }
 
@@ -54,7 +58,7 @@ public class BugNavigator implements Navigator {
             action = navigateToAdjacent();
         } else if(reachedGoal()) {
             navigating = false;
-            action = MovementAction.NONE;
+            action = MovementAction.AT_GOAL;
         } else {
             action = navigateBug();
         }
@@ -104,6 +108,10 @@ public class BugNavigator implements Navigator {
     
     public void initiateNavigation() {
         initiateNavigation(goal);
+    }
+    
+    public void pauseNavigation() {
+        
     }
     
     /******************* Private Methods ********************/
@@ -290,7 +298,7 @@ public class BugNavigator implements Navigator {
             Direction directionToGoal = location.directionTo(goal);
             movementDirection = directionToGoal;
             if(directionToGoal == myK.myDirection || directionToGoal == Direction.OMNI) {
-                return MovementAction.NONE;
+                return MovementAction.AT_GOAL;
             } else {
                 return MovementAction.ROTATE;
             }
