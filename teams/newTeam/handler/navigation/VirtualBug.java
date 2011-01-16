@@ -7,7 +7,7 @@ import battlecode.common.MapLocation;
 public class VirtualBug {
     
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
-    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
+//    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     
     private        MapLocation          goal;
     private        boolean              tracking;
@@ -103,6 +103,17 @@ public class VirtualBug {
     
     public boolean shouldCheckSecondaryGoal() {
         return false;
+    }
+    
+    /** 
+     * Calculates the next square in the virtual bug's path.  
+     * @return Null if the step was successful, and a MapLocation if you need to begin
+     *         exploring a secondary goal.
+     */
+    public MapLocation stepVirtualBug() {
+        
+        
+        return null;
     }
 }
 
