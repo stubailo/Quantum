@@ -15,8 +15,8 @@ public class BugNavigator implements Navigator {
     private final MovementController myMC;
     
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
+    private final MapLocation goal;
     
-    private        MapLocation          goal;
     private        boolean              navigating = false;
     private        boolean              goingToAdjacent = false;
     private        Direction            movementDirection = Direction.NONE;
