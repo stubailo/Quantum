@@ -54,16 +54,8 @@ public class BaseState {
         return this;
     }
     
-    public void initialize() {
-        
-    }
-    
-    public void step() {
-        
-    }
-    
-    public void cleanup() {
-        
+    public BaseState execute() {
+        return this;
     }
 
 }

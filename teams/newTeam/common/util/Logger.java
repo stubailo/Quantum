@@ -35,6 +35,16 @@ public class Logger {
     }
     
     /**
+     * For precautionary use - if this method is being called, something has gone wrong
+     * @param errorMessage
+     * @param errorAuthor
+     */
+    public static void debug_printCustomErrorMessage(String errorMessage, String errorAuthor) {
+        System.out.println("According to " + errorAuthor + ", the following has gone wrong:");
+        System.out.println(errorMessage);
+    }
+    
+    /**
      * Prints exception stack trace.
      * @param   e   Exception
      */
@@ -45,8 +55,8 @@ public class Logger {
     /**
      * Prints bytecode count.
      */
-    public static void debug_printBytecodeNumber() {
-        System.out.println("bytecodes: " + String.valueOf(Clock.getBytecodeNum()));
+    public static void debug_printRemainingBytecodes() {
+        System.out.println("remaining bytecodes: " + String.valueOf(Clock.getBytecodeNum()));
     }
 
 }

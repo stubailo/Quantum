@@ -41,11 +41,11 @@ public class RobotPlayer implements Runnable {
         myK  = new Knowledge(rc);
         myCH = new ComponentsHandler(new BroadcastHandler( myK ),
                                      new BuilderHandler( myK ),
-                                     new MovementHandler(),
+                                     new MovementHandler(myRC, myK),
                                      new SensorHandler(myRC, myK),
                                      new WeaponHandler());
-        myRS = new Idling(myRC, myK, myCH);
-        mySP = new BasePlayer(myRS);
+        myRS = new BaseState(myRC, myK, myCH);
+        mySP = BasePlayer.determineInitialSpecificPlayer(rc, myRS);
     }
     
     
@@ -72,7 +72,7 @@ public class RobotPlayer implements Runnable {
                 
                 // initialize and clean up as necessary?
                 
-                myRS.step();
+                myRS.execute();
                 
                 myRC.yield();
                 

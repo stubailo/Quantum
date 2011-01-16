@@ -1,6 +1,6 @@
 package newTeam.handler.navigation;
 
-import team039.common.util.Logger;
+import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
 import newTeam.common.QuantumConstants;
 import newTeam.handler.SensorHandler;
@@ -12,19 +12,20 @@ import battlecode.common.RobotController;
 
 public class TangentBug implements Navigator {
     
-    private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
+//    private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
     private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     private final int LOOP_BYTECODE_COST = 200;
     private final int BYTECODE_BUFFER = 250;
+    private final int MIN_BYTECODES = LOOP_BYTECODE_COST + BYTECODE_BUFFER;
     private final int RECHECK_BYTECODES = 4;
     
     private final RobotController myRC;
     private final Knowledge myK;
     private final MovementController myMC;
     private final SensorHandler mySH;
+    private final MapLocation goal;
     
     private         Direction           movementDirection;
-    private         MapLocation         goal;
     private         MapLocation         prevLocation;
     
     private         VirtualBug []       myVBs;
@@ -40,11 +41,25 @@ public class TangentBug implements Navigator {
     private         boolean             goingToSecondaryGoal;
     
     
-    public TangentBug(RobotController rc, Knowledge k, MovementController mc, SensorHandler sh) {
+    public TangentBug(RobotController rc, Knowledge k, MovementController mc, 
+                      SensorHandler sh, MapLocation newGoal) {
         myRC = rc;
         myK = k;
         myMC = mc;
         mySH = sh;
+        
+        goal = newGoal;
+        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
+        myVBs = new VirtualBug [MAX_BUGS];
+        myVBs[0] = currentVB;
+        currentPathWeight = 0;
+        pathWeights = new int [MAX_BUGS];
+        pathWeights[0] = currentPathWeight;
+        secondaryPathWeight = QuantumConstants.BIG_INT;
+        virtualBugIndex = 0;
+        stepIndex = 0;
+        goingToSecondaryGoal = false;
+        numberOfBugs = 1;
     }
 
     public MovementAction getNextAction() {
@@ -56,20 +71,24 @@ public class TangentBug implements Navigator {
             stepIndex++;
         }
         
-        MapLocation move = myVBs[virtualBugIndex].getMove(stepIndex);
+        MapLocation move = currentVB.getMove(stepIndex);
         if(move == null) {
             return MovementAction.NONE;
         }
         
-        Direction moveDirection = myK.myLocation.directionTo(move);
+        movementDirection = myK.myLocation.directionTo(move);
         MovementAction action;
-        if(myK.myDirection == moveDirection) {
-            action = MovementAction.MOVE_FORWARD;
-//      } else if(knowledge.myDirection == dir.opposite()) {
-//           action = MovementAction.MOVE_BACKWARD;
+        if(myMC.canMove(movementDirection)) {
+            if(myK.myDirection == movementDirection) {
+                action = MovementAction.MOVE_FORWARD;
+//          } else if(knowledge.myDirection == dir.opposite()) {
+//               action = MovementAction.MOVE_BACKWARD;
+            } else {
+                action = MovementAction.ROTATE;
+            }
         } else {
-            action = MovementAction.ROTATE;
-            movementDirection = moveDirection;
+            //TODO: probably will have to deal with this by bugging to the next move on the list.
+            action = MovementAction.PATH_BLOCKED;
         }
 
         return action;
@@ -79,9 +98,9 @@ public class TangentBug implements Navigator {
         return movementDirection;
     }
 
-    public void setGoal(MapLocation g) {
-        goal = g;
-    }
+//    public void setGoal(MapLocation g) {
+//        goal = g;
+//    }
 
     public boolean reachedGoal() {
         return goal.equals(myK.myLocation);
@@ -95,27 +114,26 @@ public class TangentBug implements Navigator {
         //TODO: decide if I want this to do anything
     }
 
-    public void initiateNavigation(MapLocation newGoal) {
-        goal = newGoal;
-        currentVB = new VirtualBug(goal);
-        myVBs = new VirtualBug [MAX_BUGS];
-        myVBs[0] = currentVB;
-        currentPathWeight = 0;
-        pathWeights = new int [MAX_BUGS];
-        pathWeights[0] = currentPathWeight;
-        secondaryPathWeight = QuantumConstants.BIG_INT;
-        virtualBugIndex = 0;
-        stepIndex = 0;
-    }
-
-    public void initiateNavigation() {
-        initiateNavigation(goal);
-    }
-
     public void pauseNavigation () {
-        //put stuff here... it wouldn't compile without it
+        //put stuff here... it won't compile without it
     }
-    
+//    public void initiateNavigation(MapLocation newGoal) {
+//        goal = newGoal;
+//        currentVB = new VirtualBug(goal, myRC);
+//        myVBs = new VirtualBug [MAX_BUGS];
+//        myVBs[0] = currentVB;
+//        currentPathWeight = 0;
+//        pathWeights = new int [MAX_BUGS];
+//        pathWeights[0] = currentPathWeight;
+//        secondaryPathWeight = QuantumConstants.BIG_INT;
+//        virtualBugIndex = 0;
+//        stepIndex = 0;
+//        goingToSecondaryGoal = false;
+//    }
+//
+//    public void initiateNavigation() {
+//        initiateNavigation(goal);
+//    }
     
     /****************** Private Methods ********************/
     
@@ -123,18 +141,25 @@ public class TangentBug implements Navigator {
         int remainingBytecodes = Clock.getBytecodeNum();
         int count = 0;
         
-        while(remainingBytecodes > LOOP_BYTECODE_COST + BYTECODE_BUFFER) {
+        VirtualBug branchBug;
+        while(remainingBytecodes > MIN_BYTECODES) {
 
             //check if we need to branch bugs
             if(currentVB.shouldBranch()) {
-                myVBs[numberOfBugs] = currentVB.clone();
-                pathWeights[numberOfBugs] = myVBs[numberOfBugs].getPathWeight();
+                branchBug = currentVB.clone();
+                branchBug.setOrientationClockwise(false);
+                myVBs[numberOfBugs] = branchBug;
+                pathWeights[numberOfBugs] = branchBug.getPathWeight();
+                numberOfBugs++;
+                //TODO: deal with having too many virtual bugs
             }
             
-            //steps forward if possible, and returns true if we need to explore an end of the path
-            if(currentVB.shouldCheckSecondaryGoal()) {
-                secondaryGoal = currentVB.getPathEndLocation();
+            //calculate next step, and check if we need to explore a secondary goal.
+            MapLocation newGoal = currentVB.stepVirtualBug();
+            if(newGoal != null) {
+                secondaryGoal = newGoal;
                 goingToSecondaryGoal = true;
+                //TODO: update the other virtual bugs starting from the secondary goal.
                 break;
             }
             
@@ -157,8 +182,7 @@ public class TangentBug implements Navigator {
                         secondaryPathWeight = weight;
                         secondaryBugIndex = i;
                     }
-                }
-                
+                }               
             }
             
             count++;
@@ -167,5 +191,4 @@ public class TangentBug implements Navigator {
             }
         }
     }
-
 }

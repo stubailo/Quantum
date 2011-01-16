@@ -15,8 +15,8 @@ public class BugNavigator implements Navigator {
     private final MovementController myMC;
     
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
+    private final MapLocation goal;
     
-    private        MapLocation          goal;
     private        boolean              navigating = false;
     private        boolean              goingToAdjacent = false;
     private        Direction            movementDirection = Direction.NONE;
@@ -36,15 +36,35 @@ public class BugNavigator implements Navigator {
     private        boolean []           bugPrevCW;
     private        int                  bugStep;
     
-    public BugNavigator(RobotController rc, Knowledge know, MovementController mc) {
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation, boolean navigatingToAdjacent) {
         myRC = rc;
         myK = know;
         myMC = mc;
+        goal = goalLocation;
+        navigating = true;
+        tracking = false;
+        startTracking = false;
+        bugStart = myK.myLocation;
+        prevLocation = myK.myLocation;
+        prevDirectionToGoal = bugStart.directionTo(goal);
+        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
+        bugPrevDirections = new Direction [MEMORY_LENGTH];
+        bugPrevCW = new boolean [MEMORY_LENGTH];
+        bugStep = 0;
+        goingToAdjacent = navigatingToAdjacent;
+    }
+    
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation) {
+        this(rc, know, mc, goalLocation, false);
     }
 
     public MovementAction getNextAction() {
         // do nothing if the motor is active or you are not navigating
-        if(!navigating || myMC.isActive()) {
+        if(!navigating) {
+            return MovementAction.AT_GOAL;
+        } else if(myMC.isActive()) {
             return MovementAction.NONE;
         }
 
@@ -54,7 +74,7 @@ public class BugNavigator implements Navigator {
             action = navigateToAdjacent();
         } else if(reachedGoal()) {
             navigating = false;
-            action = MovementAction.NONE;
+            action = MovementAction.AT_GOAL;
         } else {
             action = navigateBug();
         }
@@ -73,10 +93,10 @@ public class BugNavigator implements Navigator {
 //        }
     }
 
-    public void setGoal(MapLocation g) {
-        goal = g;
-    }
-
+//    public void setGoal(MapLocation g) {
+//        goal = g;
+//    }
+//
     public boolean reachedGoal() {
         return goal.equals(myK.myLocation);
     }
@@ -89,23 +109,24 @@ public class BugNavigator implements Navigator {
         goingToAdjacent = b;
     }
     
-    public void initiateNavigation(MapLocation newGoal) {
-        goal = newGoal;
-        navigating = true;
-        tracking = false;
-        startTracking = false;
-        bugStart = myK.myLocation;
-        prevDirectionToGoal = bugStart.directionTo(goal);
-        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
-        bugPrevDirections = new Direction [MEMORY_LENGTH];
-        bugPrevCW = new boolean [MEMORY_LENGTH];
-        bugStep = 0;
-    }
-    
-    public void initiateNavigation() {
-        initiateNavigation(goal);
-    }
-    
+//    public void initiateNavigation(MapLocation newGoal) {
+//        goal = newGoal;
+//        navigating = true;
+//        tracking = false;
+//        startTracking = false;
+//        bugStart = myK.myLocation;
+//        prevLocation = myK.myLocation;
+//        prevDirectionToGoal = bugStart.directionTo(goal);
+//        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
+//        bugPrevDirections = new Direction [MEMORY_LENGTH];
+//        bugPrevCW = new boolean [MEMORY_LENGTH];
+//        bugStep = 0;
+//    }
+//    
+//    public void initiateNavigation() {
+//        initiateNavigation(goal);
+//    }
+//    
     public void pauseNavigation() {
         
     }
@@ -115,6 +136,7 @@ public class BugNavigator implements Navigator {
     private MovementAction navigateBug() {
         MapLocation location = myK.myLocation;
         Direction directionToGoal = location.directionTo(goal);
+        myRC.setIndicatorString(1, directionToGoal.toString());
         int bugPos = bugStep % MEMORY_LENGTH;
         MovementAction action;
         
@@ -123,14 +145,16 @@ public class BugNavigator implements Navigator {
         if(!prevLocation.equals(location)) {
             prevTrackingDirection = prevLocation.directionTo(location);
             prevDirectionToGoal = prevLocation.directionTo(goal);
+            startTracking = false;
         }
-        
+        myRC.setIndicatorString(2, prevDirectionToGoal.toString());
         if(tracking) {
 
             if(directionToGoal != prevDirectionToGoal) {
                 // changing goal contributes negatively to the turning number.
                 turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
             }
+            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
             
             //set the initial direction to begin testing from.
             Direction startDirection = prevTrackingDirection.opposite();
@@ -188,8 +212,10 @@ public class BugNavigator implements Navigator {
                 //determine if you should track around the obstacle clockwise or counterclockwise
                 Direction ccwDir = directionToGoal;
                 Direction cwDir = directionToGoal;
+                int turn = 0;
                 boolean searching = true;
                 while(searching) {
+                    turn++;
                     ccwDir = ccwDir.rotateRight();
                     cwDir = cwDir.rotateLeft();
                     if(myMC.canMove(ccwDir)) {
@@ -217,12 +243,13 @@ public class BugNavigator implements Navigator {
                 bugPrevCW[bugPos] = trackingCW;
                 trackingDirection = bugPrevDirections[bugPos];
                 prevTrackingDirection = directionToGoal.opposite();
-                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
+                turningNumber = turn;
+//                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
                 movementDirection = trackingDirection;
                 action = getBugAction(trackingDirection);
             }
         }
-        
+        myRC.setIndicatorString(0, "turningNumber: " + String.valueOf(turningNumber));
         return action;
     }
     
@@ -237,6 +264,7 @@ public class BugNavigator implements Navigator {
                 testDir = testDir.rotateRight();
             }
         }
+        Logger.debug_printHocho(String.valueOf(turn));
         return turn;
     }
     
@@ -294,7 +322,7 @@ public class BugNavigator implements Navigator {
             Direction directionToGoal = location.directionTo(goal);
             movementDirection = directionToGoal;
             if(directionToGoal == myK.myDirection || directionToGoal == Direction.OMNI) {
-                return MovementAction.NONE;
+                return MovementAction.AT_GOAL;
             } else {
                 return MovementAction.ROTATE;
             }
