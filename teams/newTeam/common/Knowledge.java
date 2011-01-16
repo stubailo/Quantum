@@ -18,6 +18,7 @@ public class Knowledge {
     public  final   int                 myRobotID;
     public  final   Robot               myRobot;
     
+    
     /*** Round constants ***/
     public          MapLocation         myLocation;
     public          MapLocation         myPreviousLocation;
@@ -29,6 +30,13 @@ public class Knowledge {
     public          double              previousFlux;
     public          double              deltaFlux;
     public          double              totalFlux;
+    
+    /*** SpecificPlayer-specific ***/
+    
+    /**  StartingLightConstructorPlayer **/
+    // This MapLocation is set by the SensorHandler during round 0, 1, or 2,
+    //   depending on the orientation of the 
+    public          MapLocation         startingTurnedOnRecyclerLocation;
     
     
     

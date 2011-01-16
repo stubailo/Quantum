@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 import newTeam.player.BasePlayer;
 import newTeam.state.BaseState;
-import newTeam.state.starting.StartingScoutSurroundings;
+import newTeam.state.starting.StartingLightConstructorScouting;
 
 public class StartingLightConstructorPlayer extends LightConstructorPlayer {
     
@@ -13,7 +13,7 @@ public class StartingLightConstructorPlayer extends LightConstructorPlayer {
     }
     
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState state) {
-        return new StartingScoutSurroundings(state);
+        return new StartingLightConstructorScouting(state);
     }
     
     public BasePlayer determineSpecificPlayer(ComponentType compType, BaseState state) {

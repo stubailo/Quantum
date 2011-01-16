@@ -36,10 +36,21 @@ public class BugNavigator implements Navigator {
     private        boolean []           bugPrevCW;
     private        int                  bugStep;
     
-    public BugNavigator(RobotController rc, Knowledge know, MovementController mc) {
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation) {
         myRC = rc;
         myK = know;
         myMC = mc;
+        initiateNavigation(goalLocation);
+    }
+    
+    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+                        MapLocation goalLocation, boolean navigatingToAdjacent) {
+        myRC = rc;
+        myK = know;
+        myMC = mc;
+        initiateNavigation(goalLocation);
+        goingToAdjacent = navigatingToAdjacent;
     }
 
     public MovementAction getNextAction() {
