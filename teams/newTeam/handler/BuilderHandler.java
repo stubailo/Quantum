@@ -8,10 +8,12 @@ import newTeam.common.util.*;
 public class BuilderHandler {
 
     private BuilderController myBC;
+    Knowledge knowledge;
 
-    private boolean currentlyBuilding;
+    
     private boolean IAmABuilding;
 
+    private boolean currentlyBuilding;
     private Robot buildTarget = null;
 
     private MapLocation buildLocation = null;
@@ -19,9 +21,12 @@ public class BuilderHandler {
     private BuildInstructions buildInstructions = null;
     private int buildStep = 0;
 
-    public BuilderHandler ()
+    Message lastMessage = null;
+
+    public BuilderHandler ( Knowledge know )
     {
         currentlyBuilding = false;
+        knowledge = know;
     }
 
     public void addBC( BuilderController newBC )
@@ -40,8 +45,35 @@ public class BuilderHandler {
 
     }
 
+    public void buildUnit( BuildInstructions instructions, MapLocation location )
+    {
+        try {
+            myBC.build( instructions.getBaseChassis(), location);
+
+            currentlyBuilding = true;
+
+            if( IAmABuilding )
+            {
+                //use the sensor handler to set the buildTarget
+                //buildTarget = null;
+            }
+
+            buildLocation = location;
+            buildHeight = instructions.getBaseChassis().level;
+            buildInstructions = instructions;
+            buildStep = 0;
+        } catch (Exception e)
+        {
+            abortBuilding();
+        }
+    }
+
     public void step() {
 
+        if( !currentlyBuilding )
+        {
+            return;
+        }
         //don't do anything if it's currently waiting for the builder to recharge
         if ( myBC.isActive() ) {
             return;
@@ -69,9 +101,52 @@ public class BuilderHandler {
         }
     }
 
+    /*
+     * Has to be called before finishBuilding to be effective
+     */
+
+    public Message genDesignationMessage()
+    {
+        if( IAmABuilding && currentlyBuilding )
+        {
+            String[] bodyStrings = { buildInstructions.instructionsID  };
+            int [] bodyInts = { buildTarget.getID() };
+            MapLocation [] bodyLocations = { null };
+
+            Message output = MessageCoder.encodeMessage(MessageCoder.JUST_BUILT_UNIT_DESIGNATION, knowledge.myRobotID, knowledge.myLocation, Clock.getRoundNum(), false, bodyStrings, bodyInts, bodyLocations);
+
+            return output;
+        } else {
+            return null;
+        }
+    }
+
+    public Message getDesignationMessage()
+    {
+        return lastMessage;
+    }
+
     private void finishBuilding()
     {
-        
+        lastMessage = genDesignationMessage();
+        currentlyBuilding = false;
+        buildTarget = null;
+
+        buildLocation = null;
+        buildHeight = null;
+        buildInstructions = null;
+        buildStep = 0;
+    }
+
+    private void abortBuilding()
+    {
+        currentlyBuilding = false;
+        buildTarget = null;
+
+        buildLocation = null;
+        buildHeight = null;
+        buildInstructions = null;
+        buildStep = 0;
     }
 
 }

@@ -14,16 +14,13 @@ import battlecode.common.*;
 public abstract class Prefab {
 
     private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA };
-    public static BuildInstructions commRecycler = new BuildInstructions(Chassis.BUILDING, commRecyclerComponents);
+    public static BuildInstructions commRecycler = new BuildInstructions( "brc", Chassis.BUILDING, commRecyclerComponents);
 
-    private static final ComponentType[] lightSoldierComponents = {ComponentType.SHIELD, ComponentType.SIGHT, ComponentType.BLASTER, ComponentType.BLASTER};
+    private static final ComponentType[] lightSoldierComponents = { ComponentType.SHIELD, ComponentType.SIGHT, ComponentType.BLASTER, ComponentType.BLASTER};
     private static final ComponentType[] lightContructorComponents = {ComponentType.SIGHT, ComponentType.ANTENNA, ComponentType.CONSTRUCTOR};
     private static final ComponentType[] startingConstructorComponents = {ComponentType.ANTENNA};
 
-    public static BuildInstructions lightSoldier = new BuildInstructions(Chassis.LIGHT, lightSoldierComponents);
-    public static BuildInstructions lightConstructor = new BuildInstructions(Chassis.LIGHT, lightContructorComponents);
-    public static BuildInstructions startingConstructor = new BuildInstructions(Chassis.LIGHT, startingConstructorComponents);
-
-    public static BuildInstructions[] startingRecyclerUnits = { Prefab.commRecycler, Prefab.lightSoldier };
-    public static BuildOrder startingRecyclerBuildOrder = new BuildOrder( startingRecyclerUnits );
+    public static BuildInstructions lightSoldier = new BuildInstructions( "ls", Chassis.LIGHT, lightSoldierComponents);
+    public static BuildInstructions lightConstructor = new BuildInstructions( "lc", Chassis.LIGHT, lightContructorComponents);
+    public static BuildInstructions startingConstructor = new BuildInstructions( "lcs", Chassis.LIGHT, startingConstructorComponents);
 }

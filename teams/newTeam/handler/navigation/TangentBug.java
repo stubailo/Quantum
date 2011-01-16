@@ -111,12 +111,16 @@ public class TangentBug implements Navigator {
     public void initiateNavigation() {
         initiateNavigation(goal);
     }
+
+    public void pauseNavigation () {
+        //put stuff here... it wouldn't compile without it
+    }
     
     
     /****************** Private Methods ********************/
     
     private void calculateVirtualBugs() {
-        int remainingBytecodes = Clock.getBytecodesLeft();
+        int remainingBytecodes = Clock.getBytecodeNum();
         int count = 0;
         
         while(remainingBytecodes > LOOP_BYTECODE_COST + BYTECODE_BUFFER) {
@@ -159,7 +163,7 @@ public class TangentBug implements Navigator {
             
             count++;
             if(count % RECHECK_BYTECODES == 0) {
-                remainingBytecodes = Clock.getBytecodesLeft();
+                remainingBytecodes = Clock.getBytecodeNum();
             }
         }
     }

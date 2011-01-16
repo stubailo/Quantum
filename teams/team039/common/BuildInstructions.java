@@ -21,10 +21,14 @@ public class BuildInstructions {
     private Chassis baseChassis;
     private ComponentType[] instructions;
 
+    public String instructionsID; // used in messages to refer to this unit type
+
     /**
      * Takes an array of components and calculates the cost and number of steps
      */
-    public BuildInstructions( Chassis chassis, ComponentType[] components) {
+    public BuildInstructions( String id, Chassis chassis, ComponentType[] components) {
+
+        instructionsID = id;
 
         instructions = new ComponentType[20];
         totalCost = chassis.cost;
