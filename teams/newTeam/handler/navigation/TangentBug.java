@@ -41,13 +41,24 @@ public class TangentBug implements Navigator {
     private         boolean             goingToSecondaryGoal;
     
     
-    public TangentBug(RobotController rc, Knowledge k, MovementController mc, SensorHandler sh) {
+    public TangentBug(RobotController rc, Knowledge k, MovementController mc, 
+                      SensorHandler sh, MapLocation newGoal) {
         myRC = rc;
         myK = k;
         myMC = mc;
         mySH = sh;
         
-        //TODO: set goal in the constructor.
+        goal = newGoal;
+        currentVB = new VirtualBug(goal, myRC);
+        myVBs = new VirtualBug [MAX_BUGS];
+        myVBs[0] = currentVB;
+        currentPathWeight = 0;
+        pathWeights = new int [MAX_BUGS];
+        pathWeights[0] = currentPathWeight;
+        secondaryPathWeight = QuantumConstants.BIG_INT;
+        virtualBugIndex = 0;
+        stepIndex = 0;
+        goingToSecondaryGoal = false;
     }
 
     public MovementAction getNextAction() {
@@ -81,9 +92,9 @@ public class TangentBug implements Navigator {
         return movementDirection;
     }
 
-    public void setGoal(MapLocation g) {
-        goal = g;
-    }
+//    public void setGoal(MapLocation g) {
+//        goal = g;
+//    }
 
     public boolean reachedGoal() {
         return goal.equals(myK.myLocation);
@@ -97,23 +108,23 @@ public class TangentBug implements Navigator {
         //TODO: decide if I want this to do anything
     }
 
-    public void initiateNavigation(MapLocation newGoal) {
-        goal = newGoal;
-        currentVB = new VirtualBug(goal, myRC);
-        myVBs = new VirtualBug [MAX_BUGS];
-        myVBs[0] = currentVB;
-        currentPathWeight = 0;
-        pathWeights = new int [MAX_BUGS];
-        pathWeights[0] = currentPathWeight;
-        secondaryPathWeight = QuantumConstants.BIG_INT;
-        virtualBugIndex = 0;
-        stepIndex = 0;
-        goingToSecondaryGoal = false;
-    }
-
-    public void initiateNavigation() {
-        initiateNavigation(goal);
-    }
+//    public void initiateNavigation(MapLocation newGoal) {
+//        goal = newGoal;
+//        currentVB = new VirtualBug(goal, myRC);
+//        myVBs = new VirtualBug [MAX_BUGS];
+//        myVBs[0] = currentVB;
+//        currentPathWeight = 0;
+//        pathWeights = new int [MAX_BUGS];
+//        pathWeights[0] = currentPathWeight;
+//        secondaryPathWeight = QuantumConstants.BIG_INT;
+//        virtualBugIndex = 0;
+//        stepIndex = 0;
+//        goingToSecondaryGoal = false;
+//    }
+//
+//    public void initiateNavigation() {
+//        initiateNavigation(goal);
+//    }
     
     public void pauseNavigation() {
         

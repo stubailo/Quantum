@@ -116,7 +116,7 @@ public class VirtualBug {
         
         Direction directionToGoal;
         if(moveIndex == 0) {
-            directionToGoal = startLocation.directionTo(goal);
+//            directionToGoal = startLocation.directionTo(goal);
         }
         return false;
     }
@@ -134,8 +134,8 @@ public class VirtualBug {
     
     /******************* Private Methods ********************/
 
-    private void updatePathWeight() {
-        turnsToGoal = 
-    }
+//    private void updatePathWeight() {
+//        turnsToGoal = 
+//    }
 }
 
