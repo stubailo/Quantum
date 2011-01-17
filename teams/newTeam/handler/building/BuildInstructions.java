@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package team039.common;
+package newTeam.handler.building;
 
 import battlecode.common.*;
 
@@ -18,6 +18,7 @@ public class BuildInstructions {
     private int totalCost = 0;
     private int numSteps = 0;
     private int totalWeight = 0;
+    private int componentCost = 0;
     private Chassis baseChassis;
     private ComponentType[] instructions;
 
@@ -31,10 +32,11 @@ public class BuildInstructions {
         instructionsID = id;
 
         instructions = new ComponentType[20];
-        totalCost = chassis.cost;
+        totalCost = chassis==null?0:chassis.cost;
         baseChassis = chassis;
 
         for (ComponentType currComp : components) {
+            componentCost += currComp.cost;
             totalCost += currComp.cost;
             totalWeight += currComp.weight;
             instructions[numSteps] = currComp;
@@ -72,5 +74,9 @@ public class BuildInstructions {
         return baseChassis;
     }
 
-    
+    public int getComponentCost() {
+        return componentCost;
+    }
+
+
 }

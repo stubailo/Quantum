@@ -2,9 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package team039.common;
+package newTeam.common;
 
+import newTeam.handler.building.BuildInstructions;
 import battlecode.common.*;
+import newTeam.common.*;
 
 /**
  * The name is short for Prefabricated. These are the robot builds we have hard-coded.

@@ -212,8 +212,10 @@ public class BugNavigator implements Navigator {
                 //determine if you should track around the obstacle clockwise or counterclockwise
                 Direction ccwDir = directionToGoal;
                 Direction cwDir = directionToGoal;
+                int turn = 0;
                 boolean searching = true;
                 while(searching) {
+                    turn++;
                     ccwDir = ccwDir.rotateRight();
                     cwDir = cwDir.rotateLeft();
                     if(myMC.canMove(ccwDir)) {
@@ -241,7 +243,8 @@ public class BugNavigator implements Navigator {
                 bugPrevCW[bugPos] = trackingCW;
                 trackingDirection = bugPrevDirections[bugPos];
                 prevTrackingDirection = directionToGoal.opposite();
-                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
+                turningNumber = turn;
+//                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
                 movementDirection = trackingDirection;
                 action = getBugAction(trackingDirection);
             }

@@ -40,7 +40,7 @@ public class RobotPlayer implements Runnable {
 
         myK  = new Knowledge(rc);
         myCH = new ComponentsHandler(new BroadcastHandler( myK ),
-                                     new BuilderHandler(),
+                                     new BuilderHandler( myK ),
                                      new MovementHandler(myRC, myK),
                                      new SensorHandler(myRC, myK),
                                      new WeaponHandler());

@@ -48,7 +48,7 @@ public class SensorHandler {
     public          boolean     standardWayClear;
     
     
-    
+    public          RobotInfo   startingLightInfo;
     
     
     
@@ -151,6 +151,24 @@ public class SensorHandler {
             senseMines();
         }
         return numberOfSensableMines;
+    }
+
+    public void senseStartingLightPlayer ()
+    {
+        Robot[] nearbyRobots = getSensableRobots();
+
+        for( Robot robot:nearbyRobots )
+        {
+            try {
+            RobotInfo info = mySCs[0].senseRobotInfo(robot);
+            if( info.chassis.equals(Chassis.LIGHT) )
+            {
+                startingLightInfo = info;
+            }
+            } catch ( Exception e ) {
+                return;
+            }
+        }
     }
     
     
