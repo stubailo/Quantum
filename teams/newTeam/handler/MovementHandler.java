@@ -46,24 +46,29 @@ public class MovementHandler {
         }
     }
     
-    public void step() {
+    public boolean step() {
         try {
             switch(navigator.getNextAction()) {
             
             case MOVE_FORWARD:
                 myMC.moveForward();
-                break;
+                return false;
             case MOVE_BACKWARD:
                 myMC.moveBackward();
-                break;
+                return false;
                 
             case ROTATE:
                 myMC.setDirection(navigator.getMovementDirection());
-                break;
+                return false;
+                
+            case AT_GOAL:
+                return true;
             }
+            return false;
         }
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
+            return false;
         }
     }
     

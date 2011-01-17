@@ -45,6 +45,7 @@ public class SensorHandler {
                                 startingFirstMineToBeBuiltLocation,
                                 startingSecondMineToBeBuiltLocation,
                                 startingIdealBuildingLocation;
+    public          boolean     standardWayClear;
     
     
     
@@ -154,7 +155,8 @@ public class SensorHandler {
     
     
     /**
-    * Designed for use by starting light on round 0, 1, or 2, records locations of recyclers and mines
+    * Designed for use by starting light on round 0, 1, or 2, records locations of empty mines
+    * and other useful opening information
     * @return      direction to turn in, OMNI to proceed, NONE if error occurs
     */
     public Direction senseStartingLightConstructorSurroundings() {
@@ -198,40 +200,47 @@ public class SensorHandler {
           
           if(numberOfSensedRecyclers == 0) return myDirection.opposite();
           
-          if(myDirection.rotateRight() == otherDirection) {
+          boolean otherIsRight = (myDirection.rotateRight() == otherDirection);
+          if(otherIsRight) {
               usefulDirection1 = myDirection.rotateRight();
               usefulDirection2 = usefulDirection1.rotateRight();
-              
           }
           else {
               usefulDirection1 = myDirection.rotateLeft();
               usefulDirection2 = usefulDirection1.rotateLeft();
           }
           
+          Direction standardWayDirection = Direction.NONE;
           if(myDirection.ordinal() % 2 == 1) { // myDirection is diagonal
               if(numberOfSensedRecyclers == 1) {
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1, 2);
-                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1).add(usefulDirection2);
+                  standardWayDirection                = myDirection;
+                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1, 2);
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
                   startingIdealBuildingLocation       = myLocation.add(usefulDirection1, 3);
               }
               else {
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection, 2);
-                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection).add(myDirection);
+                  standardWayDirection                = usefulDirection2; 
+                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection, 2);
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
                   startingIdealBuildingLocation       = myLocation.add(otherDirection, 3);
               }
           }
           else { // myDirection is not diagonal
               if(numberOfSensedRecyclers == 1) {
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection2, 2);
-                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1).add(usefulDirection2);
+                  standardWayDirection                = otherIsRight ? usefulDirection2.rotateRight() : usefulDirection2.rotateLeft();
+                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection2, 2);
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
                   startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
               }
               else {
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(myDirection, 2);
-                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection).add(myDirection);
+                  standardWayDirection                = usefulDirection1;
+                  startingSecondMineToBeBuiltLocation = myLocation.add(myDirection, 2);
+                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
                   startingIdealBuildingLocation       = myLocation.add(myDirection, 3);
               }
           }
+          
+          standardWayClear = ((MovementController) myRC.components()[0]).canMove(standardWayDirection);
           
           return Direction.OMNI;
       }

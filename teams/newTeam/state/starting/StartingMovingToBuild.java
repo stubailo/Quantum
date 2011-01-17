@@ -7,12 +7,12 @@ import newTeam.handler.navigation.NavigatorType;
 
 public class StartingMovingToBuild extends BaseState {
     
-    private final MapLocation idealBuildingLocation;
+    private final MapLocation mineToBeBuiltLocation;
     
-    public StartingMovingToBuild(BaseState oldState, MapLocation startingIdealBuildingLocation) {
+    public StartingMovingToBuild(BaseState oldState, MapLocation startingMineToBeBuiltLocation) {
         super(oldState);
-        idealBuildingLocation = startingIdealBuildingLocation;
-        myMH.initializeNavigationTo(idealBuildingLocation, NavigatorType.BUG);
+        mineToBeBuiltLocation = startingMineToBeBuiltLocation;
+        myMH.initializeNavigationToAdjacent(mineToBeBuiltLocation, NavigatorType.BUG);
     }
     
     @Override
