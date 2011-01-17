@@ -25,10 +25,28 @@ public class BuilderHandler {
 
     Message lastMessage = null;
 
+    private boolean builtSuccessfully = false;
+
     public BuilderHandler ( Knowledge know )
     {
         currentlyBuilding = false;
         knowledge = know;
+    }
+
+    public boolean getCurrentlyBuilding()
+    {
+        return currentlyBuilding;
+    }
+
+    public boolean finishedBuilding()
+    {
+        if( builtSuccessfully )
+        {
+            builtSuccessfully = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void addBC( BuilderController newBC )
@@ -66,6 +84,28 @@ public class BuilderHandler {
             buildStep = 0;
         } catch (Exception e)
         {
+            Logger.debug_printExceptionMessage(e);
+            abortBuilding();
+        }
+    }
+
+    public void buildComponents( BuildInstructions instructions, MapLocation location, RobotLevel height )
+    {
+        try {
+            currentlyBuilding = true;
+
+            if( IAmABuilding )
+            {
+                // how to sense from here??
+            }
+
+            buildLocation = location;
+            buildHeight = height;
+            buildInstructions = instructions;
+            buildStep = 0;
+        } catch (Exception e)
+        {
+            Logger.debug_printExceptionMessage(e);
             abortBuilding();
         }
     }
@@ -109,7 +149,7 @@ public class BuilderHandler {
 
     public Message genDesignationMessage()
     {
-        if( IAmABuilding && currentlyBuilding )
+        if( IAmABuilding && currentlyBuilding && buildTarget!=null )
         {
             String[] bodyStrings = { buildInstructions.instructionsID  };
             int [] bodyInts = { buildTarget.getID() };
@@ -138,6 +178,8 @@ public class BuilderHandler {
         buildHeight = null;
         buildInstructions = null;
         buildStep = 0;
+
+        builtSuccessfully = true;
     }
 
     private void abortBuilding()
