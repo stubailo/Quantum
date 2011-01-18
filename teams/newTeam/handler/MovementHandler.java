@@ -28,6 +28,16 @@ public class MovementHandler {
     public void addMC(MovementController mc) {
         myMC = mc;
     }
+
+    public boolean canMove( Direction dir )
+    {
+        if( myMC!=null )
+        {
+            return myMC.canMove( dir );
+        } else {
+            return false;
+        }
+    }
     
     public void initializeNavigationTo(MapLocation goalLocation, NavigatorType givenNavigatorType) {
         navigatorType = givenNavigatorType;

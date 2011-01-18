@@ -21,6 +21,8 @@ public class ConstructingAntennaOnFirstLight extends RecyclerState {
             myRC.turnOff();
         }
         mySH.senseStartingLightPlayer();
+
+        Logger.debug_printSashko("found light: " + myRC.getLocation().directionTo(mySH.startingLightInfo.location));
     }
 
     @Override
@@ -39,7 +41,8 @@ public class ConstructingAntennaOnFirstLight extends RecyclerState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
+        
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.startingConstructor.getComponentCost() )
         {
             myBH.buildComponents( Prefab.startingConstructor , mySH.startingLightInfo.location, RobotLevel.ON_GROUND);
         }

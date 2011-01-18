@@ -7,6 +7,7 @@ import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
+import newTeam.state.building.MovingToBuildFactory;
 
 public class BuildingSecondRecycler extends BaseState {
 
@@ -29,7 +30,7 @@ public class BuildingSecondRecycler extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new Idling( this );
+            return new MovingToBuildFactory( this );
         }
 
         return this;
