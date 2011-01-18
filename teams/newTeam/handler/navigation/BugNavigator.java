@@ -3,6 +3,7 @@ package newTeam.handler.navigation;
 import newTeam.common.QuantumConstants;
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
+import battlecode.common.Chassis;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.MovementController;
@@ -36,11 +37,26 @@ public class BugNavigator implements Navigator {
     private        boolean []           bugPrevCW;
     private        int                  bugStep;
     
+    private        MapLocation          marker;
+    private        MapLocation          secondMarker;
+    private        int                  markerTurningNumber;
+    private        int                  secondMarkerTurningNumber;
+    private        int                  turnsBackToMarker;
+    private        int                  turnsMarkerToGoal;
+    private        int                  turnsBugToGoal;
+    private        boolean              backTracking;
+    
+    private        int                  delayRect;
+    private        int                  delayDiag;
+    private        int                  delayRSq;
+    private        int                  delayDSq;
+    
     public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
                         MapLocation goalLocation, boolean navigatingToAdjacent) {
         myRC = rc;
         myK = know;
         myMC = mc;
+        
         goal = goalLocation;
         navigating = true;
         tracking = false;
@@ -53,6 +69,12 @@ public class BugNavigator implements Navigator {
         bugPrevCW = new boolean [MEMORY_LENGTH];
         bugStep = 0;
         goingToAdjacent = navigatingToAdjacent;
+        
+        Chassis chassis = myRC.getChassis();
+        delayRect = chassis.moveDelayOrthogonal;
+        delayRSq = delayRect * delayRect;
+        delayDiag = chassis.moveDelayDiagonal;
+        delayDSq = delayDiag * delayDiag;
     }
     
     public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
@@ -86,17 +108,8 @@ public class BugNavigator implements Navigator {
 
     public Direction getMovementDirection() {
         return movementDirection;
-//        if(tracking) {
-//            return trackingDirection;
-//        } else {
-//            return myK.myLocation.directionTo(goal);
-//        }
     }
-
-//    public void setGoal(MapLocation g) {
-//        goal = g;
-//    }
-//
+    
     public boolean reachedGoal() {
         return goal.equals(myK.myLocation);
     }
@@ -108,25 +121,7 @@ public class BugNavigator implements Navigator {
     public void setGoingToAdjacent(boolean b) {
         goingToAdjacent = b;
     }
-    
-//    public void initiateNavigation(MapLocation newGoal) {
-//        goal = newGoal;
-//        navigating = true;
-//        tracking = false;
-//        startTracking = false;
-//        bugStart = myK.myLocation;
-//        prevLocation = myK.myLocation;
-//        prevDirectionToGoal = bugStart.directionTo(goal);
-//        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
-//        bugPrevDirections = new Direction [MEMORY_LENGTH];
-//        bugPrevCW = new boolean [MEMORY_LENGTH];
-//        bugStep = 0;
-//    }
-//    
-//    public void initiateNavigation() {
-//        initiateNavigation(goal);
-//    }
-//    
+   
     public void pauseNavigation() {
         
     }
@@ -136,9 +131,8 @@ public class BugNavigator implements Navigator {
     private MovementAction navigateBug() {
         MapLocation location = myK.myLocation;
         Direction directionToGoal = location.directionTo(goal);
-//        myRC.setIndicatorString(1, directionToGoal.toString());
         int bugPos = bugStep % MEMORY_LENGTH;
-        MovementAction action;
+        MovementAction action;  //this variable is returned at the end.
         
         // if you have moved between calls to navigateBug, set the previous tracking direction and 
         // the previous direction to goal
@@ -147,13 +141,14 @@ public class BugNavigator implements Navigator {
             prevDirectionToGoal = prevLocation.directionTo(goal);
             startTracking = false;
         }
-        myRC.setIndicatorString(1, String.valueOf(startTracking)+" "+ String.valueOf(tracking) + " " + String.valueOf(!prevLocation.equals(location)));
-        myRC.setIndicatorString(2, prevDirectionToGoal.toString() + " " + directionToGoal.toString());
+//        myRC.setIndicatorString(1, String.valueOf(startTracking)+" "+ String.valueOf(tracking) + " " + String.valueOf(!prevLocation.equals(location)));
+//        myRC.setIndicatorString(2, prevDirectionToGoal.toString() + " " + directionToGoal.toString());
         if(tracking) {
 
             if(directionToGoal != prevDirectionToGoal && !startTracking) {
                 // changing goal contributes negatively to the turning number.
-                turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
+                turningNumber -= calculateTurningChange(prevDirectionToGoal, 
+                                                        directionToGoal, trackingCW);
                 prevDirectionToGoal = directionToGoal;
             }
 //            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
@@ -193,24 +188,48 @@ public class BugNavigator implements Navigator {
             }
 
             //TODO: adjust the turningNumber when you calculate different rotation directions without moving.
-            if(!prevLocation.equals(location)) {
+            if(!prevLocation.equals(location) && !backTracking) {
                 turningNumber += turn;
+                turnsBackToMarker += (trackingDirection.ordinal() % 2 == 1) ? delayDiag : delayRect;
+                turnsBugToGoal = goalWeight(location, goal);
             }
+            
             //check if you are finished tracking
             if(turningNumber <= 0) {
                 tracking = false;
             }
             
-            movementDirection = trackingDirection;
-            action = getBugAction(trackingDirection);
+            //stop backtracking if you have reached your marker
+            if(backTracking && location.equals(marker)) {
+                backTracking = false;
+                turningNumber = markerTurningNumber;
+                marker = secondMarker;
+                markerTurningNumber = secondMarkerTurningNumber;
+            }
             
+            //check if you should begin backtracking
+            if(turnsBackToMarker + turnsMarkerToGoal < 
+               turnsBugToGoal + calculateTurningAdjustment()) {
+                
+                backTracking = true;
+                trackingCW = !trackingCW;
+                secondMarker = location;
+                secondMarkerTurningNumber = turningNumber;
+                turnsBackToMarker = 0;
+                turnsMarkerToGoal = goalWeight(secondMarker, goal);
+                
+                movementDirection = prevTrackingDirection.opposite();
+                action = getBugAction(movementDirection);
+            } else {
+                movementDirection = trackingDirection;
+                action = getBugAction(trackingDirection);
+            }
         } else {
             //not tracking, so check if you can move towards the goal
             if(myMC.canMove(directionToGoal)) {
                 movementDirection = directionToGoal;
                 action = getBugAction(directionToGoal);
-            } else {
-                
+            } else {               
                 //the path is blocked, so begin tracking.
                 tracking = true;
                 startTracking = true;
@@ -220,34 +239,86 @@ public class BugNavigator implements Navigator {
                 //determine if you should track around the obstacle clockwise or counterclockwise
                 Direction ccwDir = directionToGoal;
                 Direction cwDir = directionToGoal;
-                int turn = 0;
+//                int turn = 0;
                 boolean searching = true;
+//                while(searching) {
+//                    turn++;
+//                    ccwDir = ccwDir.rotateRight();
+//                    cwDir = cwDir.rotateLeft();
+//                    if(myMC.canMove(ccwDir)) {
+//                        bugPrevDirections[bugPos] = ccwDir;
+//                        trackingCW = false;
+//                        searching = false;
+//                        if(myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(goal) 
+//                                < location.add(ccwDir).distanceSquaredTo(goal)) {
+//                            bugPrevDirections[bugPos] = cwDir;
+//                            trackingCW = true;
+//                        }
+//                    } else if(myMC.canMove(cwDir)) {
+//                        bugPrevDirections[bugPos] = cwDir;
+//                        trackingCW = true;
+//                        searching = false;
+//                    }
+//                        
+//                    //stop searching if you are surrounded
+//                    if(ccwDir == cwDir) {
+//                        bugPrevDirections[bugPos] = ccwDir;
+//                        break;
+//                    }
+//                }
+                
+                //find counter clockwise turning number
+                int ccwTurn = 0;
                 while(searching) {
-                    turn++;
+                    ccwTurn++;
                     ccwDir = ccwDir.rotateRight();
-                    cwDir = cwDir.rotateLeft();
                     if(myMC.canMove(ccwDir)) {
-                        bugPrevDirections[bugPos] = ccwDir;
-                        trackingCW = false;
-                        searching = false;
-                        if(myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(goal) 
-                                < location.add(ccwDir).distanceSquaredTo(goal)) {
-                            bugPrevDirections[bugPos] = cwDir;
-                            trackingCW = true;
-                        }
-                    } else if(myMC.canMove(cwDir)) {
-                        bugPrevDirections[bugPos] = cwDir;
-                        trackingCW = true;
                         searching = false;
                     }
-                        
-                    //stop searching if you are surrounded
-                    if(ccwDir == cwDir) {
-                        bugPrevDirections[bugPos] = ccwDir;
-                        break;
+                    
+                    if(ccwDir == directionToGoal) {
+                        ccwTurn = 0;
+                        searching = false;
                     }
                 }
                 
+                //find clockwise turning number
+                int cwTurn = 0;
+                searching = true;
+                while(searching) {
+                    cwTurn++;
+                    cwDir = cwDir.rotateLeft();
+                    if(myMC.canMove(cwDir)) {
+                        searching = false;
+                    }
+                    
+                    if(cwDir == directionToGoal) {
+                        cwTurn = 0;
+                        searching = false;
+                    }
+                }
+                
+                // choose a tracking direction, and set the marker turning number
+                if(location.add(cwDir).distanceSquaredTo(goal) < 
+                   location.add(ccwDir).distanceSquaredTo(goal)) {
+                    
+                    trackingCW = true;
+                    bugPrevDirections[bugPos] = cwDir;
+                    markerTurningNumber = ccwTurn;
+                } else {
+                    trackingCW = false;
+                    bugPrevDirections[bugPos] = ccwDir;
+                    markerTurningNumber = cwTurn;
+                }
+                
+                //set a tracking marker
+                marker = location;
+                turnsBackToMarker = 0;
+                turnsMarkerToGoal = goalWeight(marker, goal);
+                turnsBugToGoal = turnsMarkerToGoal;
+                backTracking = false;
+                
+                //other tracking information
                 bugPrevCW[bugPos] = trackingCW;
                 trackingDirection = bugPrevDirections[bugPos];
                 prevTrackingDirection = directionToGoal.opposite();
@@ -260,7 +331,7 @@ public class BugNavigator implements Navigator {
                 action = getBugAction(trackingDirection);
             }
         }
-        myRC.setIndicatorString(0, "turningNumber: " + String.valueOf(turningNumber));
+//        myRC.setIndicatorString(0, "turningNumber: " + String.valueOf(turningNumber));
         return action;
     }
     
@@ -341,5 +412,32 @@ public class BugNavigator implements Navigator {
             
         return navigateBug();
 
+    }
+    
+    private int calculateTurningAdjustment() {
+        int i1 = (turningNumber/2) * 6;
+        int i2;
+        switch(turningNumber) {
+            case 0:
+            case 1:
+            case 2:
+                i2 = 0;
+                break;
+                
+            case 3:
+                i2 = 2;
+                break;
+                
+            default:
+                i2 = turningNumber - 1;
+        }                
+        
+        return delayDiag * i1 + delayRect * i2;
+    }
+    
+    private int goalWeight(MapLocation start, MapLocation end) {
+        //May be more efficient way to do this besides Math.abs.
+        return delayRect*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
+//        return delayRSq * start.distanceSquaredTo(end);
     }
 }

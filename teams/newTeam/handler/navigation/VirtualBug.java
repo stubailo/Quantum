@@ -2,6 +2,7 @@ package newTeam.handler.navigation;
 
 import newTeam.common.QuantumConstants;
 import newTeam.common.util.Logger;
+import battlecode.common.Chassis;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
@@ -97,9 +98,10 @@ public class VirtualBug {
     }
     
     private void DoCommonConstructorActions () {
-        delayRect = myRC.getChassis().moveDelayOrthogonal;
+        Chassis chassis = myRC.getChassis();
+        delayRect = chassis.moveDelayOrthogonal;
         delayRSq = delayRect * delayRect;
-        delayDiag = myRC.getChassis().moveDelayDiagonal;
+        delayDiag = chassis.moveDelayDiagonal;
         delayDSq = delayDiag * delayDiag;
     }
     
@@ -299,6 +301,10 @@ public class VirtualBug {
     private void addMove(MapLocation move) {
         //TODO: deal with index going out of bounds.  
         moveIndex++;
+        if(moveIndex >= MAX_MOVES) {
+            return;
+        }
+        
         moves[moveIndex] = move;
         prevLocation = virtualBugLocation;
         directionToGoal = move.directionTo(goal);
@@ -332,7 +338,7 @@ public class VirtualBug {
                 i2 = turningNumber - 1;
         }                
         
-        return 6 * i1 + 4 * i2;
+        return delayDiag * i1 + delayRect * i2;
     }
     
     private int goalWeight(MapLocation start, MapLocation end) {
