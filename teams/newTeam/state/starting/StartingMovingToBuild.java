@@ -17,9 +17,11 @@ public class StartingMovingToBuild extends BaseState {
         //mineToBeBuiltLocation = startingMineToBeBuiltLocation;
         needToCheck = toAdjacent;
         if(toAdjacent) {
+            Logger.debug_printHocho("whoops");
             myMH.initializeNavigationToAdjacent(mySH.startingFirstMineToBeBuiltLocation, NavigatorType.BUG);
         }
         else {
+            Logger.debug_printHocho("trying to move to " + mySH.startingSecondMineToBeBuiltLocation.toString() + " from " + myK.myLocation.toString());
             myMH.initializeNavigationTo(mySH.startingSecondMineToBeBuiltLocation, NavigatorType.BUG);
         }
     }
@@ -52,8 +54,7 @@ public class StartingMovingToBuild extends BaseState {
             }
             
             result.senseAndUpdateKnowledge();
-            result = result.getNextState();
-            return result;
+            return result.getNextState();
         }
 
         return result;

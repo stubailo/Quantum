@@ -90,5 +90,9 @@ public class Knowledge {
         }
         else justTurned = false;
     }
+    
+    public void initializeRecyclerNode() {
+        myRecyclerNode = new RecyclerNode(myRobotID, myLocation);
+    }
 
 }

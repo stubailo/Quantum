@@ -7,6 +7,7 @@ import newTeam.handler.navigation.BugNavigator;
 import newTeam.handler.navigation.Navigator;
 import newTeam.handler.navigation.MoveForwardNavigator;
 import newTeam.handler.navigation.MoveBackwardNavigator;
+import newTeam.handler.navigation.MovementAction;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -63,6 +64,9 @@ public class MovementHandler {
     
     public boolean step() {
         try {
+//            MovementAction nextAction = navigator.getNextAction();
+//            Logger.debug_printHocho(nextAction.toString());
+//            switch(nextAction) {
             switch(navigator.getNextAction()) {
             
             case MOVE_FORWARD:

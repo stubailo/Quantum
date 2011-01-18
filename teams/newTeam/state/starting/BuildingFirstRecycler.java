@@ -34,7 +34,7 @@ public class BuildingFirstRecycler extends BaseState {
                 result = new BuildingSecondRecycler(this, mySH.startingSecondMineToBeBuiltLocation);
             }
             result.senseAndUpdateKnowledge();
-            result = result.getNextState();
+            return result.getNextState();
         }
 
         return result;

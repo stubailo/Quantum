@@ -18,12 +18,19 @@ public class RobotPlayer implements Runnable {
    
     /*** RobotController ***/
     private final  RobotController      myRC;
+
+    /*** Knowledge ***/
+    private final  Knowledge            myK;
     
     /*** ComponentsHandler ***/
     private final  ComponentsHandler    myCH;
     
-    /*** Knowledge ***/
-    private final  Knowledge            myK;
+    /*** Other handlers ***/
+    public  final  BroadcastHandler     myBCH;
+    public  final  BuilderHandler       myBH;
+    public  final  MovementHandler      myMH;
+    public  final  SensorHandler        mySH;
+    public  final  WeaponHandler        myWH;
     
     /*** Specific Player ***/
     private        BasePlayer           mySP; 
@@ -36,31 +43,76 @@ public class RobotPlayer implements Runnable {
 
     
     public RobotPlayer(RobotController rc) {
-        myRC = rc;
+        myRC  = rc;
 
-        myK  = new Knowledge(rc);
-        SensorHandler sh = new SensorHandler(myRC, myK);
-        myCH = new ComponentsHandler(new BroadcastHandler(myK),
-                                     new BuilderHandler(myK, sh),
-                                     new MovementHandler(myRC, myK),
-                                     sh,
-                                     new WeaponHandler());
-        myRS = new BaseState(myRC, myK, myCH);
-        mySP = BasePlayer.determineInitialSpecificPlayer(rc, myRS);
+        myK   = new Knowledge(rc);
+        mySH  = new SensorHandler(myRC, myK);
+        myBCH = new BroadcastHandler(myK);
+        myBH  = new BuilderHandler(myK, mySH);
+        myMH  = new MovementHandler(myRC, myK);
+        myWH  = new WeaponHandler();
+        myCH  = new ComponentsHandler(myBCH,
+                                      myBH,
+                                      myMH,
+                                      mySH,
+                                      myWH);
     }
     
     
 
     public void run() {
         
+        
+        // Round 0 actions, slightly different
+        myK.doStatelessUpdate();
+        
+        ComponentType[] newCompTypes = myCH.updateComponents(myRC);
+        
+        // These two lines are different than the main loop
+        myRS = new BaseState(myRC, myK, myCH);
+        mySP = BasePlayer.determineInitialSpecificPlayer(myRC, myRS);
+        
+        myRC.setIndicatorString(0, myRS.getClass().getName());
+        
+        if(newCompTypes != null) {
+            
+            for(ComponentType newCompType : newCompTypes) {
+                mySP = mySP.determineSpecificPlayerGivenNewComponent(newCompType, myRS);
+                myRS = mySP.getNewStateBasedOnNewSpecificPlayer(myRS);
+            }
+        }
+
+        
+        myRS.senseAndUpdateKnowledge();
+        
+        
+        myRS = myRS.getNextState();
+        
+        // initialize and clean up as necessary?
+        
+        myRC.setIndicatorString(1, myRS.getClass().getName());
+
+        myRS = myRS.execute();
+        
+        myRC.setIndicatorString(2, myRS.getClass().getName());
+        
+        mySP.doSpecificPlayerStatelessActions();
+        
+        myRC.yield();
+        
         while(true) {
             try {
                 
+                // Rounds 1 and later actions
+                
+                // Stateless actions
                 myK.doStatelessUpdate();
+                mySH.refresh();
                 
                 myRC.setIndicatorString(0, myRS.getClass().getName());
                 
-                ComponentType[] newCompTypes = myCH.updateComponents(myRC);
+                newCompTypes = myCH.updateComponents(myRC);
+                
                 if(newCompTypes != null) {
                     
                     for(ComponentType newCompType : newCompTypes) {
@@ -68,7 +120,7 @@ public class RobotPlayer implements Runnable {
                         myRS = mySP.getNewStateBasedOnNewSpecificPlayer(myRS);
                     }
                 }
-                
+                // State actions
                 myRS.senseAndUpdateKnowledge();
                 
                 myRS = myRS.getNextState();
@@ -81,6 +133,8 @@ public class RobotPlayer implements Runnable {
                 
                 myRC.setIndicatorString(2, myRS.getClass().getName());
                 
+                mySP.doSpecificPlayerStatelessActions();
+                
                 myRC.yield();
                 
 
@@ -91,12 +145,6 @@ public class RobotPlayer implements Runnable {
         }
 
     }
-
-/*    public void doCommonEndTurnActions()
-    {
-        myCH.broadcast( myK.msg().composeMessage() );
-        myK.msg().emptyQueue();
-    }*/
     
     
 

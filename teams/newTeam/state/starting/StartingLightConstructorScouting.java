@@ -34,8 +34,7 @@ public class StartingLightConstructorScouting extends BaseState {
             }
             
             result.senseAndUpdateKnowledge();
-            result = result.getNextState();
-            return result;
+            return result.getNextState();
         }
             
         return this;
@@ -43,6 +42,12 @@ public class StartingLightConstructorScouting extends BaseState {
     
     @Override
     public StartingLightConstructorScouting execute() {
+        if(resultOfScoutingDirection == null) {
+            Logger.debug_printHocho("null");
+        }
+        else {
+            Logger.debug_printHocho(resultOfScoutingDirection.toString());
+        }
         myMH.setDirection(resultOfScoutingDirection);
         return this;
     }

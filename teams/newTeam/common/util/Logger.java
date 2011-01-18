@@ -56,7 +56,14 @@ public class Logger {
      * Prints bytecode count.
      */
     public static void debug_printRemainingBytecodes() {
-        System.out.println("remaining bytecodes: " + String.valueOf(Clock.getBytecodeNum()));
+        System.out.println("remaining bytecodes: " + String.valueOf(Clock.getBytecodesLeft()));
+    }
+    
+    /**
+     * Prints bytecode count.
+     */
+    public static void debug_printRemainingBytecodes(String s) {
+        System.out.println(s + " : remaining bytecodes: " + String.valueOf(Clock.getBytecodesLeft()));
     }
 
 }

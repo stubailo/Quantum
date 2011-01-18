@@ -29,8 +29,11 @@ public class Wait extends BaseState {
 
     @Override
     public BaseState getNextState() {
-        if(turnsWaited == turnsToWait)
-            return nextState;
+        if(turnsWaited == turnsToWait) {
+            BaseState result = nextState;
+            result.senseAndUpdateKnowledge();
+            return result.getNextState();
+        }
         return this;
     }
 

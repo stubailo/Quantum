@@ -7,9 +7,8 @@ import newTeam.state.idle.Idling;
 import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
-import newTeam.state.recycler.RecyclerState;
 
-public class ConstructingAntennaOnSelf extends RecyclerState {
+public class ConstructingAntennaOnSelf extends BaseState {
 
     public ConstructingAntennaOnSelf(BaseState oldState) {
         super(oldState);
@@ -26,7 +25,7 @@ public class ConstructingAntennaOnSelf extends RecyclerState {
         if( myBH.finishedBuilding() )
         {
             
-            return new RecyclerState(this);
+            return new Idling(this);
         }
 
         return this;
@@ -46,7 +45,7 @@ public class ConstructingAntennaOnSelf extends RecyclerState {
         
         if( myBH.finishedBuilding() )
         {
-            return new RecyclerState(this);
+            return new Idling(this);
         }
         
         return this;

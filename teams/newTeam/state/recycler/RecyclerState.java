@@ -1,4 +1,4 @@
-package newTeam.state.recycler;
+/*package newTeam.state.recycler;
 
 import battlecode.common.*;
 
@@ -41,4 +41,4 @@ public class RecyclerState extends BaseState {
         return this;
     }
 
-}
+}*/
