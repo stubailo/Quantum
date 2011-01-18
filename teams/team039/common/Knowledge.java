@@ -27,7 +27,7 @@ public class Knowledge {
     public  final  Team                myTeam;
     public  final  Team                enemyTeam;
     public  final  MapLocation         myStartLocation;
-    public  final  int                 myRobotID;
+    public         int                 myRobotID;
     public  final  Robot               myRobot;
     
     /*** Round constants ***/
