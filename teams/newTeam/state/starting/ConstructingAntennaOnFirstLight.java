@@ -6,10 +6,9 @@ import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
 import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
+import newTeam.state.recycler.RecyclerState;
 
-public class ConstructingAntennaOnFirstLight extends BaseState {
-
-    RobotInfo firstLightInfo;
+public class ConstructingAntennaOnFirstLight extends RecyclerState {
 
     public ConstructingAntennaOnFirstLight(BaseState oldState) {
         super(oldState);
@@ -30,8 +29,6 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
         if( myBH.finishedBuilding() )
         {
             BaseState result = new ConstructingAntennaOnSelf( this );
-            result.senseAndUpdateKnowledge();
-            result = result.getNextState();
             return result;
         }
 
@@ -52,9 +49,6 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
         if( myBH.finishedBuilding() )
         {
             BaseState result = new ConstructingAntennaOnSelf( this );
-            result.senseAndUpdateKnowledge();
-            result = result.getNextState();
-            result.execute();
             return result;
         }
 

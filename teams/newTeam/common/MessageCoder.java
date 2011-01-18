@@ -65,7 +65,7 @@ public abstract class MessageCoder {
             outputLocations[offsetI] = bodyLocations[i];
         }
 
-        int footerLocation = outputLength - 1;
+        int footerLocation = outputLength - FOOTER_LENGTH;
         outputStrings[footerLocation - 1] = END_MSG;
         outputInts[footerLocation - 1] = reBroadcast ? 1 : 0;
         
@@ -73,8 +73,8 @@ public abstract class MessageCoder {
         
         for(int i = 0; i < outputLength - 1; i++) {
             hashCode += outputInts[i];
-            hashCode += outputStrings[i].hashCode();
-            hashCode += outputLocations[i].hashCode();
+            hashCode += outputStrings[i]!=null?outputStrings[i].hashCode():0;
+            hashCode += outputLocations[i]!=null?outputLocations[i].hashCode():0;
         }
         
         hashCode += MULTIPLIER * broadcasterID + OFFSET;
@@ -99,10 +99,10 @@ public abstract class MessageCoder {
         MapLocation[] inputLocations = input.locations;
         int length                   = inputInts.length;
         
-        for(int i = 0; i < length; i++) {
+        for(int i = 0; i < length-1; i++) {
             hashCode += inputInts[i];
-            hashCode += inputStrings[i].hashCode();
-            hashCode += inputLocations[i].hashCode();
+            hashCode += inputStrings[i]!=null?inputStrings[i].hashCode():0;
+            hashCode += inputLocations[i]!=null?inputLocations[i].hashCode():0;
         }
         
         hashCode += inputInts[0] * MULTIPLIER + OFFSET;

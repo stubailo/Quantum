@@ -22,9 +22,8 @@ public class RecyclerNode {
     @Override
     public String toString()
     {
-        return "RecyclerNode [id: " + myRobotID + " location: (" + myLocation.x +
-                ", " + myLocation.y + ") " + "parent id: " + parentRobotID + (parentLocation!=null? " parent location: (" +
-                parentLocation.x + ", " + parentLocation.y + ") ]":"");
+        return "RecyclerNode [id: " + myRobotID + " parent id: " + parentRobotID + (parentLocation!=null? " vector: (" +
+                getVector().x + ", " + getVector().y + ") ]":"");
     }
 
     public boolean hasParent()

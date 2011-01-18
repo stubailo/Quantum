@@ -7,10 +7,9 @@ import newTeam.state.idle.Idling;
 import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
+import newTeam.state.recycler.RecyclerState;
 
-public class ConstructingAntennaOnSelf extends BaseState {
-
-    RobotInfo firstLightInfo;
+public class ConstructingAntennaOnSelf extends RecyclerState {
 
     public ConstructingAntennaOnSelf(BaseState oldState) {
         super(oldState);
@@ -26,7 +25,8 @@ public class ConstructingAntennaOnSelf extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new Idling(this);
+            
+            return new RecyclerState(this);
         }
 
         return this;
@@ -38,6 +38,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
         //add a sensor method that checks if the square is occupied
         if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
         {
+            Logger.debug_printSashko("building antenna");
             myBH.buildComponents( Prefab.startingConstructor , myRC.getLocation(), RobotLevel.ON_GROUND);
         }
 
@@ -45,7 +46,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
         
         if( myBH.finishedBuilding() )
         {
-            return new Idling(this);
+            return new RecyclerState(this);
         }
         
         return this;

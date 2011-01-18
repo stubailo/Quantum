@@ -5,6 +5,7 @@ import newTeam.player.BasePlayer;
 import newTeam.player.building.recycler.RecyclerCommPlayer;
 import newTeam.player.building.BuildingPlayer;
 import newTeam.state.BaseState;
+import newTeam.state.recycler.RecyclerState;
 
 public class RecyclerPlayer extends BuildingPlayer {
     
@@ -14,7 +15,7 @@ public class RecyclerPlayer extends BuildingPlayer {
     
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return oldState;
+        return new RecyclerState( oldState );
     }
     
     @Override

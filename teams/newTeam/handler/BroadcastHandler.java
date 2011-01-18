@@ -27,6 +27,8 @@ public class BroadcastHandler {
 
     public void addBCC( BroadcastController newBCC )
     {
+        
+
         if(myBCC != null) {
             int currentRange = myBCC.type().range;
             int newRange = newBCC.type().range;
@@ -39,6 +41,13 @@ public class BroadcastHandler {
         else {
             myBCC = newBCC;
         }
+
+        Logger.debug_printSashko(myBCC.toString());
+    }
+
+    public boolean canBroadcast()
+    {
+        return myBCC != null;
     }
 
     public void addToQueue(Message msgToAdd) {
@@ -51,7 +60,7 @@ public class BroadcastHandler {
         if( queueLocation > 0 )
         {
             queueLocation--;
-            return myMessageQueue[ queueLocation + 1 ];
+            return myMessageQueue[ queueLocation ];
         } else {
             return null;
         }
@@ -59,13 +68,20 @@ public class BroadcastHandler {
 
     public void broadcastFromQueue()
     {
-        if( myBCC != null )
+
+        if( myBCC != null && !myBCC.isActive() )
         {
-            try {
-                myBCC.broadcast(getFromQueue());
-            } catch ( Exception e )
+            Message nextMessage = getFromQueue();
+
+            if( nextMessage != null )
             {
-                Logger.debug_printExceptionMessage(e);
+
+                try {
+                    myBCC.broadcast(nextMessage);
+                } catch ( Exception e )
+                {
+                    Logger.debug_printExceptionMessage(e);
+                }
             }
         }
     }

@@ -1,15 +1,14 @@
 package newTeam.common;
 
-import battlecode.common.Direction;
-import battlecode.common.MapLocation;
-import battlecode.common.Robot;
-import battlecode.common.RobotController;
-import battlecode.common.Team;
+import battlecode.common.*;
 
 public class Knowledge {
     
     /*** RobotController ***/
-    private final  RobotController      myRC;
+    private final   RobotController     myRC;
+
+    /*** Parent Recycler ***/
+    public          RecyclerNode        myRecyclerNode;
     
     /*** Constants ***/
     public  final   Team                myTeam;
