@@ -39,10 +39,11 @@ public class RobotPlayer implements Runnable {
         myRC = rc;
 
         myK  = new Knowledge(rc);
-        myCH = new ComponentsHandler(new BroadcastHandler( myK ),
-                                     new BuilderHandler(),
+        SensorHandler sh = new SensorHandler(myRC, myK);
+        myCH = new ComponentsHandler(new BroadcastHandler(myK),
+                                     new BuilderHandler(myK, sh),
                                      new MovementHandler(myRC, myK),
-                                     new SensorHandler(myRC, myK),
+                                     sh,
                                      new WeaponHandler());
         myRS = new BaseState(myRC, myK, myCH);
         mySP = BasePlayer.determineInitialSpecificPlayer(rc, myRS);
@@ -56,6 +57,8 @@ public class RobotPlayer implements Runnable {
             try {
                 
                 myK.doStatelessUpdate();
+                
+                myRC.setIndicatorString(0, myRS.getClass().getName());
                 
                 ComponentType[] newCompTypes = myCH.updateComponents(myRC);
                 if(newCompTypes != null) {
@@ -72,7 +75,11 @@ public class RobotPlayer implements Runnable {
                 
                 // initialize and clean up as necessary?
                 
-                myRS.execute();
+                myRC.setIndicatorString(1, myRS.getClass().getName());
+                
+                myRS = myRS.execute();
+                
+                myRC.setIndicatorString(2, myRS.getClass().getName());
                 
                 myRC.yield();
                 

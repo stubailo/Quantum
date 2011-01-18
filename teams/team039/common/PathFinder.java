@@ -112,7 +112,7 @@ public class PathFinder {
                     
                     //if surrounded, do nothing.
                     if(testRDir1 == testLDir1)
-                        break;
+                        moveDir = testRDir1;
                 }
                 myCH.setDirection(moveDir);
             }

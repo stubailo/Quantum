@@ -138,10 +138,10 @@ public class BuildHandler {
     private void finishBuilding() {
 
         //check if you just built a recycler (and are not, yourself, a recycler)
-        if( compHandler.canIBuildThis(ComponentType.RECYCLER) && buildInstructions.equals( Prefab.commRecycler ) )
-        {
-            knowledge.msg().addToQueue( knowledge.myRecyclerNode.generateDesignation() );
-        }
+//        if( compHandler.canIBuildThis(ComponentType.RECYCLER) && buildInstructions.equals( Prefab.commRecycler ) )
+//        {
+//            //knowledge.msg().addToQueue( knowledge.myRecyclerNode.generateDesignation() );
+//        }
 
         currentlyBuilding = false;
         buildStep = 0;

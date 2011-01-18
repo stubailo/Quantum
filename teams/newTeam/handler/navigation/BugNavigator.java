@@ -156,7 +156,7 @@ public class BugNavigator implements Navigator {
                 turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
                 prevDirectionToGoal = directionToGoal;
             }
-            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
+//            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
             
             //set the initial direction to begin testing from.
             Direction startDirection = prevTrackingDirection.opposite();
@@ -275,7 +275,7 @@ public class BugNavigator implements Navigator {
                 testDir = testDir.rotateRight();
             }
         }
-        Logger.debug_printHocho(String.valueOf(turn));
+//        Logger.debug_printHocho(String.valueOf(turn));
         return turn;
     }
     

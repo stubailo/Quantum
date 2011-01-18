@@ -3,7 +3,6 @@ package newTeam.state.starting;
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
-import newTeam.state.building.MovingToBuild;
 import newTeam.common.util.Logger;
 
 public class StartingLightConstructorScouting extends BaseState {
@@ -16,12 +15,24 @@ public class StartingLightConstructorScouting extends BaseState {
     }
     
     @Override
+    public void senseAndUpdateKnowledge() {
+        resultOfScoutingDirection = mySH.senseStartingLightConstructorSurroundings();
+        
+    }
+    
+    @Override
     public BaseState getNextState() {
         
-        resultOfScoutingDirection = mySH.senseStartingLightConstructorSurroundings();
-            
         if(resultOfScoutingDirection == Direction.OMNI) {
-            BaseState result = new StartingMovingToBuild(this, mySH.startingIdealBuildingLocation);
+            
+            BaseState result = null;
+            if(mySH.standardWayClear) {
+                result = new StartingMovingToBuild(this, false);
+            }
+            else {
+                result = new StartingMovingToBuild(this, true);
+            }
+            
             result.senseAndUpdateKnowledge();
             result = result.getNextState();
             return result;

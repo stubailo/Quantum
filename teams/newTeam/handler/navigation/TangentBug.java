@@ -135,6 +135,9 @@ public class TangentBug implements Navigator {
         //TODO: decide if I want this to do anything
     }
 
+    public void pauseNavigation () {
+        //put stuff here... it won't compile without it
+    }
 //    public void initiateNavigation(MapLocation newGoal) {
 //        goal = newGoal;
 //        currentVB = new VirtualBug(goal, myRC);
@@ -152,10 +155,6 @@ public class TangentBug implements Navigator {
 //    public void initiateNavigation() {
 //        initiateNavigation(goal);
 //    }
-    
-    public void pauseNavigation() {
-        
-    }
     
     /****************** Private Methods ********************/
     
