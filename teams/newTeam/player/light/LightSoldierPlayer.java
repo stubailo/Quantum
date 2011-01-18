@@ -18,6 +18,16 @@ public class LightSoldierPlayer extends LightPlayer {
     }
     
     @Override
+    public void initialize() {
+        
+    }
+    
+    @Override
+    public void doSpecificPlayerStatelessActions() {
+        super.doSpecificPlayerStatelessActions();
+    }
+    
+    @Override
     public BasePlayer determineSpecificPlayerGivenNewComponent(ComponentType compType,
                                                                BaseState state) {
         

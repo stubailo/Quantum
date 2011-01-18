@@ -12,9 +12,9 @@ import newTeam.common.Knowledge;
 
 public class BaseState {
     
-    protected final RobotController     myRC;
-    protected final Knowledge           myK;
-    protected final ComponentsHandler   myCH;
+    public    final RobotController     myRC;
+    public    final Knowledge           myK;
+    public    final ComponentsHandler   myCH;
     
     protected final BroadcastHandler    myBCH;
     protected final BuilderHandler      myBH;

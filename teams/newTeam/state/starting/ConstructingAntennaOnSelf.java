@@ -10,8 +10,6 @@ import newTeam.state.idle.Idling;
 
 public class ConstructingAntennaOnSelf extends BaseState {
 
-    RobotInfo firstLightInfo;
-
     public ConstructingAntennaOnSelf(BaseState oldState) {
         super(oldState);
 
@@ -26,6 +24,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
+            
             return new Idling(this);
         }
 
@@ -38,6 +37,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
         //add a sensor method that checks if the square is occupied
         if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
         {
+            Logger.debug_printSashko("building antenna");
             myBH.buildComponents( Prefab.startingConstructor , myRC.getLocation(), RobotLevel.ON_GROUND);
         }
 

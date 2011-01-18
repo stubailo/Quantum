@@ -4,6 +4,8 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.common.util.Logger;
+import newTeam.common.Knowledge;
+import newTeam.handler.ComponentsHandler;
 import newTeam.player.light.StartingLightConstructorPlayer;
 import newTeam.player.light.LightPlayer;
 import newTeam.player.building.BuildingPlayer;
@@ -11,11 +13,18 @@ import newTeam.player.building.recycler.StartingRecyclerPlayer;
 
 public class BasePlayer {
     
-    private final BaseState newStateBasedOnNewSpecificPlayer;
-    private       boolean   newStateBasedOnNewSpecificPlayerRetrieved = false;
+    private   final BaseState         newStateBasedOnNewSpecificPlayer;
+    private         boolean           newStateBasedOnNewSpecificPlayerRetrieved = false;
+    protected final RobotController   myRC;
+    protected final Knowledge         myK;
+    protected final ComponentsHandler myCH;
     
     public BasePlayer(BaseState state) {
+        myRC = state.myRC;
+        myK  = state.myK;
+        myCH = state.myCH;
         newStateBasedOnNewSpecificPlayer = determineNewStateBasedOnNewSpecificPlayer(state);
+        initialize();
     }
     
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
@@ -32,7 +41,13 @@ public class BasePlayer {
         }
     }
     
+    public void initialize() {
+        
+    }
     
+    public void doSpecificPlayerStatelessActions() {
+        
+    }
     
     public BasePlayer determineSpecificPlayerGivenNewComponent(ComponentType componentType,
                                                                BaseState state) {

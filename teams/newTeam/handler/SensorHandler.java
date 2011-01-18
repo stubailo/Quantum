@@ -72,8 +72,6 @@ public class SensorHandler {
         numberOfSensors++;
     }
     
-    
-    
     /**
      * Uses some basic knowledge to reset appropriate redundancy preventers
      */
@@ -155,18 +153,19 @@ public class SensorHandler {
 
     public void senseStartingLightPlayer ()
     {
-        Robot[] nearbyRobots = getSensableRobots();
+        if(!robotsSensed) {
+            senseRobots();
+        }
 
-        for( Robot robot:nearbyRobots )
-        {
+        for(int index = 0; index < numberOfSensableRobots; index ++) {
             try {
-            RobotInfo info = mySCs[0].senseRobotInfo(robot);
-            if( info.chassis.equals(Chassis.LIGHT) )
-            {
-                startingLightInfo = info;
-            }
+                RobotInfo info = mySCs[0].senseRobotInfo(sensableRobots[index]);
+                if( info.chassis.equals(Chassis.LIGHT) ) {
+                    startingLightInfo = info;
+                    break;
+                }
             } catch ( Exception e ) {
-                return;
+                Logger.debug_printExceptionMessage(e);
             }
         }
     }
@@ -251,7 +250,7 @@ public class SensorHandler {
                     startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
                 }
                 else {
-                    standardWayDirection                = usefulDirection1;
+                    standardWayDirection                = otherIsRight ? myDirection.rotateLeft() : myDirection.rotateRight();
                     startingSecondMineToBeBuiltLocation = myLocation.add(myDirection, 2);
                     startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
                     startingIdealBuildingLocation       = myLocation.add(myDirection, 3);

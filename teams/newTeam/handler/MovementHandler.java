@@ -7,6 +7,7 @@ import newTeam.handler.navigation.BugNavigator;
 import newTeam.handler.navigation.Navigator;
 import newTeam.handler.navigation.MoveForwardNavigator;
 import newTeam.handler.navigation.MoveBackwardNavigator;
+import newTeam.handler.navigation.MovementAction;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -27,6 +28,16 @@ public class MovementHandler {
     
     public void addMC(MovementController mc) {
         myMC = mc;
+    }
+
+    public boolean canMove( Direction dir )
+    {
+        if( myMC!=null )
+        {
+            return myMC.canMove( dir );
+        } else {
+            return false;
+        }
     }
     
     public void initializeNavigationTo(MapLocation goalLocation, NavigatorType givenNavigatorType) {
@@ -53,6 +64,9 @@ public class MovementHandler {
     
     public boolean step() {
         try {
+//            MovementAction nextAction = navigator.getNextAction();
+//            Logger.debug_printHocho(nextAction.toString());
+//            switch(nextAction) {
             switch(navigator.getNextAction()) {
             
             case MOVE_FORWARD:

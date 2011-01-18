@@ -111,7 +111,12 @@ public class BugNavigator implements Navigator {
     }
     
     public boolean reachedGoal() {
-        return goal.equals(myK.myLocation);
+        if(goingToAdjacent) {
+            return goal.isAdjacentTo(myK.myLocation);
+        }
+        else {
+            return goal.equals(myK.myLocation);
+        }
     }
     
     public int distanceSquaredToGoal(MapLocation fromHere) {
