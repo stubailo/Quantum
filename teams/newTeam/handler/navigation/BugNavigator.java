@@ -62,9 +62,9 @@ public class BugNavigator implements Navigator {
 
     public MovementAction getNextAction() {
         // do nothing if the motor is active or you are not navigating
-        if(!navigating) {
+        if(reachedGoal()) {
             return MovementAction.AT_GOAL;
-        } else if(myMC.isActive()) {
+        } else if(myMC.isActive() || !navigating) {
             return MovementAction.NONE;
         }
 
@@ -136,7 +136,7 @@ public class BugNavigator implements Navigator {
     private MovementAction navigateBug() {
         MapLocation location = myK.myLocation;
         Direction directionToGoal = location.directionTo(goal);
-        myRC.setIndicatorString(1, directionToGoal.toString());
+//        myRC.setIndicatorString(1, directionToGoal.toString());
         int bugPos = bugStep % MEMORY_LENGTH;
         MovementAction action;
         
@@ -147,12 +147,14 @@ public class BugNavigator implements Navigator {
             prevDirectionToGoal = prevLocation.directionTo(goal);
             startTracking = false;
         }
-        myRC.setIndicatorString(2, prevDirectionToGoal.toString());
+        myRC.setIndicatorString(1, String.valueOf(startTracking)+" "+ String.valueOf(tracking) + " " + String.valueOf(!prevLocation.equals(location)));
+        myRC.setIndicatorString(2, prevDirectionToGoal.toString() + " " + directionToGoal.toString());
         if(tracking) {
 
-            if(directionToGoal != prevDirectionToGoal) {
+            if(directionToGoal != prevDirectionToGoal && !startTracking) {
                 // changing goal contributes negatively to the turning number.
                 turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
+                prevDirectionToGoal = directionToGoal;
             }
             Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
             
@@ -162,10 +164,12 @@ public class BugNavigator implements Navigator {
             
             // check directions beginning with the reference direction, in an order depending on 
             // if you are tracking clockwise or counterclockwise
+            int turn;
             if(startTracking) {
                 startTracking = false;
+                turn = 0;
             } else {
-                turningNumber -= 4;
+                turn = -4;
             }
             boolean pathBlocked = true;
             while(pathBlocked) {
@@ -177,17 +181,21 @@ public class BugNavigator implements Navigator {
                 }
                 
                 //update turning number
-                turningNumber++;
+                turn++;
                 
                 if(myMC.canMove(testDirection)){
                     trackingDirection = testDirection;
                     pathBlocked = false;
                 } else if(testDirection == startDirection) {
-                    turningNumber -= 4;
+                    turn = 0;
                     break;
                 }
             }
 
+            //TODO: adjust the turningNumber when you calculate different rotation directions without moving.
+            if(!prevLocation.equals(location)) {
+                turningNumber += turn;
+            }
             //check if you are finished tracking
             if(turningNumber <= 0) {
                 tracking = false;
@@ -243,8 +251,11 @@ public class BugNavigator implements Navigator {
                 bugPrevCW[bugPos] = trackingCW;
                 trackingDirection = bugPrevDirections[bugPos];
                 prevTrackingDirection = directionToGoal.opposite();
-                turningNumber = turn;
-//                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
+//                turningNumber = turn;
+                turningNumber = calculateTurningChange(directionToGoal, trackingDirection, trackingCW);
+                if(turningNumber == -4) {
+                    turningNumber = 4;
+                }
                 movementDirection = trackingDirection;
                 action = getBugAction(trackingDirection);
             }

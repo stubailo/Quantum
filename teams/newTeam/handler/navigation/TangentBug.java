@@ -26,6 +26,9 @@ public class TangentBug implements Navigator {
     private final MapLocation goal;
     
     private         Direction           movementDirection;
+    private         VirtualBug          movingBug;
+    private         int                 movingBugIndex;
+    private         int                 currBranchIndex;
     private         MapLocation         prevLocation;
     
     private         VirtualBug []       myVBs;
@@ -39,6 +42,13 @@ public class TangentBug implements Navigator {
     private         int                 secondaryBugIndex;
     private         MapLocation         secondaryGoal;
     private         boolean             goingToSecondaryGoal;
+    private         boolean             bugging;
+    
+    /** variables relating to bug branching */
+    private         int []              branchIndices;
+    private         int []              parents;
+    private         int []              turnsAlongPath;
+    private         int []              turnsToNodes;
     
     
     public TangentBug(RobotController rc, Knowledge k, MovementController mc, 
@@ -50,6 +60,7 @@ public class TangentBug implements Navigator {
         
         goal = newGoal;
         currentVB = new VirtualBug(goal, myRC, myK.myLocation);
+        currentVB.ID = 0;
         myVBs = new VirtualBug [MAX_BUGS];
         myVBs[0] = currentVB;
         currentPathWeight = 0;
@@ -60,6 +71,14 @@ public class TangentBug implements Navigator {
         stepIndex = 0;
         goingToSecondaryGoal = false;
         numberOfBugs = 1;
+        
+        branchIndices = new int [MAX_BUGS];
+        branchIndices[0] = 0;
+        parents = new int[MAX_BUGS];
+        parents[0] = 0;
+        turnsAlongPath = new int[MAX_BUGS];
+        turnsToNodes = new int[MAX_BUGS];
+        turnsToNodes[0] = 0;
     }
 
     public MovementAction getNextAction() {
@@ -67,7 +86,7 @@ public class TangentBug implements Navigator {
         //calculate
         calculateVirtualBugs();
         
-        if(!myK.myLocation.equals(prevLocation)) {
+        if(!myK.myLocation.equals(prevLocation) && !bugging) {
             stepIndex++;
         }
         
@@ -78,7 +97,9 @@ public class TangentBug implements Navigator {
         
         movementDirection = myK.myLocation.directionTo(move);
         MovementAction action;
-        if(myMC.canMove(movementDirection)) {
+        if(currentPathWeight >= QuantumConstants.BIG_INT) {
+            action = MovementAction.GOAL_INACCESSIBLE;
+        } else if(myMC.canMove(movementDirection)) {
             if(myK.myDirection == movementDirection) {
                 action = MovementAction.MOVE_FORWARD;
 //          } else if(knowledge.myDirection == dir.opposite()) {
@@ -139,9 +160,14 @@ public class TangentBug implements Navigator {
     /****************** Private Methods ********************/
     
     private void calculateVirtualBugs() {
+        
+        if(goingToSecondaryGoal) {
+            return;
+        }
+        
         int remainingBytecodes = Clock.getBytecodesLeft();
         int count = 0;
-        
+
         VirtualBug branchBug;
         while(remainingBytecodes > MIN_BYTECODES) {
 
@@ -149,8 +175,17 @@ public class TangentBug implements Navigator {
             if(currentVB.shouldBranch()) {
                 branchBug = currentVB.clone();
                 branchBug.setOrientationClockwise(false);
+//                branchBug.ID = numberOfBugs;
                 myVBs[numberOfBugs] = branchBug;
                 pathWeights[numberOfBugs] = branchBug.getPathWeight();
+//                turnsAlongPath[numberOfBugs] = branchBug.getTurnsAlongPath();
+//                turnsToNodes[numberOfBugs] = turnsAlongPath[numberOfBugs];
+//                branchIndices[numberOfBugs] = currentVB.getMoveIndex();
+//                parents[numberOfBugs] = virtualBugIndex;
+                if(numberOfBugs == 1) {
+                    secondaryPathWeight = myVBs[2].getPathWeight();
+                    secondaryBugIndex = 2;
+                }
                 numberOfBugs++;
                 //TODO: deal with having too many virtual bugs
             }
@@ -166,6 +201,7 @@ public class TangentBug implements Navigator {
             
             currentPathWeight = currentVB.getPathWeight();
             pathWeights[virtualBugIndex] = currentPathWeight;
+            turnsAlongPath[virtualBugIndex] = currentVB.getTurnsAlongPath();
             
             if(currentPathWeight > secondaryPathWeight) {
                 currentVB = myVBs[secondaryBugIndex];
@@ -189,7 +225,53 @@ public class TangentBug implements Navigator {
             count++;
             if(count % RECHECK_BYTECODES == 0) {
                 remainingBytecodes = Clock.getBytecodesLeft();
+            } else {
+                remainingBytecodes -= LOOP_BYTECODE_COST;
             }
         }
     }
+    
+    private void reset() {
+        //TODO: write a reset function
+    }
+    
+//    private void recalculateBugs() {
+//        int remainingBytecodes = Clock.getBytecodesLeft();
+//        int count = 0;
+//        
+//        while(remainingBytecodes > MIN_BYTECODES) {
+//            
+//            count++;
+//            if(count % RECHECK_BYTECODES == 0) {
+//                remainingBytecodes = Clock.getBytecodesLeft();
+//            } else {
+//                remainingBytecodes -= LOOP_BYTECODE_COST;
+//            }
+//        }
+//    }
+//    
+//    private int getBranchIndex(int ID1, int ID2) {
+//        int parents1 [] = new int [MAX_BUGS];
+//        parents1[0] = ID1;
+//        int root1 = 0;
+//        while(parents1[root1] != 0) {
+//            root1++;
+//            parents1[root1] = parents[parents1[root1 - 1]];
+//        }
+//        
+//        int parents2 [] = new int [MAX_BUGS];
+//        parents2[0] = ID2;
+//        int root2 = 0;
+//        while(parents2[root2] != 0) {
+//            root2++;
+//            parents2[root2] = parents[parents2[root2 - 1]];
+//        }
+//        
+//        int branchNumber = 0;
+//        while(branchNumber <= root1 && branchNumber <= root2 && 
+//              parents1[root1 - branchNumber] == parents2[root2 - branchNumber]) {
+//            branchNumber++;
+//        }
+//        return branchIndices[parents1[root1 - branchNumber + 1]];
+//    }
 }

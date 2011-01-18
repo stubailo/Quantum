@@ -9,6 +9,8 @@ import battlecode.common.TerrainTile;
 
 public class VirtualBug {
     
+    public        int                  ID;
+    
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
 //    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     private final RobotController myRC;
@@ -31,6 +33,8 @@ public class VirtualBug {
     private        int                  moveIndex; 
     private        int                  delayRect;
     private        int                  delayDiag;
+    private        int                  delayRSq;
+    private        int                  delayDSq;
     private        int                  turnsToGoal;
     private        int                  turnsAlongPath;
     private        int                  pathWeight;
@@ -94,7 +98,9 @@ public class VirtualBug {
     
     private void DoCommonConstructorActions () {
         delayRect = myRC.getChassis().moveDelayOrthogonal;
+        delayRSq = delayRect * delayRect;
         delayDiag = myRC.getChassis().moveDelayDiagonal;
+        delayDSq = delayDiag * delayDiag;
     }
     
     public VirtualBug clone() {
@@ -137,6 +143,14 @@ public class VirtualBug {
         return pathWeight;
     }
     
+    public int getTurnsAlongPath() {
+        return turnsAlongPath;
+    }
+    
+    public int getMoveIndex() {
+        return moveIndex;
+    }
+    
 //    public MapLocation getCounterClockwiseMove() {
 //        return counterClockwiseMove;
 //    }
@@ -166,6 +180,9 @@ public class VirtualBug {
             tracking = true;
             trackingCW = true;
             startTracking = true;
+            if(tile == TerrainTile.OFF_MAP) {
+                turnsAlongPath += QuantumConstants.BIG_INT;
+            }
             return true;
         } else {
             addMove(nextLocation);
@@ -221,6 +238,9 @@ public class VirtualBug {
                     prevDirectionToGoal = directionToGoal;
                     addMove(nextLocation);
                     turningNumber = turn;                 
+                } else if(tile == TerrainTile.OFF_MAP) {
+                    searching = false;
+                    turnsAlongPath += QuantumConstants.BIG_INT;
                 }
             }
             
@@ -257,6 +277,9 @@ public class VirtualBug {
                     prevDirectionToGoal = directionToGoal;
                     addMove(nextLocation);
                     turningNumber += turn;
+                } else if(tile == TerrainTile.OFF_MAP) {
+                    searching = false;
+                    turnsAlongPath += QuantumConstants.BIG_INT;
                 }
                                 
                 turn++;
@@ -286,14 +309,36 @@ public class VirtualBug {
         }
        
         turnsToGoal = goalWeight(move, goal);
-        pathWeight = turnsAlongPath + turnsToGoal;
+        pathWeight = turnsAlongPath + turnsToGoal + calculateTurningAdjustment();
         
         virtualBugLocation = move;
+    }
+    
+    private int calculateTurningAdjustment() {
+        int i1 = (turningNumber/2) * 6;
+        int i2;
+        switch(turningNumber) {
+            case 0:
+            case 1:
+            case 2:
+                i2 = 0;
+                break;
+                
+            case 3:
+                i2 = 2;
+                break;
+                
+            default:
+                i2 = turningNumber - 1;
+        }                
+        
+        return 6 * i1 + 4 * i2;
     }
     
     private int goalWeight(MapLocation start, MapLocation end) {
         //May be more efficient way to do this besides Math.abs.
         return delayRect*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
+//        return delayRSq * start.distanceSquaredTo(end);
     }
     
     private int calculateTurningChange(Direction oldDir, Direction newDir, boolean CW) {
@@ -303,7 +348,6 @@ public class VirtualBug {
             turn++;
             testDir = CW ? testDir.rotateLeft() : testDir.rotateRight();
         }
-        Logger.debug_printHocho(String.valueOf(turn));
         return turn;
     }
 }

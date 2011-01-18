@@ -14,7 +14,7 @@ public final class QuantumConstants {
 	/** Number of locations to remember for bug navigation */
 	public static final int BUG_MEMORY_LENGTH = 15;
 	/** Bug distance increase before trying different path */
-	public static final double BUG_DISTANCE_SWITCH = 1.2;
+	public static final int BUG_DISTANCE_SWITCH = 30;
 	/** Maximum number of moves to remember doing tangent bug */
 	public static final int TANGENT_BUG_PATH_LENGTH = 200;
 	/** Maximum number of virtual bugs in the tangent bug algorithm */

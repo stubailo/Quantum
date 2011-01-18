@@ -7,6 +7,7 @@ public enum MovementAction {
     MOVE_BACKWARD,
     AT_GOAL,
     PATH_BLOCKED,
+    GOAL_INACCESSIBLE,
     NONE
 
 }
