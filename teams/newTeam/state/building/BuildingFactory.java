@@ -1,21 +1,21 @@
-package newTeam.state.starting;
+package newTeam.state.building;
 
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
-import newTeam.common.Prefab;
+import newTeam.common.*;
 import newTeam.common.util.Logger;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
-import newTeam.state.building.MovingToBuildFactory;
 
-public class BuildingSecondRecycler extends BaseState {
+public class BuildingFactory extends BaseState {
 
-    private final MapLocation toBuildLocation;
-    
-    public BuildingSecondRecycler(BaseState oldState, MapLocation givenToBuildLocation) {
+    MapLocation toBuildLocation;
+
+    public BuildingFactory(BaseState oldState, MapLocation whereToBuild) {
         super(oldState);
-        toBuildLocation = givenToBuildLocation;
+
+        toBuildLocation = whereToBuild;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class BuildingSecondRecycler extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new MovingToBuildFactory( this );
+            return new Idling( this );
         }
 
         return this;
@@ -39,9 +39,8 @@ public class BuildingSecondRecycler extends BaseState {
     @Override
     public BaseState execute() {
 
-        //add a sensor method that checks if the square is occupied
         if(myK.myLocation.isAdjacentTo(toBuildLocation)) {
-            if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 10 )
+            if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.factory.getTotalCost() + 10 )
             {
                 myBH.buildUnit( Prefab.commRecycler , toBuildLocation);
             }

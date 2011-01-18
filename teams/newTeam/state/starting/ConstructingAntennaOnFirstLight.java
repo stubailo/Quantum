@@ -6,10 +6,9 @@ import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
 import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
+import newTeam.state.recycler.RecyclerState;
 
-public class ConstructingAntennaOnFirstLight extends BaseState {
-
-    RobotInfo firstLightInfo;
+public class ConstructingAntennaOnFirstLight extends RecyclerState {
 
     public ConstructingAntennaOnFirstLight(BaseState oldState) {
         super(oldState);
@@ -22,6 +21,8 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
             myRC.turnOff();
         }
         mySH.senseStartingLightPlayer();
+
+        Logger.debug_printSashko("found light: " + myRC.getLocation().directionTo(mySH.startingLightInfo.location));
     }
 
     @Override
@@ -30,8 +31,6 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
         if( myBH.finishedBuilding() )
         {
             BaseState result = new ConstructingAntennaOnSelf( this );
-            result.senseAndUpdateKnowledge();
-            result = result.getNextState();
             return result;
         }
 
@@ -42,7 +41,8 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
+        
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.startingConstructor.getComponentCost() )
         {
             myBH.buildComponents( Prefab.startingConstructor , mySH.startingLightInfo.location, RobotLevel.ON_GROUND);
         }
@@ -52,9 +52,6 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
         if( myBH.finishedBuilding() )
         {
             BaseState result = new ConstructingAntennaOnSelf( this );
-            result.senseAndUpdateKnowledge();
-            result = result.getNextState();
-            result.execute();
             return result;
         }
 

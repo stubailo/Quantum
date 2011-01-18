@@ -72,8 +72,6 @@ public class SensorHandler {
         numberOfSensors++;
     }
     
-    
-    
     /**
      * Uses some basic knowledge to reset appropriate redundancy preventers
      */

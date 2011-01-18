@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package team039.common;
+package newTeam.common;
 
 import battlecode.common.*;
 
@@ -18,6 +18,17 @@ public class RecyclerNode {
 
     public MapLocation myLocation;
     public MapLocation parentLocation;
+
+    public RecyclerNode()
+    {
+
+    }
+
+    public RecyclerNode ( int i_myID, MapLocation i_myLocation )
+    {
+        myRobotID = i_myID;
+        myLocation = i_myLocation;
+    }
 
     @Override
     public String toString()
