@@ -14,7 +14,7 @@ public abstract class MessageCoder {
 
     //not in Quantum Constants because they are only used here
     public static final int HEADER_LENGTH = 2;
-    public static final int FOOTER_LENGTH = 1;
+    public static final int FOOTER_LENGTH = 2;
     public static final int MAX_MESSAGES = 15;
     public static final String SECURITY_CODE = "Q5";
     public static final String START_MSG = "%S";
@@ -26,11 +26,15 @@ public abstract class MessageCoder {
     public static final String RECYCLER_DESIGNATION = "rd";
     public static final String JUST_BUILT_UNIT_DESIGNATION = "ud"; //when a recycler, factory, or armory builds a unit
 
+    // encoding constants
+    private static final int MULTIPLIER = 7;
+    private static final int OFFSET = 22;
+    
     /*
      * Takes a series of arguments, any of which can be null, and generates a
      * valid single message.
      */
-    public static Message encodeMessage(
+    public static final Message encodeMessage(
             String msgType,
             int broadcasterID,
             MapLocation broadcasterLocation,
@@ -62,8 +66,20 @@ public abstract class MessageCoder {
         }
 
         int footerLocation = outputLength - 1;
-        outputStrings[footerLocation] = END_MSG;
-        outputInts[footerLocation] = reBroadcast ? 1 : 0;
+        outputStrings[footerLocation - 1] = END_MSG;
+        outputInts[footerLocation - 1] = reBroadcast ? 1 : 0;
+        
+        int hashCode = 0;
+        
+        for(int i = 0; i < outputLength - 1; i++) {
+            hashCode += outputInts[i];
+            hashCode += outputStrings[i].hashCode();
+            hashCode += outputLocations[i].hashCode();
+        }
+        
+        hashCode += MULTIPLIER * broadcasterID + OFFSET;
+        
+        outputInts[footerLocation] = hashCode;
 
         Message output = new Message();
 
@@ -72,6 +88,26 @@ public abstract class MessageCoder {
         output.locations = outputLocations;
 
         return output;
+    }
+    
+    public static boolean isValid(Message input) {
+        
+        
+        int hashCode                 = 0;
+        int[] inputInts              = input.ints;
+        String[] inputStrings        = input.strings;
+        MapLocation[] inputLocations = input.locations;
+        int length                   = inputInts.length;
+        
+        for(int i = 0; i < length; i++) {
+            hashCode += inputInts[i];
+            hashCode += inputStrings[i].hashCode();
+            hashCode += inputLocations[i].hashCode();
+        }
+        
+        hashCode += inputInts[0] * MULTIPLIER + OFFSET;
+        
+        return (hashCode == inputInts[length - 1]);
     }
 
     public static String getMessageType(Message input) {
