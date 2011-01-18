@@ -12,7 +12,7 @@ import battlecode.common.RobotController;
 
 public class TangentBug implements Navigator {
     
-//    private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
+    private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
     private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     private final int LOOP_BYTECODE_COST = 200;
     private final int BYTECODE_BUFFER = 250;
@@ -27,8 +27,8 @@ public class TangentBug implements Navigator {
     
     private         Direction           movementDirection;
     private         VirtualBug          movingBug;
-    private         int                 movingBugIndex;
-    private         int                 currBranchIndex;
+//    private         int                 movingBugIndex;
+    private         int                 currNodeIndex;
     private         MapLocation         prevLocation;
     
     private         VirtualBug []       myVBs;
@@ -42,13 +42,14 @@ public class TangentBug implements Navigator {
     private         int                 secondaryBugIndex;
     private         MapLocation         secondaryGoal;
     private         boolean             goingToSecondaryGoal;
-    private         boolean             bugging;
+//    private         boolean             bugging;
     
     /** variables relating to bug branching */
     private         int []              branchIndices;
     private         int []              parents;
-    private         int []              turnsAlongPath;
-    private         int []              turnsToNodes;
+//    private         int []              branchDepths;
+//    private         int []              turnsAlongPath;
+//    private         int []              turnsToNodes;
     
     
     public TangentBug(RobotController rc, Knowledge k, MovementController mc, 
@@ -59,43 +60,59 @@ public class TangentBug implements Navigator {
         mySH = sh;
         
         goal = newGoal;
-        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
-        currentVB.ID = 0;
-        myVBs = new VirtualBug [MAX_BUGS];
-        myVBs[0] = currentVB;
-        currentPathWeight = 0;
-        pathWeights = new int [MAX_BUGS];
-        pathWeights[0] = currentPathWeight;
-        secondaryPathWeight = QuantumConstants.BIG_INT;
-        virtualBugIndex = 0;
-        stepIndex = 0;
-        goingToSecondaryGoal = false;
-        numberOfBugs = 1;
-        
-        branchIndices = new int [MAX_BUGS];
-        branchIndices[0] = 0;
-        parents = new int[MAX_BUGS];
-        parents[0] = 0;
-        turnsAlongPath = new int[MAX_BUGS];
-        turnsToNodes = new int[MAX_BUGS];
-        turnsToNodes[0] = 0;
+        reset();
+//        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
+//        currentVB.index = 0;
+//        movingBug = currentVB;
+//        myVBs = new VirtualBug [MAX_BUGS];
+//        myVBs[0] = currentVB;
+//        currentPathWeight = 0;
+//        pathWeights = new int [MAX_BUGS];
+//        pathWeights[0] = currentPathWeight;
+//        secondaryPathWeight = QuantumConstants.BIG_INT;
+//        virtualBugIndex = 0;
+//        stepIndex = 0;
+//        goingToSecondaryGoal = false;
+//        numberOfBugs = 1;
+//        currNodeIndex = MAX_MOVES;
+//        
+//        branchIndices = new int [MAX_BUGS];
+//        branchIndices[0] = 0;
+////        branchDepths = new int [MAX_BUGS];
+////        branchDepths[0] = 0;
     }
 
     public MovementAction getNextAction() {
+        MapLocation location = myK.myLocation;
+        
+        // check if we have reached the secondary goal.
+        if(goingToSecondaryGoal && location.equals(secondaryGoal)) {
+            reset();
+        }
         
         //calculate
         calculateVirtualBugs();
         
-        if(!myK.myLocation.equals(prevLocation) && !bugging) {
-            stepIndex++;
+        // check whether to move up or down the virtual bug tree.
+        if(!location.equals(prevLocation)) {
+            if(stepIndex < currNodeIndex) {
+                stepIndex++;
+            } else if(stepIndex > currNodeIndex) {
+                stepIndex--;
+            } else {
+                stepIndex++;
+                movingBug = currentVB;
+            }
         }
         
-        MapLocation move = currentVB.getMove(stepIndex);
+        // get the next move along the moving path.
+        MapLocation move = movingBug.getMove(stepIndex);
         if(move == null) {
             return MovementAction.NONE;
         }
         
-        movementDirection = myK.myLocation.directionTo(move);
+        // get the movement action associated with the next move.  
+        movementDirection = location.directionTo(move);
         MovementAction action;
         if(currentPathWeight >= QuantumConstants.BIG_INT) {
             action = MovementAction.GOAL_INACCESSIBLE;
@@ -138,23 +155,7 @@ public class TangentBug implements Navigator {
     public void pauseNavigation () {
         //put stuff here... it won't compile without it
     }
-//    public void initiateNavigation(MapLocation newGoal) {
-//        goal = newGoal;
-//        currentVB = new VirtualBug(goal, myRC);
-//        myVBs = new VirtualBug [MAX_BUGS];
-//        myVBs[0] = currentVB;
-//        currentPathWeight = 0;
-//        pathWeights = new int [MAX_BUGS];
-//        pathWeights[0] = currentPathWeight;
-//        secondaryPathWeight = QuantumConstants.BIG_INT;
-//        virtualBugIndex = 0;
-//        stepIndex = 0;
-//        goingToSecondaryGoal = false;
-//    }
-//
-//    public void initiateNavigation() {
-//        initiateNavigation(goal);
-//    }
+
     
     /****************** Private Methods ********************/
     
@@ -174,19 +175,20 @@ public class TangentBug implements Navigator {
             if(currentVB.shouldBranch()) {
                 branchBug = currentVB.clone();
                 branchBug.setOrientationClockwise(false);
-//                branchBug.ID = numberOfBugs;
+                branchBug.index = numberOfBugs;
                 myVBs[numberOfBugs] = branchBug;
                 pathWeights[numberOfBugs] = branchBug.getPathWeight();
 //                turnsAlongPath[numberOfBugs] = branchBug.getTurnsAlongPath();
 //                turnsToNodes[numberOfBugs] = turnsAlongPath[numberOfBugs];
-//                branchIndices[numberOfBugs] = currentVB.getMoveIndex();
-//                parents[numberOfBugs] = virtualBugIndex;
+                branchIndices[numberOfBugs] = currentVB.getMoveIndex();
+                parents[numberOfBugs] = virtualBugIndex;
+//                branchDepths[virtualBugIndex]++;
+//                branchDepths[numberOfBugs]++;
                 if(numberOfBugs == 1) {
-                    secondaryPathWeight = myVBs[2].getPathWeight();
-                    secondaryBugIndex = 2;
+                    secondaryPathWeight = myVBs[1].getPathWeight();
+                    secondaryBugIndex = 1;
                 }
                 numberOfBugs++;
-                //TODO: deal with having too many virtual bugs
             }
             
             //calculate next step, and check if we need to explore a secondary goal.
@@ -194,18 +196,22 @@ public class TangentBug implements Navigator {
             if(newGoal != null) {
                 secondaryGoal = newGoal;
                 goingToSecondaryGoal = true;
-                //TODO: update the other virtual bugs starting from the secondary goal.
                 break;
             }
             
             currentPathWeight = currentVB.getPathWeight();
             pathWeights[virtualBugIndex] = currentPathWeight;
-            turnsAlongPath[virtualBugIndex] = currentVB.getTurnsAlongPath();
+//            turnsAlongPath[virtualBugIndex] = currentVB.getTurnsAlongPath();
             
+            //Switch paths if necessary
             if(currentPathWeight > secondaryPathWeight) {
                 currentVB = myVBs[secondaryBugIndex];
                 currentPathWeight = pathWeights[secondaryBugIndex];
                 virtualBugIndex = secondaryBugIndex;
+                
+                if(!movingBug.equals(currentVB)) {
+                    currNodeIndex = getBranchIndex(movingBug.index, currentVB.index);
+                }
                 
                 secondaryPathWeight = QuantumConstants.BIG_INT;
                 int weight;
@@ -221,6 +227,14 @@ public class TangentBug implements Navigator {
                 }               
             }
             
+            //Go to the end of the current branch if we have too many bugs.
+            if(numberOfBugs == MAX_BUGS) {
+                secondaryGoal = currentVB.getPathEndLocation();
+                goingToSecondaryGoal = true;
+                break;
+            }
+            
+            //Periodically recheck remaining bytecodes
             count++;
             if(count % RECHECK_BYTECODES == 0) {
                 remainingBytecodes = Clock.getBytecodesLeft();
@@ -231,46 +245,49 @@ public class TangentBug implements Navigator {
     }
     
     private void reset() {
-        //TODO: write a reset function
+        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
+        currentVB.index = 0;
+        movingBug = currentVB;
+        myVBs = new VirtualBug [MAX_BUGS];
+        myVBs[0] = currentVB;
+        currentPathWeight = 0;
+        pathWeights = new int [MAX_BUGS];
+        pathWeights[0] = currentPathWeight;
+        secondaryPathWeight = QuantumConstants.BIG_INT;
+        virtualBugIndex = 0;
+        stepIndex = 0;
+        goingToSecondaryGoal = false;
+        numberOfBugs = 1;
+        currNodeIndex = MAX_MOVES;
+        
+        branchIndices = new int [MAX_BUGS];
+        branchIndices[0] = 0;
+//      branchDepths = new int [MAX_BUGS];
+//      branchDepths[0] = 0;
     }
-    
-//    private void recalculateBugs() {
-//        int remainingBytecodes = Clock.getBytecodesLeft();
-//        int count = 0;
-//        
-//        while(remainingBytecodes > MIN_BYTECODES) {
-//            
-//            count++;
-//            if(count % RECHECK_BYTECODES == 0) {
-//                remainingBytecodes = Clock.getBytecodesLeft();
-//            } else {
-//                remainingBytecodes -= LOOP_BYTECODE_COST;
-//            }
-//        }
-//    }
-//    
-//    private int getBranchIndex(int ID1, int ID2) {
-//        int parents1 [] = new int [MAX_BUGS];
-//        parents1[0] = ID1;
-//        int root1 = 0;
-//        while(parents1[root1] != 0) {
-//            root1++;
-//            parents1[root1] = parents[parents1[root1 - 1]];
-//        }
-//        
-//        int parents2 [] = new int [MAX_BUGS];
-//        parents2[0] = ID2;
-//        int root2 = 0;
-//        while(parents2[root2] != 0) {
-//            root2++;
-//            parents2[root2] = parents[parents2[root2 - 1]];
-//        }
-//        
-//        int branchNumber = 0;
-//        while(branchNumber <= root1 && branchNumber <= root2 && 
-//              parents1[root1 - branchNumber] == parents2[root2 - branchNumber]) {
-//            branchNumber++;
-//        }
-//        return branchIndices[parents1[root1 - branchNumber + 1]];
-//    }
+  
+    private int getBranchIndex(int ID1, int ID2) {
+        int parents1 [] = new int [MAX_BUGS];
+        parents1[0] = ID1;
+        int root1 = 0;
+        while(parents1[root1] != 0) {
+            root1++;
+            parents1[root1] = parents[parents1[root1 - 1]];
+        }
+        
+        int parents2 [] = new int [MAX_BUGS];
+        parents2[0] = ID2;
+        int root2 = 0;
+        while(parents2[root2] != 0) {
+            root2++;
+            parents2[root2] = parents[parents2[root2 - 1]];
+        }
+        
+        int branchNumber = 0;
+        while(branchNumber <= root1 && branchNumber <= root2 && 
+              parents1[root1 - branchNumber] == parents2[root2 - branchNumber]) {
+            branchNumber++;
+        }
+        return branchIndices[parents1[root1 - branchNumber + 1]];
+    }
 }

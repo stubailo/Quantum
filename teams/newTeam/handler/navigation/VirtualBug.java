@@ -9,7 +9,7 @@ import battlecode.common.TerrainTile;
 
 public class VirtualBug {
     
-    public        int                  ID;
+    public        int                  index;
     
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
 //    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
