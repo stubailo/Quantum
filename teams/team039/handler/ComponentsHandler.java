@@ -627,22 +627,22 @@ public class ComponentsHandler {
     public boolean broadcast(Message composedMessage) {
 
 
-
-        if (composedMessage == null || myCC == null) {
-            return false;
-        }
-
-        try {
-            if (myCC.isActive()) {
-                return false;
-            }
-            myCC.broadcast(composedMessage);
-            
-            return true;
-        } catch (Exception e) {
-            Logger.debug_printExceptionMessage(e);
-            return false;
-        }
+        return false;
+//        if (composedMessage == null || myCC == null) {
+//            return false;
+//        }
+//
+//        try {
+//            if (myCC.isActive()) {
+//                return false;
+//            }
+//            myCC.broadcast(composedMessage);
+//            
+//            return true;
+//        } catch (Exception e) {
+//            Logger.debug_printExceptionMessage(e);
+//            return false;
+//        }
     }
 
     /***************************** BUILDING METHODS *******************************/
@@ -678,9 +678,9 @@ public class ComponentsHandler {
         }
 
         try {
-            //if(knowledge.totalFlux > component.cost + QuantumConstants.SMALL_BUFFER) {
+            if(knowledge.totalFlux > component.cost + QuantumConstants.SMALL_BUFFER) {
                 myBC.build(component, location, height);
-            //}
+            }
             return true;
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -694,10 +694,13 @@ public class ComponentsHandler {
         }
 
         try {
-            //if(mySCs[0].senseObjectAtLocation(location, RobotLevel.ON_GROUND) == null && knowledge.totalFlux > chassis.cost + QuantumConstants.SMALL_BUFFER) {
+            if(myMC.canMove(myRC.getLocation().directionTo(location)) && knowledge.totalFlux > chassis.cost + QuantumConstants.SMALL_BUFFER) {
                 myBC.build(chassis, location);
-            //}
-            return true;
+                return true;
+            }
+            else {
+                return false;
+            }
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
             return false;

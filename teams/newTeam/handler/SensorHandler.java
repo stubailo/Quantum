@@ -178,95 +178,131 @@ public class SensorHandler {
     * @return      direction to turn in, OMNI to proceed, NONE if error occurs
     */
     public Direction senseStartingLightConstructorSurroundings() {
-      try {
-          SensorController sensor      = mySCs[0];
-          MapLocation      myLocation  = myK.myLocation;
-          Direction        myDirection = myK.myDirection;
+        try {
+            SensorController sensor      = mySCs[0];
+            MapLocation      myLocation  = myK.myLocation;
+            Direction        myDirection = myK.myDirection;
               
-          Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
+            Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
               
-          Direction otherDirection          = Direction.NONE,
-                    usefulDirection1        = Direction.NONE,
-                    usefulDirection2        = Direction.NONE;
-          int       numberOfSensedRecyclers = 0,
-                    lowestRecyclerID        = QuantumConstants.BIG_INT;
-          for(Robot sensedRobot : sensedRobots) {
-              if(sensedRobot.getTeam() != Team.NEUTRAL) { // We must check that it's not debris.
-                  if(numberOfSensedRecyclers == 0) {
-                      startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
-                      lowestRecyclerID = sensedRobot.getID();
-                      otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
-                      numberOfSensedRecyclers++;
-                  }
-                  else {
-                      if(sensedRobot.getID() < lowestRecyclerID) {
-                          startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
-                          if(myDirection == otherDirection) {
-                              otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
-                          }
-                      }
-                      else {
-                          if(myDirection == otherDirection) {
-                              otherDirection = myLocation.directionTo(sensor.senseLocationOf(sensedRobot));
-                          }
-                      }
-                      numberOfSensedRecyclers++;
-                      break;
-                  }
-              }
-          }
+            Direction otherDirection          = Direction.NONE,
+                      usefulDirection1        = Direction.NONE,
+                      usefulDirection2        = Direction.NONE;
+            int       numberOfSensedRecyclers = 0,
+                      lowestRecyclerID        = QuantumConstants.BIG_INT;
+            for(Robot sensedRobot : sensedRobots) {
+                if(sensedRobot.getTeam() != Team.NEUTRAL) { // We must check that it's not debris.
+                    if(numberOfSensedRecyclers == 0) {
+                        startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
+                        lowestRecyclerID = sensedRobot.getID();
+                        otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
+                        numberOfSensedRecyclers++;
+                    }
+                    else {
+                        if(sensedRobot.getID() < lowestRecyclerID) {
+                            startingTurnedOnRecyclerLocation = sensor.senseLocationOf(sensedRobot);
+                            if(myDirection == otherDirection) {
+                                otherDirection = myLocation.directionTo(startingTurnedOnRecyclerLocation);
+                            }
+                        }
+                        else {
+                            if(myDirection == otherDirection) {
+                                otherDirection = myLocation.directionTo(sensor.senseLocationOf(sensedRobot));
+                            }
+                        }
+                        numberOfSensedRecyclers++;
+                        break;
+                    }
+                }
+            }
           
-          if(numberOfSensedRecyclers == 0) return myDirection.opposite();
+            if(numberOfSensedRecyclers == 0) return myDirection.opposite();
+            
+            boolean otherIsRight = (myDirection.rotateRight() == otherDirection);
+            if(otherIsRight) {
+                usefulDirection1 = myDirection.rotateRight();
+                usefulDirection2 = usefulDirection1.rotateRight();
+            }
+            else {
+                usefulDirection1 = myDirection.rotateLeft();
+                usefulDirection2 = usefulDirection1.rotateLeft();
+            }
           
-          boolean otherIsRight = (myDirection.rotateRight() == otherDirection);
-          if(otherIsRight) {
-              usefulDirection1 = myDirection.rotateRight();
-              usefulDirection2 = usefulDirection1.rotateRight();
-          }
-          else {
-              usefulDirection1 = myDirection.rotateLeft();
-              usefulDirection2 = usefulDirection1.rotateLeft();
-          }
+            Direction standardWayDirection = Direction.NONE;
+            if(myDirection.ordinal() % 2 == 1) { // myDirection is diagonal
+                if(numberOfSensedRecyclers == 1) {
+                    standardWayDirection                = myDirection;
+                    startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1, 2);
+                    startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
+                    startingIdealBuildingLocation       = myLocation.add(usefulDirection1, 3);
+                }
+                else {
+                    standardWayDirection                = usefulDirection2; 
+                    startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection, 2);
+                    startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
+                    startingIdealBuildingLocation       = myLocation.add(otherDirection, 3);
+                }
+            }
+            else { // myDirection is not diagonal
+                if(numberOfSensedRecyclers == 1) {
+                    standardWayDirection                = otherIsRight ? usefulDirection2.rotateRight() : usefulDirection2.rotateLeft();
+                    startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection2, 2);
+                    startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
+                    startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
+                }
+                else {
+                    standardWayDirection                = usefulDirection1;
+                    startingSecondMineToBeBuiltLocation = myLocation.add(myDirection, 2);
+                    startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
+                    startingIdealBuildingLocation       = myLocation.add(myDirection, 3);
+                }
+            }
           
-          Direction standardWayDirection = Direction.NONE;
-          if(myDirection.ordinal() % 2 == 1) { // myDirection is diagonal
-              if(numberOfSensedRecyclers == 1) {
-                  standardWayDirection                = myDirection;
-                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1, 2);
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
-                  startingIdealBuildingLocation       = myLocation.add(usefulDirection1, 3);
-              }
-              else {
-                  standardWayDirection                = usefulDirection2; 
-                  startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection, 2);
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
-                  startingIdealBuildingLocation       = myLocation.add(otherDirection, 3);
-              }
-          }
-          else { // myDirection is not diagonal
-              if(numberOfSensedRecyclers == 1) {
-                  standardWayDirection                = otherIsRight ? usefulDirection2.rotateRight() : usefulDirection2.rotateLeft();
-                  startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection2, 2);
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
-                  startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
-              }
-              else {
-                  standardWayDirection                = usefulDirection1;
-                  startingSecondMineToBeBuiltLocation = myLocation.add(myDirection, 2);
-                  startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
-                  startingIdealBuildingLocation       = myLocation.add(myDirection, 3);
-              }
-          }
+            standardWayClear = ((MovementController) myRC.components()[0]).canMove(standardWayDirection);
           
-          standardWayClear = ((MovementController) myRC.components()[0]).canMove(standardWayDirection);
-          
-          return Direction.OMNI;
-      }
-      catch(Exception e) {
-          Logger.debug_printExceptionMessage(e);
-          return Direction.NONE;
-      }
-  }
+            return Direction.OMNI;
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+            return Direction.NONE;
+        }
+    }
+    
+    
+    
+    /**
+     * Designed by first-round use of recycler, finds lowest ID adjacent recycler.
+     * 
+     * (So that it can turn itself off if it's not the lowest)
+     */
+    public Boolean amLowestIDRecycler() {
+        try {
+            SensorController sensor = mySCs[0];
+            int myID = myK.myRobotID;
+            for (Robot robot : sensor.senseNearbyGameObjects(Robot.class)) {
+                RobotInfo robotInfo = sensor.senseRobotInfo(robot);
+                Team team = robot.getTeam();
+                if (team == myK.myTeam) {
+                    ComponentType[] compTypes = robotInfo.components;
+                    switch (robotInfo.chassis) {
+                        case BUILDING:
+                            for (ComponentType compType : compTypes) {
+                                if (compType == ComponentType.RECYCLER) {
+                                    if (robot.getID() < myID) {
+                                        return false;
+                                    }
+                                    break;
+                                }
+                            }
+                    }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            Logger.debug_printExceptionMessage(e);
+            return true;
+        }
+    }
     
 
 }

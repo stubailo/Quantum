@@ -130,7 +130,7 @@ public class Knowledge {
         }
         else justTurned = false;
 
-        myMsgHandler.receiveMessages();
+        //myMsgHandler.receiveMessages();
     }
 
     public boolean parentChanged = false;

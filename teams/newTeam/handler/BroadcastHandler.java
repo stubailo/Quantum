@@ -27,11 +27,16 @@ public class BroadcastHandler {
 
     public void addBCC( BroadcastController newBCC )
     {
-        int currentRange = myBCC.type().range;
-        int newRange = newBCC.type().range;
-
-        if( newRange > currentRange )
-        {
+        if(myBCC != null) {
+            int currentRange = myBCC.type().range;
+            int newRange = newBCC.type().range;
+    
+            if( newRange > currentRange )
+            {
+                myBCC = newBCC;
+            }
+        }
+        else {
             myBCC = newBCC;
         }
     }

@@ -10,7 +10,8 @@ import newTeam.common.MessageCoder;
 public class BuilderHandler {
 
     private BuilderController myBC;
-    Knowledge knowledge;
+    private final Knowledge knowledge;
+    private final SensorHandler mySH;
 
     
     private boolean IAmABuilding;
@@ -27,10 +28,11 @@ public class BuilderHandler {
 
     private boolean builtSuccessfully = false;
 
-    public BuilderHandler ( Knowledge know )
+    public BuilderHandler ( Knowledge know, SensorHandler sh )
     {
         currentlyBuilding = false;
         knowledge = know;
+        mySH = sh;
     }
 
     public boolean getCurrentlyBuilding()
@@ -138,7 +140,9 @@ public class BuilderHandler {
                 Logger.debug_printExceptionMessage(e);
             }
 
-        } else {
+        }
+        
+        if (buildStep == buildInstructions.getNumSteps()) {
             finishBuilding();
         }
     }

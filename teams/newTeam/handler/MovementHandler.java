@@ -5,6 +5,8 @@ import newTeam.common.Knowledge;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.handler.navigation.BugNavigator;
 import newTeam.handler.navigation.Navigator;
+import newTeam.handler.navigation.MoveForwardNavigator;
+import newTeam.handler.navigation.MoveBackwardNavigator;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -13,6 +15,7 @@ public class MovementHandler {
     private final Knowledge             myK;
     private       MovementController    myMC;
     private       Navigator             navigator;
+    private       NavigatorType         navigatorType;
     
     
     
@@ -26,8 +29,10 @@ public class MovementHandler {
         myMC = mc;
     }
     
-    public void initializeNavigationTo(MapLocation goalLocation, NavigatorType navigatorType) {
-        switch(navigatorType) {
+    public void initializeNavigationTo(MapLocation goalLocation, NavigatorType givenNavigatorType) {
+        navigatorType = givenNavigatorType;
+        
+        switch(givenNavigatorType) {
         case BUG:
             navigator = new BugNavigator(myRC, myK, myMC, goalLocation);
             break;
@@ -52,9 +57,18 @@ public class MovementHandler {
             
             case MOVE_FORWARD:
                 myMC.moveForward();
+                
+                if(navigatorType == NavigatorType.MOVE_FORWARD) {
+                    return true;
+                }
                 return false;
+                
             case MOVE_BACKWARD:
                 myMC.moveBackward();
+                
+                if(navigatorType == NavigatorType.MOVE_BACKWARD) {
+                    return true;
+                }
                 return false;
                 
             case ROTATE:
@@ -63,6 +77,12 @@ public class MovementHandler {
                 
             case AT_GOAL:
                 return true;
+                
+            case PATH_BLOCKED:
+                //TODO
+                switch(navigatorType) {
+                
+                }
             }
             return false;
         }
@@ -70,6 +90,10 @@ public class MovementHandler {
             Logger.debug_printExceptionMessage(e);
             return false;
         }
+    }
+    
+    public boolean reachedGoal() {
+        return navigator.reachedGoal();
     }
     
     public void setDirection(Direction direction) {
@@ -81,6 +105,16 @@ public class MovementHandler {
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
         }
+    }
+    
+    public void moveForward() {
+        navigatorType = NavigatorType.MOVE_FORWARD;
+        navigator = new MoveForwardNavigator(myRC, myMC);
+    }
+    
+    public void moveBackward() {
+        navigatorType = NavigatorType.MOVE_BACKWARD;
+        navigator = new MoveBackwardNavigator(myRC, myMC);
     }
 
 }

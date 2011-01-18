@@ -25,12 +25,12 @@ public class StartingLightConstructorScouting extends BaseState {
         
         if(resultOfScoutingDirection == Direction.OMNI) {
             
-            BaseState result;
+            BaseState result = null;
             if(mySH.standardWayClear) {
-                
+                result = new StartingMovingToBuild(this, false);
             }
             else {
-                result = new StartingMovingToBuild(this, mySH.startingFirstMineToBeBuiltLocation);
+                result = new StartingMovingToBuild(this, true);
             }
             
             result.senseAndUpdateKnowledge();
