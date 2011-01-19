@@ -131,7 +131,7 @@ public class MovementHandler {
     
     public void zigZag() {
         navigatorType = NavigatorType.ZIG_ZAG;
-       // navigator = new ZigZagNavigator(myMC, myK);
+        navigator = new ZigZagNavigator(myMC, myK);
     }
 
     public void circle( MapLocation location )
