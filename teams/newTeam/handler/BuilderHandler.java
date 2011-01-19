@@ -24,6 +24,10 @@ public class BuilderHandler {
     private BuildInstructions buildInstructions = null;
     private int buildStep = 0;
 
+    boolean needsFactory = false;
+    boolean needsArmory = false;
+    boolean needsRecycler = false;
+
     Message lastMessage = null;
 
     private boolean builtSuccessfully = false;
@@ -113,7 +117,6 @@ public class BuilderHandler {
     }
 
     public void step() {
-
         if( !currentlyBuilding )
         {
             return;
@@ -126,6 +129,20 @@ public class BuilderHandler {
         //skip things I can't build
         while (buildStep != buildInstructions.getNumSteps()
                 && !BuildMappings.canBuild(myBC.type(), buildInstructions.getComponent(buildStep))) {
+
+            /*
+             * if( BuildMappings.canBuild( ComponentType.ARMORY, buildInstructions.getComponent(buildStep)) )
+            {
+                needsArmory = true;
+            } else if ( BuildMappings.canBuild( ComponentType.RECYCLER, buildInstructions.getComponent(buildStep)) )
+            {
+                needsRecycler = true;
+            } else if ( BuildMappings.canBuild( ComponentType.FACTORY, buildInstructions.getComponent(buildStep)))
+            {
+                needsFactory = true;
+            }
+             */
+
             buildStep++;
         }
 
