@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.player.BasePlayer;
+import newTeam.common.*;
 
 public class LightPlayer extends BasePlayer {
     
@@ -25,6 +26,18 @@ public class LightPlayer extends BasePlayer {
     @Override
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
+
+        boolean hasBeenPinged = false;
+
+        Message[] messages = myCH.myMSH.getMessages();
+
+        for( Message message : messages )
+        {
+            if( !hasBeenPinged && MessageCoder.getMessageType(message).equals(MessageCoder.RECYCLER_PING) && MessageCoder.isValid(message) )
+            {
+                myK.myRecyclerNode = RecyclerNode.getFromPing(message);
+            }
+        }
     }
     
     @Override

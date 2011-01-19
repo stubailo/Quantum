@@ -2,6 +2,7 @@ package newTeam.handler;
 
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
+<<<<<<< HEAD
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.handler.navigation.BugNavigator;
 import newTeam.handler.navigation.TangentBug;
@@ -10,6 +11,9 @@ import newTeam.handler.navigation.MoveForwardNavigator;
 import newTeam.handler.navigation.MoveBackwardNavigator;
 import newTeam.handler.navigation.MovementAction;
 import newTeam.handler.navigation.ZigZagNavigator;
+=======
+import newTeam.handler.navigation.*;
+>>>>>>> 0197d909f12dd974f0ed6b79657c617cc451baab
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -144,7 +148,13 @@ public class MovementHandler {
     
     public void zigZag() {
         navigatorType = NavigatorType.ZIG_ZAG;
-        navigator = new ZigZagNavigator(myMC, myK);
+       // navigator = new ZigZagNavigator(myMC, myK);
+    }
+
+    public void circle( MapLocation location )
+    {
+        navigatorType = NavigatorType.CIRCLE;
+        navigator = new CircleNavigator(myRC, myMC, location);
     }
 
 }

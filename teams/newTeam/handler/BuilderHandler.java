@@ -24,6 +24,10 @@ public class BuilderHandler {
     private BuildInstructions buildInstructions = null;
     private int buildStep = 0;
 
+    boolean needsFactory = false;
+    boolean needsArmory = false;
+    boolean needsRecycler = false;
+
     Message lastMessage = null;
 
     private boolean builtSuccessfully = false;
@@ -76,8 +80,7 @@ public class BuilderHandler {
 
             if( IAmABuilding )
             {
-                //use the sensor handler to set the buildTarget
-                //buildTarget = null;
+                buildTarget = mySH.senseAtLocation(location, instructions.getBaseChassis().level);
             }
 
             buildLocation = location;
@@ -98,7 +101,7 @@ public class BuilderHandler {
 
             if( IAmABuilding )
             {
-                // how to sense from here??
+                buildTarget = mySH.senseAtLocation(location, instructions.getBaseChassis().level);
             }
 
             buildLocation = location;
@@ -113,7 +116,6 @@ public class BuilderHandler {
     }
 
     public void step() {
-
         if( !currentlyBuilding )
         {
             return;
@@ -126,6 +128,8 @@ public class BuilderHandler {
         //skip things I can't build
         while (buildStep != buildInstructions.getNumSteps()
                 && !BuildMappings.canBuild(myBC.type(), buildInstructions.getComponent(buildStep))) {
+
+
             buildStep++;
         }
 
@@ -147,34 +151,21 @@ public class BuilderHandler {
         }
     }
 
-    /*
-     * Has to be called before finishBuilding to be effective
-     */
-
-    public Message genDesignationMessage()
-    {
-        if( IAmABuilding && currentlyBuilding && buildTarget!=null )
-        {
-            String[] bodyStrings = { buildInstructions.instructionsID  };
-            int [] bodyInts = { buildTarget.getID() };
-            MapLocation [] bodyLocations = { null };
-
-            Message output = MessageCoder.encodeMessage(MessageCoder.JUST_BUILT_UNIT_DESIGNATION, knowledge.myRobotID, knowledge.myLocation, Clock.getRoundNum(), false, bodyStrings, bodyInts, bodyLocations);
-
-            return output;
-        } else {
-            return null;
-        }
-    }
 
     public Message getDesignationMessage()
     {
         return lastMessage;
     }
 
+    public Robot getBuildTarget()
+    {
+        return buildTarget;
+    }
+
     private void finishBuilding()
     {
-        lastMessage = genDesignationMessage();
+       // lastMessage = genDesignationMessage();
+
         currentlyBuilding = false;
         buildTarget = null;
 

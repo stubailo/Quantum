@@ -27,6 +27,8 @@ public abstract class MessageCoder {
     public static final String RECYCLER_DESIGNATION = "rd";
     public static final String JUST_BUILT_UNIT_DESIGNATION = "ud"; //when a recycler, factory, or armory builds a unit
 
+    public static final String BUILD_FACTORY_COMMAND = "bfc";
+
     // encoding constants
     private static final int MULTIPLIER = 7;
     private static final int OFFSET = 22;

@@ -24,8 +24,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            
-            return new Idling(this);
+            return new UpgradeBase(this);
         }
 
         return this;
@@ -42,11 +41,6 @@ public class ConstructingAntennaOnSelf extends BaseState {
         }
 
         myBH.step();
-        
-        if( myBH.finishedBuilding() )
-        {
-            return new Idling(this);
-        }
         
         return this;
     }

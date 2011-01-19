@@ -9,6 +9,8 @@ public class Knowledge {
 
     /*** Parent Recycler ***/
     public          RecyclerNode        myRecyclerNode;
+
+    public          String              unitType;
     
     /*** Constants ***/
     public  final   Team                myTeam;

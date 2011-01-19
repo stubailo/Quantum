@@ -17,6 +17,7 @@ public class ComponentsHandler {
     public  final MovementHandler   myMH;
     public  final SensorHandler     mySH;
     public  final WeaponHandler     myWH;
+    public  final MessageHandler    myMSH;
     
     public boolean hasWeapons = false;
     
@@ -25,13 +26,15 @@ public class ComponentsHandler {
                              BuilderHandler   bh,
                              MovementHandler  mh,
                              SensorHandler    sh,
-                             WeaponHandler    wh) {
+                             WeaponHandler    wh,
+                             MessageHandler   msh) {
         
         myBCH = bch;
         myBH  = bh;
         myMH  = mh;
         mySH  = sh;
         myWH  = wh;
+        myMSH = msh;
         
     }
     
@@ -61,6 +64,7 @@ public class ComponentsHandler {
 
                 case BUILDING_MOTOR:
                 case SMALL_MOTOR:
+                case MEDIUM_MOTOR:
                     myMH.addMC((MovementController) newComp);
                     break;
 

@@ -88,9 +88,4 @@ public class BroadcastHandler {
         }
     }
 
-    public Message[] receiveMessages()
-    {
-        return myRC.getAllMessages();
-    }
-
 }
