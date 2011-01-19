@@ -42,7 +42,7 @@ public class BuildingFactory extends BaseState {
         if(myK.myLocation.isAdjacentTo(toBuildLocation)) {
             if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.factory.getTotalCost() + 10 )
             {
-                myBH.buildUnit( Prefab.commRecycler , toBuildLocation);
+                myBH.buildUnit( Prefab.factory , toBuildLocation);
             }
 
             myBH.step();

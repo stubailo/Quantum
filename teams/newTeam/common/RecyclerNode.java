@@ -19,6 +19,9 @@ public class RecyclerNode {
     public MapLocation myLocation;
     public MapLocation parentLocation;
 
+    public boolean hasFactory;
+    public MapLocation factoryLocation;
+
     public RecyclerNode()
     {
 
@@ -54,15 +57,17 @@ public class RecyclerNode {
 
     public Message generatePing()
     {
-        int[] ints = new int[1];
-        MapLocation[] locations = new MapLocation[1];
-        String[] strings = new String[1];
+        int bodyLength = 2;
 
-        strings[0] = "";
+        int[] ints = new int[bodyLength];
+        MapLocation[] locations = new MapLocation[bodyLength];
+        String[] strings = new String[bodyLength];
 
         ints[0] = parentRobotID;
+        ints[1] = hasFactory?1:0;
 
         locations[0] = parentLocation;
+        locations[1] = factoryLocation;
 
         return MessageCoder.encodeMessage(MessageCoder.RECYCLER_PING, myRobotID, myLocation, Clock.getRoundNum(), false, strings, ints, locations);
     }
@@ -90,6 +95,9 @@ public class RecyclerNode {
 
         output.parentRobotID = MessageCoder.getIntFromBody(ping, 0);
         output.parentLocation = MessageCoder.getLocationFromBody(ping, 0);
+
+        output.hasFactory = MessageCoder.getIntFromBody(ping, 1) == 1;
+        output.factoryLocation = MessageCoder.getLocationFromBody(ping, 1);
 
         return output;
     }

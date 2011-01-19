@@ -1,4 +1,4 @@
-package newTeam.state.starting;
+package newTeam.state.factory;
 
 import battlecode.common.*;
 
@@ -8,9 +8,9 @@ import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
 
-public class ConstructingAntennaOnSelf extends BaseState {
+public class BuildingDishOnSelf extends BaseState {
 
-    public ConstructingAntennaOnSelf(BaseState oldState) {
+    public BuildingDishOnSelf(BaseState oldState) {
         super(oldState);
 
     }
@@ -24,7 +24,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            
+
             return new Idling(this);
         }
 
@@ -35,19 +35,19 @@ public class ConstructingAntennaOnSelf extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.DISH.cost + 10 )
         {
-            Logger.debug_printSashko("building antenna");
-            myBH.buildComponents( Prefab.startingConstructor , myRC.getLocation(), RobotLevel.ON_GROUND);
+            Logger.debug_printSashko("building dish");
+            myBH.buildComponents( Prefab.factory , myRC.getLocation(), RobotLevel.ON_GROUND);
         }
 
         myBH.step();
-        
+
         if( myBH.finishedBuilding() )
         {
-            return new Idling(this);
+            return new BuildingMediums(this);
         }
-        
+
         return this;
     }
 

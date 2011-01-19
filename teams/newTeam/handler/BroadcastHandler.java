@@ -9,6 +9,7 @@ import newTeam.common.util.Logger;
 public class BroadcastHandler {
 
     private BroadcastController myBCC;
+    private RobotController myRC;
 
     private Knowledge knowledge;
 
@@ -16,10 +17,11 @@ public class BroadcastHandler {
 
     private int queueLocation;
 
-    public BroadcastHandler ( Knowledge know )
+    public BroadcastHandler ( Knowledge know, RobotController rc )
     {
         knowledge = know;
         myBCC = null;
+        myRC = rc;
 
         queueLocation = 0;
         myMessageQueue = new Message[QuantumConstants.MESSAGE_QUEUE_LENGTH];
@@ -84,6 +86,11 @@ public class BroadcastHandler {
                 }
             }
         }
+    }
+
+    public Message[] receiveMessages()
+    {
+        return myRC.getAllMessages();
     }
 
 }

@@ -8,6 +8,7 @@ import newTeam.handler.navigation.Navigator;
 import newTeam.handler.navigation.MoveForwardNavigator;
 import newTeam.handler.navigation.MoveBackwardNavigator;
 import newTeam.handler.navigation.MovementAction;
+import newTeam.handler.navigation.ZigZagNavigator;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -132,6 +133,11 @@ public class MovementHandler {
     public void moveBackward() {
         navigatorType = NavigatorType.MOVE_BACKWARD;
         navigator = new MoveBackwardNavigator(myRC, myMC);
+    }
+    
+    public void zigZag() {
+        navigatorType = NavigatorType.ZIG_ZAG;
+        navigator = new ZigZagNavigator(myMC, myK);
     }
 
 }
