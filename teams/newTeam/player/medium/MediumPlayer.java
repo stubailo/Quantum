@@ -1,37 +1,39 @@
-package newTeam.player.light;
+package newTeam.player.medium;
 
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
+import newTeam.state.idle.Idling;
+import newTeam.state.WaitingForDesignation;
 import newTeam.player.BasePlayer;
-import newTeam.state.building.ConstructorWaitingForCommand;
 
-public class LightConstructorPlayer extends LightPlayer {
-    
-    public LightConstructorPlayer(BaseState state) {
-        
+public class MediumPlayer extends BasePlayer {
+
+    public MediumPlayer(BaseState state) {
+
         super(state);
     }
-    
+
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new ConstructorWaitingForCommand( oldState );
+        return new Idling( oldState );
     }
-    
+
     @Override
     public void initialize() {
-        
+
     }
-    
+
     @Override
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
     }
-    
+
     @Override
     public BasePlayer determineSpecificPlayerGivenNewComponent(ComponentType compType,
                                                                BaseState state) {
-        
+
+
         return this;
     }
 

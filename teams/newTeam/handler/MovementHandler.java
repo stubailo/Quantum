@@ -2,13 +2,7 @@ package newTeam.handler;
 
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
-import newTeam.handler.navigation.NavigatorType;
-import newTeam.handler.navigation.BugNavigator;
-import newTeam.handler.navigation.Navigator;
-import newTeam.handler.navigation.MoveForwardNavigator;
-import newTeam.handler.navigation.MoveBackwardNavigator;
-import newTeam.handler.navigation.MovementAction;
-import newTeam.handler.navigation.ZigZagNavigator;
+import newTeam.handler.navigation.*;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -98,6 +92,9 @@ public class MovementHandler {
                 switch(navigatorType) {
                 
                 }
+                
+            case GOAL_INACCESSIBLE:
+                //TODO
             }
             return false;
         }
@@ -134,7 +131,13 @@ public class MovementHandler {
     
     public void zigZag() {
         navigatorType = NavigatorType.ZIG_ZAG;
-        navigator = new ZigZagNavigator(myMC, myK);
+       // navigator = new ZigZagNavigator(myMC, myK);
+    }
+
+    public void circle( MapLocation location )
+    {
+        navigatorType = NavigatorType.CIRCLE;
+        navigator = new CircleNavigator(myRC, myMC, location);
     }
 
 }

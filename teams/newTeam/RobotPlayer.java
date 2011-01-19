@@ -7,11 +7,7 @@ import newTeam.handler.ComponentsHandler;
 import newTeam.common.Knowledge;
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
-import newTeam.handler.BroadcastHandler;
-import newTeam.handler.BuilderHandler;
-import newTeam.handler.MovementHandler;
-import newTeam.handler.SensorHandler;
-import newTeam.handler.WeaponHandler;
+import newTeam.handler.*;
 import newTeam.common.util.Logger;
 
 public class RobotPlayer implements Runnable {
@@ -31,6 +27,7 @@ public class RobotPlayer implements Runnable {
     public  final  MovementHandler      myMH;
     public  final  SensorHandler        mySH;
     public  final  WeaponHandler        myWH;
+    public  final  MessageHandler       myMSH;
     
     /*** Specific Player ***/
     private        BasePlayer           mySP; 
@@ -51,11 +48,13 @@ public class RobotPlayer implements Runnable {
         myBH  = new BuilderHandler(myK, mySH);
         myMH  = new MovementHandler(myRC, myK);
         myWH  = new WeaponHandler();
+        myMSH = new MessageHandler( myRC );
         myCH  = new ComponentsHandler(myBCH,
                                       myBH,
                                       myMH,
                                       mySH,
-                                      myWH);
+                                      myWH,
+                                      myMSH);
     }
     
     
@@ -65,6 +64,7 @@ public class RobotPlayer implements Runnable {
         
         // Round 0 actions, slightly different
         myK.doStatelessUpdate();
+        myMSH.receiveMessages();
         
         ComponentType[] newCompTypes = myCH.updateComponents(myRC);
         
@@ -72,7 +72,7 @@ public class RobotPlayer implements Runnable {
         myRS = new BaseState(myRC, myK, myCH);
         mySP = BasePlayer.determineInitialSpecificPlayer(myRC, myRS);
         
-        myRC.setIndicatorString(0, myRS.getClass().getName());
+//        myRC.setIndicatorString(0, myRS.getClass().getName());
         
         if(newCompTypes != null) {
             
@@ -88,11 +88,11 @@ public class RobotPlayer implements Runnable {
         
         // initialize and clean up as necessary?
         
-        myRC.setIndicatorString(1, myRS.getClass().getName());
+//        myRC.setIndicatorString(1, myRS.getClass().getName());
 
         myRS = myRS.execute();
         
-        myRC.setIndicatorString(2, myRS.getClass().getName());
+//        myRC.setIndicatorString(2, myRS.getClass().getName());
         
         mySP.doSpecificPlayerStatelessActions();
         
@@ -100,14 +100,18 @@ public class RobotPlayer implements Runnable {
         
         while(true) {
             try {
-                
+                //erase indicator strings:
+                myRC.setIndicatorString(0, " ");
+                myRC.setIndicatorString(1, " ");
+                myRC.setIndicatorString(2, " ");
                 // Rounds 1 and later actions
                 
                 // Stateless actions
                 myK.doStatelessUpdate();
                 mySH.refresh();
+                myMSH.receiveMessages();
                 
-                myRC.setIndicatorString(0, myRS.getClass().getName());
+//                myRC.setIndicatorString(0, myRS.getClass().getName());
                 
                 newCompTypes = myCH.updateComponents(myRC);
                 
@@ -125,13 +129,15 @@ public class RobotPlayer implements Runnable {
                 
                 // initialize and clean up as necessary?
                 
-                myRC.setIndicatorString(1, myRS.getClass().getName());
+//                myRC.setIndicatorString(1, myRS.getClass().getName());
                 
                 myRS = myRS.execute();
                 
-                myRC.setIndicatorString(2, myRS.getClass().getName());
+//                myRC.setIndicatorString(2, myRS.getClass().getName());
                 
                 mySP.doSpecificPlayerStatelessActions();
+
+                myBCH.broadcastFromQueue();
                 
                 myRC.yield();
                 

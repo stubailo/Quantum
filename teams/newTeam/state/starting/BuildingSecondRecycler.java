@@ -33,7 +33,7 @@ public class BuildingSecondRecycler extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new MovingToBuildFactory( this );
+            return new Idling( this );
         }
 
         return this;

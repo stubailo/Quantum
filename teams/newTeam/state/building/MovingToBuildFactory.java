@@ -5,6 +5,7 @@ import battlecode.common.*;
 import newTeam.state.BaseState;
 import newTeam.common.*;
 import newTeam.common.util.Logger;
+import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
 
 public class MovingToBuildFactory extends BaseState {
@@ -12,6 +13,7 @@ public class MovingToBuildFactory extends BaseState {
     public MovingToBuildFactory(BaseState oldState) {
         super(oldState);
 
+        myMH.circle(myK.myRecyclerNode.myLocation);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class MovingToBuildFactory extends BaseState {
 
         if( inGoodBuildLocation() )
         {
-            return new BuildingFactory( this, myRC.getLocation() );
+            return new Idling( this ); //BuildingFactory( this, myRC.getLocation() );
         }
 
         return this;
@@ -32,80 +34,91 @@ public class MovingToBuildFactory extends BaseState {
     @Override
     public BaseState execute() {
 
-
+        myMH.step();
 
         return this;
     }
 
     public boolean inGoodBuildLocation()
     {
-        Direction direction = Direction.NORTH;
-
+        Direction testDirection = Direction.EAST;
         boolean foundVoid = false;
-        boolean foundVoidAndEmpty = false;
 
-        for ( int i=0; i<8; i++ )
+        for( int i=0; i<8; i++ )
         {
-            if( !myMH.canMove(direction) )
+            if(!myMH.canMove( testDirection ) )
             {
-                foundVoid = true;
-                break;
+                if( !testDirection.isDiagonal() )
+                {
+                    foundVoid = true;
+                    break;
+                } else {
+                    if( !myMH.canMove(testDirection.rotateRight()) )
+                    {
+                        foundVoid = true;
+                        break;
+                    }
+                }
             }
-            direction = direction.rotateRight();
+            testDirection = testDirection.rotateRight();
         }
 
         if( !foundVoid )
         {
             return true;
         }
+        
+        boolean foundEmpty = false;
 
-        for ( int i=0; i<8; i++ )
+        for( int i=0; i<8; i++ )
         {
-            if( myMH.canMove(direction) )
+            if(myMH.canMove( testDirection ))
             {
-                foundVoidAndEmpty = true;
+                foundEmpty = true;
                 break;
             }
-            direction = direction.rotateRight();
+
+            testDirection = testDirection.rotateRight();
         }
 
-        if( !foundVoidAndEmpty )
+        if( !foundEmpty )
         {
             return false;
         }
 
-        int numberOfEmpties = 0;
+        //now you should be on the first empty clockwise direction
+
         foundVoid = false;
 
-        boolean discontinuous = false;
+        Direction startDirection = testDirection.rotateLeft();
 
-        for ( int i=0; i<8; i++ )
+        Direction nextDirection;
+
+        nextDirection = testDirection.rotateRight();
+
+        while( testDirection != startDirection )
         {
-            if( !foundVoid && myMH.canMove(direction) )
+            nextDirection = testDirection.rotateRight();
+
+            System.out.println( testDirection );
+
+            if( foundVoid == false && myMH.canMove(nextDirection) )
             {
-                numberOfEmpties++;
-            } else if (!foundVoid && !myMH.canMove(direction) ) {
+                testDirection = nextDirection;
+            } else if( foundVoid == false && myMH.canMove(nextDirection.rotateRight()) ) {
+                testDirection = nextDirection.rotateRight();
+            } else if( foundVoid == false ) {
                 foundVoid = true;
-            } else if (foundVoid && myMH.canMove(direction)  ) {
-                discontinuous = true;
-                break;
+                testDirection = nextDirection;
+            } else if( foundVoid == true && !myMH.canMove(testDirection) ){
+                testDirection = nextDirection;
+            } else {
+                return false;
             }
-            direction = direction.rotateRight();
         }
 
-        Logger.debug_printSashko("empties: " + numberOfEmpties);
+        return true;
 
-        if( discontinuous )
-        {
-            return false;
-        }
-
-        if( numberOfEmpties > 2 )
-        {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }
