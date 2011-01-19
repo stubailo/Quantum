@@ -8,9 +8,9 @@ import newTeam.common.Prefab;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
 
-public class BuildingDishOnSelf extends BaseState {
+public class BuildingMediums extends BaseState {
 
-    public BuildingDishOnSelf(BaseState oldState) {
+    public BuildingMediums(BaseState oldState) {
         super(oldState);
 
     }
@@ -37,15 +37,14 @@ public class BuildingDishOnSelf extends BaseState {
         //add a sensor method that checks if the square is occupied
         if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.DISH.cost + 10 )
         {
-            Logger.debug_printSashko("building dish");
-            myBH.buildComponents( Prefab.factory , myRC.getLocation(), RobotLevel.ON_GROUND);
+            myBH.buildUnit( Prefab.mediumSoldier , myRC.getLocation().add(Direction.NORTH));
         }
 
         myBH.step();
 
         if( myBH.finishedBuilding() )
         {
-            return new BuildingMediums(this);
+            return new Idling(this);
         }
 
         return this;
