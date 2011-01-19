@@ -15,7 +15,11 @@ public class BugNavigator implements Navigator {
     private final Knowledge myK;
     private final MovementController myMC;
     
+    //TODO: Probably don't need to keep an array of memory...
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
+    private final int MAX_PENALTIES = 200;
+    private final int ABORT = QuantumConstants.BUG_ABORT;
+    private final int OFFSET = 2;
     private final MapLocation goal;
     
     private        boolean              navigating = false;
@@ -36,6 +40,11 @@ public class BugNavigator implements Navigator {
     private        Direction []         bugPrevDirections; 
     private        boolean []           bugPrevCW;
     private        int                  bugStep;
+    private        MapLocation []       penaltyMarkers;
+    private        int                  penalties;
+    private        int                  cumulativePenalties;
+    private        int                  prevNumberOfPenalties;
+    private        int                  prevTurningNumber;
     
     private        MapLocation          marker;
     private        MapLocation          secondMarker;
@@ -45,6 +54,8 @@ public class BugNavigator implements Navigator {
     private        int                  turnsMarkerToGoal;
     private        int                  turnsBugToGoal;
     private        boolean              backTracking;
+    private        boolean              stopBackTracking;
+    private        boolean              abortNext;
     
     private        int                  delayRect;
     private        int                  delayDiag;
@@ -58,17 +69,8 @@ public class BugNavigator implements Navigator {
         myMC = mc;
         
         goal = goalLocation;
-        navigating = true;
-        tracking = false;
-        startTracking = false;
-        bugStart = myK.myLocation;
-        prevLocation = myK.myLocation;
-        prevDirectionToGoal = bugStart.directionTo(goal);
-        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
-        bugPrevDirections = new Direction [MEMORY_LENGTH];
-        bugPrevCW = new boolean [MEMORY_LENGTH];
-        bugStep = 0;
         goingToAdjacent = navigatingToAdjacent;
+        reset();
         
         Chassis chassis = myRC.getChassis();
         delayRect = chassis.moveDelayOrthogonal;
@@ -80,6 +82,23 @@ public class BugNavigator implements Navigator {
     public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
                         MapLocation goalLocation) {
         this(rc, know, mc, goalLocation, false);
+    }
+    
+    private void reset() {
+        navigating = true;
+        tracking = false;
+        startTracking = false;
+        bugStart = myK.myLocation;
+        prevLocation = myK.myLocation;
+        prevDirectionToGoal = bugStart.directionTo(goal);
+        bugPrevLocations = new MapLocation [MEMORY_LENGTH];
+        bugPrevDirections = new Direction [MEMORY_LENGTH];
+        bugPrevCW = new boolean [MEMORY_LENGTH];
+        penaltyMarkers = new MapLocation [MAX_PENALTIES];
+        penalties = 0;
+        prevNumberOfPenalties = 0;
+        cumulativePenalties = 0;
+        bugStep = 0;
     }
 
     public MovementAction getNextAction() {
@@ -146,6 +165,7 @@ public class BugNavigator implements Navigator {
             prevDirectionToGoal = prevLocation.directionTo(goal);
             startTracking = false;
         }
+        
 //        myRC.setIndicatorString(1, String.valueOf(startTracking)+" "+ String.valueOf(tracking) + " " + String.valueOf(!prevLocation.equals(location)));
 //        myRC.setIndicatorString(2, prevDirectionToGoal.toString() + " " + directionToGoal.toString());
         if(tracking) {
@@ -156,21 +176,31 @@ public class BugNavigator implements Navigator {
                                                         directionToGoal, trackingCW);
                 prevDirectionToGoal = directionToGoal;
             }
-//            Logger.debug_printHocho("turning number: " + String.valueOf(turningNumber));
             
             //set the initial direction to begin testing from.
             Direction startDirection = prevTrackingDirection.opposite();
-            Direction testDirection = startDirection;
-            
-            // check directions beginning with the reference direction, in an order depending on 
-            // if you are tracking clockwise or counterclockwise
+
             int turn;
             if(startTracking) {
                 startTracking = false;
                 turn = 0;
+            } else if(prevTrackingDirection.ordinal() % 2 == 1){
+                startDirection = (trackingCW) ? 
+                        startDirection.rotateLeft() : 
+                        startDirection.rotateRight();
+                turn = -3;
             } else {
-                turn = -4;
-            }
+                startDirection = (trackingCW) ?
+                        startDirection.rotateLeft().rotateLeft() :
+                        startDirection.rotateRight().rotateRight();
+                        
+                turn = -2;
+            }            
+            Direction testDirection = startDirection;
+            
+            
+            // check directions beginning with the reference direction, in an order depending on 
+            // if you are tracking clockwise or counterclockwise
             boolean pathBlocked = true;
             while(pathBlocked) {
                 //increment direction
@@ -193,42 +223,97 @@ public class BugNavigator implements Navigator {
             }
 
             //TODO: adjust the turningNumber when you calculate different rotation directions without moving.
-            if(!prevLocation.equals(location) && !backTracking) {
-                turningNumber += turn;
-                turnsBackToMarker += (trackingDirection.ordinal() % 2 == 1) ? delayDiag : delayRect;
-                turnsBugToGoal = goalWeight(location, goal);
+            if(!prevLocation.equals(location)) {
+               
+                prevTurningNumber = turningNumber;
+                if(!stopBackTracking) {
+                    turningNumber += turn;
+                    turnsBackToMarker += (trackingDirection.ordinal() % 2 == 1) ? 
+                                          delayDiag - OFFSET : delayRect - OFFSET;
+                    turnsBugToGoal = manhattanWeight(location, goal, delayRect);
+
+                }
+                if(!backTracking) {
+                    
+                    //record any penalty locations
+                    if(checkForPenalty(prevTurningNumber, turningNumber) && penalties < MAX_PENALTIES) {
+                        penaltyMarkers[penalties] = location;
+                        penalties++;                    
+                    }
+                }
             }
             
-            //check if you are finished tracking
-            if(turningNumber <= 0) {
-                tracking = false;
+            myRC.setIndicatorString(1, "backTracking: " + backTracking + 
+                    " stopBackTracking: " + stopBackTracking +
+                    " moved? " + (prevLocation.equals(location)));
+
+            //stop backtracking if you have passed the backtracking marker.
+            if(stopBackTracking) {
+                stopBackTracking = false;
+                backTracking = false;
+//                turningNumber = markerTurningNumber;
+                markerTurningNumber = secondMarkerTurningNumber;
+                marker = secondMarker;               
             }
             
             //stop backtracking if you have reached your marker
             if(backTracking && location.equals(marker)) {
-                backTracking = false;
+                stopBackTracking = true;
                 turningNumber = markerTurningNumber;
-                marker = secondMarker;
-                markerTurningNumber = secondMarkerTurningNumber;
             }
             
-            //check if you should begin backtracking
-            if(turnsBackToMarker + turnsMarkerToGoal < 
-               turnsBugToGoal + calculateTurningAdjustment()) {
+            int bugWeight = turnsBugToGoal + calculateTurningAdjustment();
+            int pathWeight = turnsBackToMarker + turnsMarkerToGoal;
+            //check if you are finished tracking or should begin backtracking
+            if(turningNumber <= 0 && 
+               location.distanceSquaredTo(goal) < bugPrevLocations[bugPos].distanceSquaredTo(goal)) {
+                
+                tracking = false;
+                action = getBugAction(directionToGoal);
+                movementDirection = directionToGoal;
+            } else if((pathWeight < bugWeight || bugWeight > ABORT) &&
+                      !prevLocation.equals(location) &&
+                      !stopBackTracking && !backTracking) {
                 
                 backTracking = true;
                 trackingCW = !trackingCW;
                 secondMarker = location;
                 secondMarkerTurningNumber = turningNumber;
                 turnsBackToMarker = 0;
-                turnsMarkerToGoal = goalWeight(secondMarker, goal);
+                turnsMarkerToGoal = bugWeight;
+                penalties = 0;
+                prevNumberOfPenalties = 0;
+                cumulativePenalties = 0;
+                penaltyMarkers = new MapLocation[MAX_PENALTIES];
                 
-                movementDirection = prevTrackingDirection.opposite();
+                prevTrackingDirection = prevTrackingDirection.opposite();
+                movementDirection = prevTrackingDirection;
                 action = getBugAction(movementDirection);
+                if(bugWeight > ABORT) {
+                    if(abortNext) {
+                        action = MovementAction.GOAL_INACCESSIBLE;
+                        reset();
+                    } else {
+                        abortNext = true;
+                    }
+                }
             } else {
                 movementDirection = trackingDirection;
                 action = getBugAction(trackingDirection);
             }
+            
+            myRC.setIndicatorString(0, trackingDirection.toString() + " " + movementDirection.toString()
+                    + " " + directionToGoal.toString());
+            if(marker!=null && secondMarker != null) {
+            myRC.setIndicatorString(0,  "(" +location.x +"," +location.y +
+                                        "); (" + marker.x + "," + marker.y +
+                                        "); (" + secondMarker.x +","+secondMarker.y +")");
+            }
+            myRC.setIndicatorString(2, "Marker: " + String.valueOf(turnsBackToMarker + turnsMarkerToGoal) +
+                    " Bug: " + String.valueOf(turnsBugToGoal + calculateTurningAdjustment()) +
+                    " Penalties: " + penalties + " Turns: " + turningNumber
+                    + " Marker TN: " + markerTurningNumber);
+
         } else {
             //not tracking, so check if you can move towards the goal
             if(myMC.canMove(directionToGoal)) {
@@ -238,39 +323,14 @@ public class BugNavigator implements Navigator {
                 //the path is blocked, so begin tracking.
                 tracking = true;
                 startTracking = true;
+                bugStep++;
                 bugPos = (bugPos + 1) % QuantumConstants.BUG_MEMORY_LENGTH;
                 bugPrevLocations[bugPos] = location;
             
                 //determine if you should track around the obstacle clockwise or counterclockwise
                 Direction ccwDir = directionToGoal;
                 Direction cwDir = directionToGoal;
-//                int turn = 0;
                 boolean searching = true;
-//                while(searching) {
-//                    turn++;
-//                    ccwDir = ccwDir.rotateRight();
-//                    cwDir = cwDir.rotateLeft();
-//                    if(myMC.canMove(ccwDir)) {
-//                        bugPrevDirections[bugPos] = ccwDir;
-//                        trackingCW = false;
-//                        searching = false;
-//                        if(myMC.canMove(cwDir) && location.add(cwDir).distanceSquaredTo(goal) 
-//                                < location.add(ccwDir).distanceSquaredTo(goal)) {
-//                            bugPrevDirections[bugPos] = cwDir;
-//                            trackingCW = true;
-//                        }
-//                    } else if(myMC.canMove(cwDir)) {
-//                        bugPrevDirections[bugPos] = cwDir;
-//                        trackingCW = true;
-//                        searching = false;
-//                    }
-//                        
-//                    //stop searching if you are surrounded
-//                    if(ccwDir == cwDir) {
-//                        bugPrevDirections[bugPos] = ccwDir;
-//                        break;
-//                    }
-//                }
                 
                 //find counter clockwise turning number
                 int ccwTurn = 0;
@@ -319,9 +379,16 @@ public class BugNavigator implements Navigator {
                 //set a tracking marker
                 marker = location;
                 turnsBackToMarker = 0;
-                turnsMarkerToGoal = goalWeight(marker, goal);
+                turnsMarkerToGoal = manhattanWeight(marker, goal);
                 turnsBugToGoal = turnsMarkerToGoal;
                 backTracking = false;
+                stopBackTracking = false;
+                abortNext = false;
+                penaltyMarkers = new MapLocation [MAX_PENALTIES];
+                penalties = 0;
+                prevNumberOfPenalties = 0;
+                cumulativePenalties = 0;
+                prevTurningNumber = 0;
                 
                 //other tracking information
                 bugPrevCW[bugPos] = trackingCW;
@@ -420,8 +487,9 @@ public class BugNavigator implements Navigator {
     }
     
     private int calculateTurningAdjustment() {
-        int i1 = (turningNumber/2) * 6;
-        int i2;
+        int i1 = (turningNumber/2);
+        int i2 = 0;
+        int p = 0;
         switch(turningNumber) {
             case 0:
             case 1:
@@ -434,15 +502,49 @@ public class BugNavigator implements Navigator {
                 break;
                 
             default:
-                i2 = turningNumber - 1;
-        }                
+                if(turningNumber > 3) {
+                    i2 = turningNumber - 1;
+                }
+        }
         
-        return delayDiag * i1 + delayRect * i2;
+//        myRC.setIndicatorString(2, "penalties: " + penalties + 
+//                " prevPenalties: " + prevNumberOfPenalties +
+//                " cumPenalties: " + cumulativePenalties+ " p: "+p);
+        
+        if(penalties > prevNumberOfPenalties && penalties > 1) {
+            for(int j = prevNumberOfPenalties; j < penalties - 1; j++) {
+                cumulativePenalties += manhattanWeight(penaltyMarkers[j], penaltyMarkers[j+1]);
+            }
+            prevNumberOfPenalties = penalties - 1;
+        }
+        
+        if(penalties > 0) {
+            p = cumulativePenalties + 
+                manhattanWeight(myK.myLocation, penaltyMarkers[penalties - 1], delayDiag);
+        }
+        
+        return delayDiag * i1 + delayRect * i2 + p;
     }
     
-    private int goalWeight(MapLocation start, MapLocation end) {
+    private int manhattanWeight(MapLocation start, MapLocation end) {
         //May be more efficient way to do this besides Math.abs.
-        return delayRect*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
+        return manhattanWeight(start, end, delayRect);
 //        return delayRSq * start.distanceSquaredTo(end);
+    }
+    
+    private int manhattanWeight(MapLocation start, MapLocation end, int delay) {
+        //May be more efficient way to do this besides Math.abs.
+        return delay*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
+//        return delayRSq * start.distanceSquaredTo(end);
+    }
+    
+    private int euclideanWeight(MapLocation start, MapLocation end, int delay) {
+        return (int) (delay*Math.sqrt(start.distanceSquaredTo(end)));
+    }
+    
+    private boolean checkForPenalty(int turn1, int turn2) {
+        turn1 = (turn1 > 2) ? turn1 : 4;
+        turn2 = (turn2 > 2) ? turn2 : 4;
+        return Math.abs((turn1 + 1)/2 - (turn2 + 1)/2) >= 1;
     }
 }

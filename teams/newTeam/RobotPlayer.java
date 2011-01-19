@@ -72,7 +72,7 @@ public class RobotPlayer implements Runnable {
         myRS = new BaseState(myRC, myK, myCH);
         mySP = BasePlayer.determineInitialSpecificPlayer(myRC, myRS);
         
-        myRC.setIndicatorString(0, myRS.getClass().getName());
+//        myRC.setIndicatorString(0, myRS.getClass().getName());
         
         if(newCompTypes != null) {
             
@@ -90,11 +90,11 @@ public class RobotPlayer implements Runnable {
         
         // initialize and clean up as necessary?
         
-        myRC.setIndicatorString(1, myRS.getClass().getName());
+//        myRC.setIndicatorString(1, myRS.getClass().getName());
 
         myRS = myRS.execute();
         
-        myRC.setIndicatorString(2, myRS.getClass().getName());
+//        myRC.setIndicatorString(2, myRS.getClass().getName());
         
         mySP.doSpecificPlayerStatelessActions();
         
@@ -102,14 +102,17 @@ public class RobotPlayer implements Runnable {
         
         while(true) {
             try {
-                
+                //erase indicator strings:
+                myRC.setIndicatorString(0, " ");
+                myRC.setIndicatorString(1, " ");
+                myRC.setIndicatorString(2, " ");
                 // Rounds 1 and later actions
                 
                 // Stateless actions
                 myK.doStatelessUpdate();
                 mySH.refresh();
                 
-                myRC.setIndicatorString(0, myRS.getClass().getName());
+//                myRC.setIndicatorString(0, myRS.getClass().getName());
                 
                 newCompTypes = myCH.updateComponents(myRC);
                 
@@ -127,11 +130,11 @@ public class RobotPlayer implements Runnable {
                 
                 // initialize and clean up as necessary?
                 
-                myRC.setIndicatorString(1, myRS.getClass().getName());
+//                myRC.setIndicatorString(1, myRS.getClass().getName());
                 
                 myRS = myRS.execute();
                 
-                myRC.setIndicatorString(2, myRS.getClass().getName());
+//                myRC.setIndicatorString(2, myRS.getClass().getName());
                 
                 mySP.doSpecificPlayerStatelessActions();
                 

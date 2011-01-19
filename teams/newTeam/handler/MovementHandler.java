@@ -97,6 +97,9 @@ public class MovementHandler {
                 switch(navigatorType) {
                 
                 }
+                
+            case GOAL_INACCESSIBLE:
+                //TODO
             }
             return false;
         }
