@@ -8,8 +8,9 @@ import newTeam.common.util.Logger;
 public class SensorHandler {
     
     
-    private final RobotController myRC;
-    private final Knowledge       myK;
+    private final RobotController    myRC;
+    private final Knowledge          myK;
+    private final MovementController myMC;
     
     
     /*** Controller ***/
@@ -57,8 +58,9 @@ public class SensorHandler {
     
     public SensorHandler(RobotController rc, Knowledge know) {
         
-        myRC      = rc;
-        myK = know;
+        myRC = rc;
+        myK  = know;
+        myMC = (MovementController) myRC.components()[0];
     }
     
     
@@ -257,7 +259,7 @@ public class SensorHandler {
                 }
             }
           
-            standardWayClear = ((MovementController) myRC.components()[0]).canMove(standardWayDirection);
+            standardWayClear = myMC.canMove(standardWayDirection);
           
             return Direction.OMNI;
         }
@@ -265,6 +267,23 @@ public class SensorHandler {
             Logger.debug_printExceptionMessage(e);
             return Direction.NONE;
         }
+    }
+    
+    
+    
+    /**
+     * Finds adjacent location in which building is possible
+     * @return      empty adjacent square, myLocation if such a location does not exist
+     */
+    public MapLocation findEmptyLocationToBuild() {
+        Direction testDirection = Direction.EAST;
+        for(int garbage = 0; garbage < 8; garbage++) {
+            if(myMC.canMove(testDirection)) {
+                return myK.myLocation.add(testDirection);
+            }
+            testDirection = testDirection.rotateRight();
+        }
+        return myK.myLocation;
     }
     
     

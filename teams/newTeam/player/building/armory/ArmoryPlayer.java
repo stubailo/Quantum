@@ -1,4 +1,4 @@
-package newTeam.player.building.factory;
+package newTeam.player.building.armory;
 
 import battlecode.common.*;
 import newTeam.common.*;
