@@ -23,6 +23,7 @@ public abstract class MessageCoder {
 
     //message types
     public static final String RECYCLER_PING = "rp";
+    public static final String FACTORY_PING = "fp";
     public static final String RECYCLER_DESIGNATION = "rd";
     public static final String JUST_BUILT_UNIT_DESIGNATION = "ud"; //when a recycler, factory, or armory builds a unit
 
@@ -66,8 +67,8 @@ public abstract class MessageCoder {
         }
 
         int footerLocation = outputLength - FOOTER_LENGTH;
-        outputStrings[footerLocation - 1] = END_MSG;
-        outputInts[footerLocation - 1] = reBroadcast ? 1 : 0;
+        outputStrings[footerLocation] = END_MSG;
+        outputInts[footerLocation] = reBroadcast ? 1 : 0;
         
         int hashCode = 0;
         
@@ -79,7 +80,7 @@ public abstract class MessageCoder {
         
         hashCode += MULTIPLIER * broadcasterID + OFFSET;
         
-        outputInts[footerLocation] = hashCode;
+        outputInts[footerLocation+1] = hashCode;
 
         Message output = new Message();
 

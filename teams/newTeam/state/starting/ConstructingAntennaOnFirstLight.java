@@ -1,5 +1,6 @@
 package newTeam.state.starting;
 
+import newTeam.state.recycler.ConstructingAntennaOnSelf;
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
