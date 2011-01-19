@@ -33,7 +33,7 @@ public class FactoryPlayer extends BuildingPlayer {
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
 
-        Message[] messages = myCH.myBCH.receiveMessages();
+        Message[] messages = myCH.myMSH.getMessages();
 
         for( Message message : messages )
         {

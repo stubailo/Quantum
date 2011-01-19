@@ -24,7 +24,8 @@ public class BuildingMediums extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-
+            myBCH.addToQueue(myBH.getDesignationMessage());
+            
             return new Idling(this);
         }
 
@@ -35,17 +36,12 @@ public class BuildingMediums extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.DISH.cost + 10 )
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.mediumSoldier.getTotalCost() + 10 )
         {
             myBH.buildUnit( Prefab.mediumSoldier , myRC.getLocation().add(Direction.NORTH));
         }
 
         myBH.step();
-
-        if( myBH.finishedBuilding() )
-        {
-            return new Idling(this);
-        }
 
         return this;
     }

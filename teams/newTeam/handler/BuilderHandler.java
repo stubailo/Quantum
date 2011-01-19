@@ -80,8 +80,7 @@ public class BuilderHandler {
 
             if( IAmABuilding )
             {
-                //use the sensor handler to set the buildTarget
-                //buildTarget = null;
+                buildTarget = mySH.senseAtLocation(location, instructions.getBaseChassis().level);
             }
 
             buildLocation = location;
@@ -102,7 +101,7 @@ public class BuilderHandler {
 
             if( IAmABuilding )
             {
-                // how to sense from here??
+                buildTarget = mySH.senseAtLocation(location, instructions.getBaseChassis().level);
             }
 
             buildLocation = location;
@@ -130,18 +129,6 @@ public class BuilderHandler {
         while (buildStep != buildInstructions.getNumSteps()
                 && !BuildMappings.canBuild(myBC.type(), buildInstructions.getComponent(buildStep))) {
 
-            /*
-             * if( BuildMappings.canBuild( ComponentType.ARMORY, buildInstructions.getComponent(buildStep)) )
-            {
-                needsArmory = true;
-            } else if ( BuildMappings.canBuild( ComponentType.RECYCLER, buildInstructions.getComponent(buildStep)) )
-            {
-                needsRecycler = true;
-            } else if ( BuildMappings.canBuild( ComponentType.FACTORY, buildInstructions.getComponent(buildStep)))
-            {
-                needsFactory = true;
-            }
-             */
 
             buildStep++;
         }
@@ -174,7 +161,7 @@ public class BuilderHandler {
         {
             String[] bodyStrings = { buildInstructions.instructionsID  };
             int [] bodyInts = { buildTarget.getID() };
-            MapLocation [] bodyLocations = { null };
+            MapLocation [] bodyLocations = { knowledge.myRecyclerNode.myLocation };
 
             Message output = MessageCoder.encodeMessage(MessageCoder.JUST_BUILT_UNIT_DESIGNATION, knowledge.myRobotID, knowledge.myLocation, Clock.getRoundNum(), false, bodyStrings, bodyInts, bodyLocations);
 
@@ -192,6 +179,7 @@ public class BuilderHandler {
     private void finishBuilding()
     {
         lastMessage = genDesignationMessage();
+
         currentlyBuilding = false;
         buildTarget = null;
 

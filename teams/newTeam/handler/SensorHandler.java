@@ -88,7 +88,21 @@ public class SensorHandler {
         }
     }
 
-
+    public Robot senseAtLocation( MapLocation location, RobotLevel height)
+    {
+        GameObject obj;
+        try {
+        obj = mySCs[0].senseObjectAtLocation(location, height);
+        } catch ( Exception e ) {
+            return null;
+        }
+        if( obj instanceof Robot )
+        {
+            return (Robot) obj;
+        } else {
+            return null;
+        }
+    }
 
     private void senseRobots() {
         if(robotsSensed) return;

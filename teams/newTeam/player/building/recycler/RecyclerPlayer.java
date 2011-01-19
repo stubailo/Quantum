@@ -14,6 +14,8 @@ public class RecyclerPlayer extends BuildingPlayer {
     protected final RecyclerNode myRN;
     boolean hasFactory;
 
+    
+
     public RecyclerPlayer(BaseState state) {
         super(state);
         if(myK.myRecyclerNode == null) {
@@ -42,7 +44,7 @@ public class RecyclerPlayer extends BuildingPlayer {
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
 
-        Message[] messages = myCH.myBCH.receiveMessages();
+        Message[] messages = myCH.myMSH.getMessages();
 
         for( Message message : messages )
         {

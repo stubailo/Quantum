@@ -7,11 +7,7 @@ import newTeam.handler.ComponentsHandler;
 import newTeam.common.Knowledge;
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
-import newTeam.handler.BroadcastHandler;
-import newTeam.handler.BuilderHandler;
-import newTeam.handler.MovementHandler;
-import newTeam.handler.SensorHandler;
-import newTeam.handler.WeaponHandler;
+import newTeam.handler.*;
 import newTeam.common.util.Logger;
 
 public class RobotPlayer implements Runnable {
@@ -31,6 +27,7 @@ public class RobotPlayer implements Runnable {
     public  final  MovementHandler      myMH;
     public  final  SensorHandler        mySH;
     public  final  WeaponHandler        myWH;
+    public  final  MessageHandler       myMSH;
     
     /*** Specific Player ***/
     private        BasePlayer           mySP; 
@@ -51,11 +48,13 @@ public class RobotPlayer implements Runnable {
         myBH  = new BuilderHandler(myK, mySH);
         myMH  = new MovementHandler(myRC, myK);
         myWH  = new WeaponHandler();
+        myMSH = new MessageHandler( myRC );
         myCH  = new ComponentsHandler(myBCH,
                                       myBH,
                                       myMH,
                                       mySH,
-                                      myWH);
+                                      myWH,
+                                      myMSH);
     }
     
     
@@ -65,6 +64,7 @@ public class RobotPlayer implements Runnable {
         
         // Round 0 actions, slightly different
         myK.doStatelessUpdate();
+        myMSH.receiveMessages();
         
         ComponentType[] newCompTypes = myCH.updateComponents(myRC);
         
@@ -108,6 +108,7 @@ public class RobotPlayer implements Runnable {
                 // Stateless actions
                 myK.doStatelessUpdate();
                 mySH.refresh();
+                myMSH.receiveMessages();
                 
                 myRC.setIndicatorString(0, myRS.getClass().getName());
                 

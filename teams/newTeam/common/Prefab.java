@@ -32,7 +32,7 @@ public abstract class Prefab {
 
     public static BuildInstructions flyingSoldier = new BuildInstructions( "fs", Chassis.FLYING, flyingSoldierComponents);
 
-    private static final ComponentType[] mediumSoldierComponents = { ComponentType.DISH, ComponentType.TELESCOPE, ComponentType.RAILGUN };
+    private static final ComponentType[] mediumSoldierComponents = { ComponentType.DISH, ComponentType.RADAR, ComponentType.BLASTER };
 
-    public static BuildInstructions mediumSoldier = new BuildInstructions( "ms", Chassis.MEDIUM, flyingSoldierComponents);
+    public static BuildInstructions mediumSoldier = new BuildInstructions( "ms", Chassis.MEDIUM, mediumSoldierComponents);
 }

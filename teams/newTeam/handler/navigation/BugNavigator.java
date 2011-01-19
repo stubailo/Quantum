@@ -86,7 +86,7 @@ public class BugNavigator implements Navigator {
         // do nothing if the motor is active or you are not navigating
         if(reachedGoal()) {
             return MovementAction.AT_GOAL;
-        } else if(myMC.isActive() || !navigating) {
+        } else if(myMC == null || myMC.isActive() || !navigating) {
             return MovementAction.NONE;
         }
 
