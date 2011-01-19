@@ -4,6 +4,7 @@ import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.handler.navigation.BugNavigator;
+import newTeam.handler.navigation.TangentBug;
 import newTeam.handler.navigation.Navigator;
 import newTeam.handler.navigation.MoveForwardNavigator;
 import newTeam.handler.navigation.MoveBackwardNavigator;
@@ -16,14 +17,16 @@ public class MovementHandler {
     private final RobotController       myRC;
     private final Knowledge             myK;
     private       MovementController    myMC;
+    private       SensorHandler         mySH;
     private       Navigator             navigator;
     private       NavigatorType         navigatorType;
     
     
     
-    public MovementHandler(RobotController rc, Knowledge know) {
+    public MovementHandler(RobotController rc, Knowledge know, SensorHandler sh) {
         myRC = rc;
         myK  = know;
+        mySH = sh;
     }
     
     
@@ -47,6 +50,10 @@ public class MovementHandler {
         switch(givenNavigatorType) {
         case BUG:
             navigator = new BugNavigator(myRC, myK, myMC, goalLocation);
+            break;
+            
+        case TANGENT_BUG:
+            navigator = new TangentBug(myRC, myK, myMC, mySH, goalLocation);
             break;
             //TODO: add TANGENT_BUG
         }

@@ -9,7 +9,7 @@ public class NavigationTester extends BaseState {
     public NavigationTester(BaseState oldState, MapLocation goal) {
         super(oldState);
         
-        myMH.initializeNavigationTo(goal, NavigatorType.BUG);
+        myMH.initializeNavigationTo(goal, NavigatorType.TANGENT_BUG);
     }
     
     @Override
