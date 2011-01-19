@@ -62,8 +62,6 @@ public class RecyclerPlayer extends BuildingPlayer {
         {
                 myCH.myBCH.addToQueue( myRN.generatePing() );
         }
-
-        myCH.myBCH.broadcastFromQueue();
     }
     
     @Override

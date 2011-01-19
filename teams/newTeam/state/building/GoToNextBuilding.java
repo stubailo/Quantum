@@ -7,6 +7,7 @@ import newTeam.common.*;
 import newTeam.common.util.Logger;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
+import newTeam.state.building.WaitUntilDone;
 
 public class GoToNextBuilding extends BaseState {
 
@@ -26,13 +27,20 @@ public class GoToNextBuilding extends BaseState {
 
     @Override
     public BaseState getNextState() {
+
+        if(myMH.reachedGoal())
+        {
+
+            return new WaitUntilDone( this );
+        }
+
         return this;
     }
 
     @Override
     public BaseState execute() {
 
-        if(!myMH.reachedGoal())
+        
         myMH.step();
 
         return this;

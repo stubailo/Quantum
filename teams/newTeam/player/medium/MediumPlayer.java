@@ -16,7 +16,7 @@ public class MediumPlayer extends BasePlayer {
 
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new WaitingForDesignation( oldState );
+        return new Idling( oldState );
     }
 
     @Override

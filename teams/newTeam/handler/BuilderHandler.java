@@ -151,34 +151,20 @@ public class BuilderHandler {
         }
     }
 
-    /*
-     * Has to be called before finishBuilding to be effective
-     */
-
-    public Message genDesignationMessage()
-    {
-        if( IAmABuilding && currentlyBuilding && buildTarget!=null )
-        {
-            String[] bodyStrings = { buildInstructions.instructionsID  };
-            int [] bodyInts = { buildTarget.getID() };
-            MapLocation [] bodyLocations = { knowledge.myRecyclerNode.myLocation };
-
-            Message output = MessageCoder.encodeMessage(MessageCoder.JUST_BUILT_UNIT_DESIGNATION, knowledge.myRobotID, knowledge.myLocation, Clock.getRoundNum(), false, bodyStrings, bodyInts, bodyLocations);
-
-            return output;
-        } else {
-            return null;
-        }
-    }
 
     public Message getDesignationMessage()
     {
         return lastMessage;
     }
 
+    public Robot getBuildTarget()
+    {
+        return buildTarget;
+    }
+
     private void finishBuilding()
     {
-        lastMessage = genDesignationMessage();
+       // lastMessage = genDesignationMessage();
 
         currentlyBuilding = false;
         buildTarget = null;

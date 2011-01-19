@@ -2,12 +2,7 @@ package newTeam.handler;
 
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
-import newTeam.handler.navigation.NavigatorType;
-import newTeam.handler.navigation.BugNavigator;
-import newTeam.handler.navigation.Navigator;
-import newTeam.handler.navigation.MoveForwardNavigator;
-import newTeam.handler.navigation.MoveBackwardNavigator;
-import newTeam.handler.navigation.MovementAction;
+import newTeam.handler.navigation.*;
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -129,6 +124,12 @@ public class MovementHandler {
     public void moveBackward() {
         navigatorType = NavigatorType.MOVE_BACKWARD;
         navigator = new MoveBackwardNavigator(myRC, myMC);
+    }
+
+    public void circle( MapLocation location )
+    {
+        navigatorType = NavigatorType.CIRCLE;
+        navigator = new CircleNavigator(myRC, myMC, location);
     }
 
 }

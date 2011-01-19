@@ -11,6 +11,8 @@ public final class QuantumConstants {
         public static final int MESSAGE_QUEUE_LENGTH = 10;
         /* How many rounds between recurring message broadcasts */
         public static final int PING_CYCLE_LENGTH = 4;
+        /* How many rounds a unit waits for a command from the recycler before moving out */
+        public static final int TIME_WAIT_FOR_COMMAND = 10;
 	/** Total flux needed to explore for more mines */
 	public static final int TOTAL_FLUX_EXPLORE = 120;
 	/** Number of locations to remember for bug navigation */

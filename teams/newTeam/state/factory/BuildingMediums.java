@@ -23,9 +23,7 @@ public class BuildingMediums extends BaseState {
     public BaseState getNextState() {
 
         if( myBH.finishedBuilding() )
-        {
-            myBCH.addToQueue(myBH.getDesignationMessage());
-            
+        {            
             return new Idling(this);
         }
 

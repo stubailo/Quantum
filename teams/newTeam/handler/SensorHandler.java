@@ -287,17 +287,25 @@ public class SensorHandler {
     
     /**
      * Finds adjacent location in which building is possible
-     * @return      empty adjacent square, myLocation if such a location does not exist
+     * @return      empty adjacent square, null if such a location does not exist
      */
     public MapLocation findEmptyLocationToBuild() {
+
         Direction testDirection = Direction.EAST;
+        for(int garbage = 0; garbage < 8; garbage++) {
+            if(!myMC.canMove(testDirection)) {
+                break;
+            }
+            testDirection = testDirection.rotateRight();
+        }
+
         for(int garbage = 0; garbage < 8; garbage++) {
             if(myMC.canMove(testDirection)) {
                 return myK.myLocation.add(testDirection);
             }
             testDirection = testDirection.rotateRight();
         }
-        return myK.myLocation;
+        return null;
     }
     
     

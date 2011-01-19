@@ -135,6 +135,8 @@ public class RobotPlayer implements Runnable {
                 myRC.setIndicatorString(2, myRS.getClass().getName());
                 
                 mySP.doSpecificPlayerStatelessActions();
+
+                myBCH.broadcastFromQueue();
                 
                 myRC.yield();
                 

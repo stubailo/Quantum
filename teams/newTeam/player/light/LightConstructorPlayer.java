@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.player.BasePlayer;
+import newTeam.state.building.ConstructorWaitingForCommand;
 
 public class LightConstructorPlayer extends LightPlayer {
     
@@ -14,7 +15,7 @@ public class LightConstructorPlayer extends LightPlayer {
     
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return oldState;
+        return new ConstructorWaitingForCommand( oldState );
     }
     
     @Override

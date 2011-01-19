@@ -1,4 +1,4 @@
-package newTeam.state;
+package newTeam.state.building;
 
 import battlecode.common.*;
 
@@ -9,10 +9,10 @@ import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
 import newTeam.state.building.GoToNextBuilding;
 
-public class WaitingForDesignation extends BaseState {
+public class WaitUntilDone extends BaseState {
 
 
-    public WaitingForDesignation( BaseState oldState ) {
+    public WaitUntilDone( BaseState oldState ) {
         super( oldState );
     }
 
@@ -35,7 +35,7 @@ public class WaitingForDesignation extends BaseState {
 
                 if( designation.equals(Prefab.mediumSoldier.instructionsID) )
                 {
-                    return new GoToNextBuilding( this, MessageCoder.getLocationFromBody(message, 0) );
+                    return new Idling(  this );
                 }
             }
         }

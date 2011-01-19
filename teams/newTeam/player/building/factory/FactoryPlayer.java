@@ -51,8 +51,6 @@ public class FactoryPlayer extends BuildingPlayer {
                 myCH.myBCH.addToQueue( generateFactoryPing() );
         }
 
-        myCH.myBCH.broadcastFromQueue();
-
     }
 
     @Override
