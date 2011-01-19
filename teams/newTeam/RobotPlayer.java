@@ -81,10 +81,8 @@ public class RobotPlayer implements Runnable {
                 myRS = mySP.getNewStateBasedOnNewSpecificPlayer(myRS);
             }
         }
-
         
         myRS.senseAndUpdateKnowledge();
-        
         
         myRS = myRS.getNextState();
         
