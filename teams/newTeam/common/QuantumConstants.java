@@ -17,6 +17,10 @@ public final class QuantumConstants {
 	public static final int TOTAL_FLUX_EXPLORE = 120;
 	/** Number of locations to remember for bug navigation */
 	public static final int BUG_MEMORY_LENGTH = 15;
+	/** Force bug to begin backtracking at this number */
+	public static final int BUG_FORCE_BACKTRACK = 350;
+	/** Maximum path weight before aborting bug navigation */
+	public static final int BUG_ABORT = 500;
 	/** Bug distance increase before trying different path */
 	public static final int BUG_DISTANCE_SWITCH = 30;
 	/** Maximum number of moves to remember doing tangent bug */

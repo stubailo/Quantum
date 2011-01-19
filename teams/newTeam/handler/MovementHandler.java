@@ -92,6 +92,9 @@ public class MovementHandler {
                 switch(navigatorType) {
                 
                 }
+                
+            case GOAL_INACCESSIBLE:
+                //TODO
             }
             return false;
         }
@@ -124,6 +127,11 @@ public class MovementHandler {
     public void moveBackward() {
         navigatorType = NavigatorType.MOVE_BACKWARD;
         navigator = new MoveBackwardNavigator(myRC, myMC);
+    }
+    
+    public void zigZag() {
+        navigatorType = NavigatorType.ZIG_ZAG;
+       // navigator = new ZigZagNavigator(myMC, myK);
     }
 
     public void circle( MapLocation location )
