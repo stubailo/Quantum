@@ -8,12 +8,33 @@ import newTeam.common.util.Logger;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
 
-public class MovingToBuildFactory extends BaseState {
+public class MovingToBuildArmory extends BaseState {
 
-    public MovingToBuildFactory(BaseState oldState) {
+    MapLocation[] adjacentLocations;
+    MapLocation facLoc;
+
+    int strategyNum = 0; //which strategy are we using to try to find a spot?
+
+    public MovingToBuildArmory(BaseState oldState, MapLocation factoryLocation) {
         super(oldState);
 
-        myMH.circle(myK.myRecyclerNode.myLocation, true);
+        facLoc = factoryLocation;
+        adjacentLocations = new MapLocation[4];
+
+        Direction primaryDir = factoryLocation.directionTo(myK.myRecyclerNode.myLocation);
+
+        if( primaryDir.isDiagonal() )
+        {
+            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
+            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
+        } else {
+            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
+            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
+            adjacentLocations[2] = factoryLocation.add(primaryDir.rotateLeft().rotateLeft());
+            adjacentLocations[3] = factoryLocation.add(primaryDir.rotateRight().rotateRight());
+        }
+
+        myMH.circle(factoryLocation, true);
     }
 
     @Override
@@ -25,7 +46,22 @@ public class MovingToBuildFactory extends BaseState {
 
         if( inGoodBuildLocation() )
         {
-            return new BuildingFactory( this ); //BuildingFactory( this, myRC.getLocation() );
+            return new BuildingArmory( this ); //BuildingFactory( this, myRC.getLocation() );
+        }
+
+        if( strategyNum == 0 && myMH.getPathBlocked() )
+        {
+            System.out.println( "path blocked yo");
+            Direction tempDir = myK.myRecyclerNode.myLocation.directionTo(facLoc).rotateRight();
+
+            strategyNum = 1;
+            myMH.initializeNavigationTo(myK.myRecyclerNode.myLocation.add(tempDir), NavigatorType.BUG);
+        }
+
+        if( strategyNum == 1 && myMH.reachedGoal() )
+        {
+            strategyNum = 2;
+            myMH.circle(myK.myRecyclerNode.myLocation, true);
         }
 
         return this;
@@ -41,6 +77,23 @@ public class MovingToBuildFactory extends BaseState {
 
     public boolean inGoodBuildLocation()
     {
+        boolean adj = false;
+
+        for( MapLocation location : adjacentLocations )
+         {
+                if( location != null && myRC.getLocation().isAdjacentTo( location ) && myMH.canMove( myRC.getLocation().directionTo(location) ) )
+                {
+                    
+                    adj=true;
+                    break;
+                }
+        }
+
+        if( adj == false )
+        {
+            return false;
+        }
+
         Direction testDirection = Direction.EAST;
         boolean foundVoid = false;
 
@@ -67,7 +120,7 @@ public class MovingToBuildFactory extends BaseState {
         {
             return true;
         }
-        
+
         boolean foundEmpty = false;
 
         for( int i=0; i<8; i++ )

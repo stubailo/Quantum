@@ -21,7 +21,7 @@ public class StartingLightConstructorPlayer extends LightConstructorPlayer {
         
 //        return new NavigationTester(oldState, 
 //                myK.myLocation.add(Direction.NORTH, 20).add(Direction.EAST, 0));
-        return new Wait( 1, oldState, new StartingLightConstructorScouting(oldState) );
+        return new Wait( 3, oldState, new StartingLightConstructorScouting(oldState) );
     }
     
     @Override

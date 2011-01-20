@@ -19,8 +19,6 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
     public void senseAndUpdateKnowledge() {
         
         mySH.senseStartingLightPlayer();
-
-        Logger.debug_printSashko("found light: " + myRC.getLocation().directionTo(mySH.startingLightInfo.location));
     }
 
     @Override

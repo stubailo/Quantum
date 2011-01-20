@@ -34,9 +34,11 @@ public class BuildingMediums extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.mediumSoldier.getTotalCost() + 10 )
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.mediumSoldier.getTotalCost() + 200 )
         {
-            myBH.buildUnit( Prefab.mediumSoldier , myRC.getLocation().add(Direction.NORTH));
+            MapLocation buildLocation = mySH.findEmptyLocationToBuild();
+            if(buildLocation!=null)
+            myBH.buildUnit( Prefab.mediumSoldier , buildLocation);
         }
 
         myBH.step();

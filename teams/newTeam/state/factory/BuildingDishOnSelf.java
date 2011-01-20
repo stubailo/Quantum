@@ -42,12 +42,6 @@ public class BuildingDishOnSelf extends BaseState {
         }
 
         myBH.step();
-
-        if( myBH.finishedBuilding() )
-        {
-            return new BuildingMediums(this);
-        }
-
         return this;
     }
 

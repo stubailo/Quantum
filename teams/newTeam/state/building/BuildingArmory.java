@@ -8,14 +8,16 @@ import newTeam.common.util.Logger;
 import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.idle.Idling;
 
-public class BuildingFactory extends BaseState {
+public class BuildingArmory extends BaseState {
 
     MapLocation toBuildLocation;
 
     MapLocation moveLocation;
 
-    public BuildingFactory(BaseState oldState) {
+    public BuildingArmory(BaseState oldState) {
         super(oldState);
+
+        System.out.println( "building armory!" );
 
         toBuildLocation = myRC.getLocation();
         moveLocation = mySH.findEmptyLocationToBuild();
@@ -32,7 +34,7 @@ public class BuildingFactory extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new MovingToBuildArmory( this, toBuildLocation );
+            return new Idling( this );
         }
 
         return this;
@@ -44,7 +46,7 @@ public class BuildingFactory extends BaseState {
         if(myK.myLocation.isAdjacentTo(toBuildLocation)) {
             if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.factory.getTotalCost() + 10 )
             {
-                myBH.buildUnit( Prefab.factory , toBuildLocation);
+                myBH.buildUnit( Prefab.armory , toBuildLocation);
             }
 
             myBH.step();

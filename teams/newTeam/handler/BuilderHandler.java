@@ -132,23 +132,26 @@ public class BuilderHandler {
 
             buildStep++;
         }
-
+try {
 
         if (buildStep < buildInstructions.getNumSteps()) {
 
-            try {
+            
                 myBC.build(buildInstructions.getComponent(buildStep), buildLocation, buildHeight);
                 buildStep++;
-            } catch ( Exception e )
-            {
-                Logger.debug_printExceptionMessage(e);
-            }
+ 
 
         }
         
         if (buildStep == buildInstructions.getNumSteps()) {
             finishBuilding();
         }
+        }
+        catch ( Exception e )
+            {
+                abortBuilding();
+                Logger.debug_printExceptionMessage(e);
+            }
     }
 
 

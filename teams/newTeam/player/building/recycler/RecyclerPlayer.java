@@ -58,7 +58,7 @@ public class RecyclerPlayer extends BuildingPlayer {
             }
         }
 
-        if( Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
+        if( Clock.getRoundNum() > 5 && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
         {
                 myCH.myBCH.addToQueue( myRN.generatePing() );
         }

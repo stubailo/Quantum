@@ -13,7 +13,7 @@ public class MovementHandler {
     private       Navigator             navigator;
     private       NavigatorType         navigatorType;
     
-    
+    private boolean pathBlocked = false;
     
     public MovementHandler(RobotController rc, Knowledge know) {
         myRC = rc;
@@ -88,7 +88,7 @@ public class MovementHandler {
                 return true;
                 
             case PATH_BLOCKED:
-                //TODO
+                pathBlocked = true;
                 switch(navigatorType) {
                 
                 }
@@ -106,6 +106,17 @@ public class MovementHandler {
     
     public boolean reachedGoal() {
         return navigator.reachedGoal();
+    }
+
+    public boolean getPathBlocked()
+    {
+        if( pathBlocked )
+        {
+            pathBlocked = false;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public void setDirection(Direction direction) {
@@ -134,10 +145,10 @@ public class MovementHandler {
         navigator = new ZigZagNavigator(myMC, myK);
     }
 
-    public void circle( MapLocation location )
+    public void circle( MapLocation location, boolean clockwise )
     {
         navigatorType = NavigatorType.CIRCLE;
-        navigator = new CircleNavigator(myRC, myMC, location);
+        navigator = new CircleNavigator(myRC, myMC, location, clockwise);
     }
 
 }
