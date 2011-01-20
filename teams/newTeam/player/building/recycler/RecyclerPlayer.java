@@ -12,9 +12,6 @@ import newTeam.state.idle.Idling;
 public class RecyclerPlayer extends BuildingPlayer {
     
     protected final RecyclerNode myRN;
-    boolean hasFactory;
-
-    
 
     public RecyclerPlayer(BaseState state) {
         super(state);
@@ -22,8 +19,6 @@ public class RecyclerPlayer extends BuildingPlayer {
             myK.initializeRecyclerNode();
         }
         myRN = myK.myRecyclerNode;
-
-        hasFactory = false;
     }
     
     @Override
@@ -38,6 +33,8 @@ public class RecyclerPlayer extends BuildingPlayer {
             Logger.debug_printHocho("turning off...");
             myRC.turnOff();
         }
+
+        myK.pinging = true;
     }
     
     @Override
@@ -46,19 +43,16 @@ public class RecyclerPlayer extends BuildingPlayer {
 
         Message[] messages = myCH.myMSH.getMessages();
 
+
         for( Message message : messages )
         {
-
-            if( !hasFactory && MessageCoder.getMessageType(message).equals(MessageCoder.FACTORY_PING) && MessageCoder.isValid(message) )
+            if( MessageCoder.getMessageType(message).equals(MessageCoder.FACTORY_FOUND_ARMORY) && MessageCoder.isValid(message) )
             {
-                hasFactory = true;
-                myRN.hasFactory = true;
-                myRN.factoryLocation = MessageCoder.getBroadcasterLocation(message);
-                System.out.println("synced with factory ID: " + MessageCoder.getBroadcasterID(message));
+                myK.myRecyclerNode.armoryID = MessageCoder.getIntFromBody(message, 0);
             }
         }
 
-        if( Clock.getRoundNum() > 5 && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
+        if( myK.pinging && Clock.getRoundNum() > 5 && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
         {
                 myCH.myBCH.addToQueue( myRN.generatePing() );
         }

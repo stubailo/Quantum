@@ -30,13 +30,6 @@ public class StartingRecyclerCommPlayer extends StartingRecyclerPlayer {
     @Override
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
-        
-        if( myBCH.canBroadcast() && Clock.getRoundNum()%QuantumConstants.PING_CYCLE_LENGTH == 0 )
-        {
-            myBCH.addToQueue( myRN.generatePing() );
-        }
-
-        myBCH.broadcastFromQueue();
     }
     
     @Override

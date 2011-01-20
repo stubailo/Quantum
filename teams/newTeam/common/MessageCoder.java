@@ -29,6 +29,14 @@ public abstract class MessageCoder {
 
     public static final String BUILD_FACTORY_COMMAND = "bfc";
 
+    public static final String FACTORY_BUILT = "fb";
+    public static final String ARMORY_BUILT = "ab";
+    public static final String UPGRADE_ABORTED = "ua";
+
+    public static final String FACTORY_FOUND_ARMORY = "ffa";
+
+    public static final String MAKE_FACTORY_PING = "mfp";
+
     // encoding constants
     private static final int MULTIPLIER = 7;
     private static final int OFFSET = 22;

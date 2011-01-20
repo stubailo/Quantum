@@ -9,8 +9,7 @@ public class Knowledge {
 
     /*** Parent Recycler ***/
     public          RecyclerNode        myRecyclerNode;
-
-    public          String              unitType;
+    public          boolean             pinging;
     
     /*** Constants ***/
     public  final   Team                myTeam;
@@ -57,6 +56,8 @@ public class Knowledge {
         
         previousFlux = 0;
         myLocation = myRC.getLocation();
+
+        pinging = false;
     }
     
     

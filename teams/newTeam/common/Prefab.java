@@ -15,7 +15,7 @@ import newTeam.common.*;
  */
 public abstract class Prefab {
 
-    private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA };
+    private static final ComponentType[] commRecyclerComponents = { ComponentType.RECYCLER, ComponentType.ANTENNA, ComponentType.PROCESSOR };
     private static final ComponentType[] factoryComponents = { ComponentType.FACTORY, ComponentType.DISH };
     private static final ComponentType[] armoryComponents = { ComponentType.ARMORY };
     public static BuildInstructions factory = new BuildInstructions( "bf", Chassis.BUILDING, factoryComponents );

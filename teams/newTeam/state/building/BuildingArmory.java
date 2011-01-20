@@ -17,8 +17,6 @@ public class BuildingArmory extends BaseState {
     public BuildingArmory(BaseState oldState) {
         super(oldState);
 
-        System.out.println( "building armory!" );
-
         toBuildLocation = myRC.getLocation();
         moveLocation = mySH.findEmptyLocationToBuild();
 
@@ -34,6 +32,12 @@ public class BuildingArmory extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
+            int[] ints = { 0 };
+            String[] strings = { null };
+            MapLocation[] locations = { toBuildLocation };
+
+            myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.ARMORY_BUILT, myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations) );
+
             return new Idling( this );
         }
 

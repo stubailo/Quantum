@@ -19,8 +19,11 @@ public class RecyclerNode {
     public MapLocation myLocation;
     public MapLocation parentLocation;
 
-    public boolean hasFactory;
+    public int factoryID;
     public MapLocation factoryLocation;
+
+    public int armoryID;
+    public MapLocation armoryLocation;
 
     public RecyclerNode()
     {
@@ -57,17 +60,21 @@ public class RecyclerNode {
 
     public Message generatePing()
     {
-        int bodyLength = 2;
+        int bodyLength = 4;
 
         int[] ints = new int[bodyLength];
         MapLocation[] locations = new MapLocation[bodyLength];
         String[] strings = new String[bodyLength];
 
-        ints[0] = parentRobotID;
-        ints[1] = hasFactory?1:0;
+        ints[0] = myRobotID;
+        ints[1] = parentRobotID;
+        ints[2] = factoryID;
+        ints[3] = armoryID;
 
-        locations[0] = parentLocation;
-        locations[1] = factoryLocation;
+        locations[0] = myLocation;
+        locations[1] = parentLocation;
+        locations[2] = factoryLocation;
+        locations[3] = armoryLocation;
 
         return MessageCoder.encodeMessage(MessageCoder.RECYCLER_PING, myRobotID, myLocation, Clock.getRoundNum(), false, strings, ints, locations);
     }
@@ -90,14 +97,17 @@ public class RecyclerNode {
     {
         RecyclerNode output = new RecyclerNode();
 
-        output.myRobotID = MessageCoder.getBroadcasterID(ping);
-        output.myLocation = MessageCoder.getBroadcasterLocation(ping);
+        output.myRobotID = MessageCoder.getIntFromBody(ping, 0);
+        output.myLocation = MessageCoder.getLocationFromBody(ping, 0);
 
-        output.parentRobotID = MessageCoder.getIntFromBody(ping, 0);
-        output.parentLocation = MessageCoder.getLocationFromBody(ping, 0);
+        output.parentRobotID = MessageCoder.getIntFromBody(ping, 1);
+        output.parentLocation = MessageCoder.getLocationFromBody(ping, 1);
 
-        output.hasFactory = MessageCoder.getIntFromBody(ping, 1) == 1;
-        output.factoryLocation = MessageCoder.getLocationFromBody(ping, 1);
+        output.factoryID = MessageCoder.getIntFromBody(ping, 2);
+        output.factoryLocation = MessageCoder.getLocationFromBody(ping, 2);
+
+        output.armoryID = MessageCoder.getIntFromBody(ping, 3);
+        output.armoryLocation = MessageCoder.getLocationFromBody(ping, 3);
 
         return output;
     }

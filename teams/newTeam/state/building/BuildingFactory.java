@@ -32,6 +32,12 @@ public class BuildingFactory extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
+            int[] ints = { 0 };
+            String[] strings = { null };
+            MapLocation[] locations = { toBuildLocation };
+
+            myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FACTORY_BUILT, myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations) );
+
             return new MovingToBuildArmory( this, toBuildLocation );
         }
 
