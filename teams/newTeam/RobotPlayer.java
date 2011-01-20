@@ -47,7 +47,7 @@ public class RobotPlayer implements Runnable {
         myBCH = new BroadcastHandler(myK, myRC);
         myBH  = new BuilderHandler(myK, mySH);
         myMH  = new MovementHandler(myRC, myK);
-        myWH  = new WeaponHandler();
+        myWH  = new WeaponHandler(myK);
         myMSH = new MessageHandler( myRC );
         myCH  = new ComponentsHandler(myBCH,
                                       myBH,
@@ -129,7 +129,7 @@ public class RobotPlayer implements Runnable {
                 
                 // initialize and clean up as necessary?
                 
-//                myRC.setIndicatorString(1, myRS.getClass().getName());
+                myRC.setIndicatorString(0, myRS.getClass().getName());
                 
                 myRS = myRS.execute();
                 
