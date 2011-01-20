@@ -30,7 +30,7 @@ public abstract class Prefab {
     public static BuildInstructions lightConstructor = new BuildInstructions( "lc", Chassis.LIGHT, lightContructorComponents);
     public static BuildInstructions startingConstructor = new BuildInstructions( "lcs", Chassis.LIGHT, startingConstructorComponents);
 
-    private static final ComponentType[] flyingSoldierComponents = { ComponentType.BLASTER, ComponentType.RADAR };
+    private static final ComponentType[] flyingSoldierComponents = { ComponentType.BLASTER, ComponentType.DUMMY };
 
     public static BuildInstructions flyingSoldier = new BuildInstructions( "fs", Chassis.FLYING, flyingSoldierComponents);
 
