@@ -37,4 +37,22 @@ public abstract class Prefab {
     private static final ComponentType[] mediumSoldierComponents = { ComponentType.DISH, ComponentType.RADAR, ComponentType.BLASTER };
 
     public static BuildInstructions mediumSoldier = new BuildInstructions( "ms", Chassis.MEDIUM, mediumSoldierComponents);
+
+    /*
+     * IMPORTANT ADD NETWORKED BUILD UNITS TO THIS ARRAY
+     */
+    private static BuildInstructions[] networkBuildList = { flyingSoldier };
+
+    public static BuildInstructions getInstructionsFromID ( String id )
+    {
+        for ( BuildInstructions current : networkBuildList )
+        {
+            if( current.instructionsID.equals(id) )
+            {
+                return current;
+            }
+        }
+
+        return null;
+    }
 }

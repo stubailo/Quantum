@@ -25,7 +25,7 @@ public class BuildingDishOnSelf extends BaseState {
         if( myBH.finishedBuilding() )
         {
 
-            return new Idling(this);
+            return new FactoryAcceptingCommands(this);
         }
 
         return this;

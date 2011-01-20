@@ -5,6 +5,7 @@ import battlecode.common.*;
 import newTeam.player.BasePlayer;
 import newTeam.player.building.recycler.RecyclerPlayer;
 import newTeam.player.building.factory.FactoryPlayer;
+import newTeam.player.building.armory.ArmoryPlayer;
 import newTeam.state.BaseState;
 
 public class BuildingPlayer extends BasePlayer {
@@ -39,6 +40,8 @@ public class BuildingPlayer extends BasePlayer {
                 return new RecyclerPlayer(state);
             case FACTORY:
                 return new FactoryPlayer(state);
+            case ARMORY:
+                return new ArmoryPlayer(state);
         }
         return this;
     }

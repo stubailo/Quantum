@@ -48,7 +48,9 @@ public class RecyclerPlayer extends BuildingPlayer {
         {
             if( MessageCoder.getMessageType(message).equals(MessageCoder.FACTORY_FOUND_ARMORY) && MessageCoder.isValid(message) )
             {
+                
                 myK.myRecyclerNode.armoryID = MessageCoder.getIntFromBody(message, 0);
+                System.out.println( "found armory! " + myK.myRecyclerNode.armoryID );
             }
         }
 

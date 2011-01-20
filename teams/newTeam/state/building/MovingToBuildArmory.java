@@ -165,7 +165,6 @@ public class MovingToBuildArmory extends BaseState {
 
         while( testDirection != startDirection )
         {
-            System.out.println(testDirection);
             nextDirection = testDirection.rotateRight();
 
             if( foundVoid == false && myMH.canMove(nextDirection) )

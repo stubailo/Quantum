@@ -47,7 +47,7 @@ public class FactoryPlayer extends BuildingPlayer {
                 hasRecycler = true;
             } else if ( MessageCoder.getMessageType(message).equals(MessageCoder.MAKE_FACTORY_PING) && MessageCoder.isValid(message) )
             {
-                myK.pinging = true;
+                //myK.pinging = true;
             }
         }
 

@@ -28,6 +28,7 @@ public abstract class MessageCoder {
     public static final String JUST_BUILT_UNIT_DESIGNATION = "ud"; //when a recycler, factory, or armory builds a unit
 
     public static final String BUILD_FACTORY_COMMAND = "bfc";
+    public static final String BUILD_UNIT_COMMAND = "buc";
 
     public static final String FACTORY_BUILT = "fb";
     public static final String ARMORY_BUILT = "ab";

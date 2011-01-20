@@ -76,8 +76,8 @@ public class WaitingForBaseUpgrade extends BaseState {
             MapLocation locations[] = { null };
 
             myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.MAKE_FACTORY_PING , myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations) );
-            myK.pinging = false;
-            return new Idling( this );
+            //myK.pinging = false;
+            return new UpgradedRecycler( this );
         }
 
         return this;

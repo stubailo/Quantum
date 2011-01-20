@@ -36,6 +36,52 @@ public class RecyclerNode {
         myLocation = i_myLocation;
     }
 
+    public MapLocation[] genBuildLocations ()
+    {
+        if( factoryLocation==null )
+        {
+            MapLocation[] output = { myLocation };
+            return output;
+        }
+
+        MapLocation[] adjacentLocations = new MapLocation[4];
+
+        MapLocation[] outputLocations = new MapLocation[4];
+
+        Direction primaryDir = factoryLocation.directionTo(myLocation);
+
+        if( primaryDir.isDiagonal() )
+        {
+            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
+            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
+        } else {
+            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
+            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
+            adjacentLocations[2] = factoryLocation.add(primaryDir.rotateLeft().rotateLeft());
+            adjacentLocations[3] = factoryLocation.add(primaryDir.rotateRight().rotateRight());
+        }
+
+        if( armoryLocation == null )
+        {
+            return adjacentLocations;
+        }
+
+        int outputi = 0;
+
+        for( MapLocation location : adjacentLocations )
+        {
+            if( location == null )
+            {
+                break;
+            } else if ( location.isAdjacentTo( armoryLocation ) ) {
+                outputLocations [outputi] = location;
+                outputi++;
+            }
+        }
+
+        return outputLocations;
+    }
+
     @Override
     public String toString()
     {
