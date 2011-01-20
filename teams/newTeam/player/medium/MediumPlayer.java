@@ -4,7 +4,6 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
-import newTeam.state.WaitingForDesignation;
 import newTeam.player.BasePlayer;
 
 public class MediumPlayer extends BasePlayer {
