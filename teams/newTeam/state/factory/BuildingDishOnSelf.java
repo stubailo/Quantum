@@ -25,7 +25,7 @@ public class BuildingDishOnSelf extends BaseState {
         if( myBH.finishedBuilding() )
         {
 
-            return new Idling(this);
+            return new FactoryAcceptingCommands(this);
         }
 
         return this;
@@ -42,12 +42,6 @@ public class BuildingDishOnSelf extends BaseState {
         }
 
         myBH.step();
-
-        if( myBH.finishedBuilding() )
-        {
-            return new BuildingMediums(this);
-        }
-
         return this;
     }
 

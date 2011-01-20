@@ -8,7 +8,7 @@ import newTeam.player.building.recycler.RecyclerCommPlayer;
 import newTeam.player.building.BuildingPlayer;
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
-import newTeam.state.factory.*;
+import newTeam.state.armory.*;
 
 public class ArmoryPlayer extends BuildingPlayer {
 
@@ -22,7 +22,7 @@ public class ArmoryPlayer extends BuildingPlayer {
 
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new BuildingDishOnSelf( oldState );
+        return new ArmoryAcceptingCommands( oldState );
     }
 
     @Override

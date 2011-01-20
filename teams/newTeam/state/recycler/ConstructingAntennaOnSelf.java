@@ -34,10 +34,10 @@ public class ConstructingAntennaOnSelf extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.ANTENNA.cost + 10 )
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getComponentCost() - ComponentType.RECYCLER.cost + 10 )
         {
             Logger.debug_printSashko("building antenna");
-            myBH.buildComponents( Prefab.startingConstructor , myRC.getLocation(), RobotLevel.ON_GROUND);
+            myBH.buildComponents( Prefab.commRecycler , myRC.getLocation(), RobotLevel.ON_GROUND);
         }
 
         myBH.step();

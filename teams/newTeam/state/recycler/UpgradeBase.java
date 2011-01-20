@@ -28,10 +28,13 @@ public class UpgradeBase extends BaseState {
         if( myBH.finishedBuilding() )
         {
             builtConstructor = true;
+
             int[] ints = { constructor.getID() };
             String[] strings = { null };
             MapLocation[] locations = { null };
             myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.BUILD_FACTORY_COMMAND, myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations));
+
+            return new WaitingForBaseUpgrade( this );
         }
 
         return this;

@@ -14,10 +14,13 @@ public class FactoryPlayer extends BuildingPlayer {
 
     boolean hasRecycler;
 
+    boolean pinging;
+
     public FactoryPlayer(BaseState state) {
         super(state);
 
         hasRecycler = false;
+        pinging = false;
     }
 
     @Override
@@ -38,17 +41,30 @@ public class FactoryPlayer extends BuildingPlayer {
         for( Message message : messages )
         {
             
-            if( !hasRecycler && MessageCoder.getMessageType(message).equals(MessageCoder.RECYCLER_PING) )//&& MessageCoder.isValid(message) )
+            if( MessageCoder.getMessageType(message).equals(MessageCoder.RECYCLER_PING) && MessageCoder.isValid(message) )
             {
                 myK.myRecyclerNode = RecyclerNode.getFromPing(message);
                 hasRecycler = true;
-                System.out.println("synced with recycler ID: " + myK.myRecyclerNode.myRobotID);
+            } else if ( MessageCoder.getMessageType(message).equals(MessageCoder.MAKE_FACTORY_PING) && MessageCoder.isValid(message) )
+            {
+                //myK.pinging = true;
             }
         }
 
-        if( Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 1 && myCH.myBCH.canBroadcast() )
+        if( hasRecycler && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 1 && myK.myRecyclerNode.armoryID == 0 && myK.myRecyclerNode.armoryLocation!=null && myK.myRecyclerNode.armoryLocation.isAdjacentTo( myK.myLocation ) )
         {
-                myCH.myBCH.addToQueue( generateFactoryPing() );
+            int newArmoryID = myCH.mySH.senseAtLocation( myK.myRecyclerNode.armoryLocation , RobotLevel.ON_GROUND ).getID();
+
+            int[] ints = { newArmoryID };
+            String[] strings = { null };
+            MapLocation[] locations = { null };
+
+            myCH.myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FACTORY_FOUND_ARMORY, myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations) );
+        }
+
+        if( myK.pinging && Clock.getRoundNum() > 5 && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
+        {
+                myCH.myBCH.addToQueue( myK.myRecyclerNode.generatePing() );
         }
 
     }

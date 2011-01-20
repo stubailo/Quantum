@@ -2,12 +2,7 @@ package newTeam.state;
 
 import battlecode.common.*;
 
-import newTeam.handler.BroadcastHandler;
-import newTeam.handler.BuilderHandler;
-import newTeam.handler.ComponentsHandler;
-import newTeam.handler.MovementHandler;
-import newTeam.handler.SensorHandler;
-import newTeam.handler.WeaponHandler;
+import newTeam.handler.*;
 import newTeam.common.Knowledge;
 
 public class BaseState {
@@ -21,6 +16,7 @@ public class BaseState {
     protected final MovementHandler     myMH;
     protected final SensorHandler       mySH;
     protected final WeaponHandler       myWH;
+    protected final MessageHandler      myMSH;
     
     public BaseState(RobotController rc, Knowledge know, ComponentsHandler ch) {
         myRC  = rc;
@@ -32,6 +28,7 @@ public class BaseState {
         myMH  = ch.myMH;
         mySH  = ch.mySH;
         myWH  = ch.myWH;
+        myMSH = ch.myMSH;
     }
     
     public BaseState(BaseState oldState) {
@@ -44,6 +41,7 @@ public class BaseState {
         myMH  = oldState.myMH;
         mySH  = oldState.mySH;
         myWH  = oldState.myWH;
+        myMSH = oldState.myMSH;
     }
     
     public void senseAndUpdateKnowledge() {
