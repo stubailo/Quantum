@@ -18,13 +18,19 @@ public class SensorHandler {
     private       int                numberOfSensors = 0;
     private final MovementController myMC;
 
-    /*** Team ***/
+    /*** Life Constants ***/
     private final Team               myTeam;
+    private final Team               enemyTeam;
+    private final int                myID;
+    
+    /*** Round Constants ***/
+    private       MapLocation        myLocation;
     
     /*** Constants ***/
-    private static final int MAX_TOTAL_NUMBER_OF_ROBOTS  = QuantumConstants.MAX_TOTAL_NUMBER_OF_ROBOTS;
-    private static final int MAX_NUMBER_OF_SENSED_THINGS = QuantumConstants.MAX_NUMBER_OF_SENSED_THINGS;
-    private static final int LOCATION_HASH_SIZE          = QuantumConstants.LOCATION_HASH_SIZE;
+    private static final int MAX_TOTAL_NUMBER_OF_ROBOTS    = QuantumConstants.MAX_TOTAL_NUMBER_OF_ROBOTS;
+    private static final int MAX_NUMBER_OF_SENSABLE_THINGS = QuantumConstants.MAX_NUMBER_OF_SENSABLE_THINGS;
+    private static final int LOCATION_HASH_SIZE            = QuantumConstants.LOCATION_HASH_SIZE;
+    private static final int BIG_INT                       = QuantumConstants.BIG_INT;
     
     /*** 
      * REDUNDANCY PREVENTERS
@@ -33,9 +39,11 @@ public class SensorHandler {
      */
     private int             lastRoundRefreshed      = -1;
     private boolean         robotsSensed            = false;
+    private boolean         robotInfosSensed        = false;
     private boolean         robotsDeepSensed        = false;
     private boolean         minesSensed             = false;
     private boolean         blockersSensed          = false;
+    private boolean         emptyMinesSensed        = false;
     //private final boolean[] sensableRobotsIdHash    = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
     
     /***
@@ -43,29 +51,34 @@ public class SensorHandler {
      * 
      * 
      */
-    private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableRobotInfos              = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   int[]               sensableRobotsSensorHash        = new int[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableRobotInfos              = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableRobots          = 0;
-    private final   Robot[]             sensableAlliedRobots            = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableAlliedRobotInfos        = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableAlliedRobots            = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableAlliedRobotInfos        = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableAlliedRobots    = 0;
-    private final   Robot[]             sensableEnemyRobots             = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableEnemyRobotInfos         = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableEnemyRobots             = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableEnemyRobotInfos         = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableEnemyRobots     = 0;
-    private final   Robot[]             sensableAlliedBuildings         = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableAlliedBuildingInfos     = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableAlliedBuildings         = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableAlliedBuildingInfos     = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableAlliedBuildings = 0;
-    private final   Robot[]             sensableEnemyBuildings          = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableEnemyBuildingInfos      = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableEnemyBuildings          = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableEnemyBuildingInfos      = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableEnemyBuildings  = 0;
-    private final   Robot[]             sensableDebris                  = new Robot[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   RobotInfo[]         sensableDebrisInfos             = new RobotInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Robot[]             sensableDebris                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   RobotInfo[]         sensableDebrisInfos             = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableDebris          = 0;
-    private final   Mine[]              sensableMines                   = new Mine[MAX_NUMBER_OF_SENSED_THINGS];
-    private final   MineInfo[]          sensableMineInfos               = new MineInfo[MAX_NUMBER_OF_SENSED_THINGS];
+    private final   Mine[]              sensableMines                   = new Mine[MAX_NUMBER_OF_SENSABLE_THINGS];
+//    private final   MineInfo[]          sensableMineInfos               = new MineInfo[MAX_NUMBER_OF_SENSED_THINGS];
     private         int                 numberOfSensableMines           = 0;
+    private final   Mine[]              sensableEmptyMines              = new Mine[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private         int                 numberOfSensableEmptyMines      = 0;
     
     private final   TerrainStatus[][]   terrainStatusHash           = new TerrainStatus[LOCATION_HASH_SIZE][LOCATION_HASH_SIZE];
+    
+    private         boolean             enemiesNearby;
     
     public          MapLocation         startingTurnedOnRecyclerLocation,
                                         startingFirstMineToBeBuiltLocation,
@@ -88,6 +101,8 @@ public class SensorHandler {
         myMC = (MovementController) myRC.components()[0];
         
         myTeam = myK.myTeam;
+        enemyTeam = myTeam.opponent();
+        myID   = myK.myRobotID;
     }
     
     
@@ -109,13 +124,26 @@ public class SensorHandler {
         lastRoundRefreshed = Clock.getRoundNum();
         
         robotsSensed = false;
+        robotInfosSensed = false;
         robotsDeepSensed = false;
+        enemiesNearby = false;
+        myLocation = myK.myLocation;
         //if(myK.justMoved || myK.justTurned) {
-        if(myK.justMoved) {
+        if(myK.justMoved || myK.justTurned) {
             minesSensed = false;
+            emptyMinesSensed = false;
             blockersSensed = false;
         }
     }
+    
+    
+    
+    public boolean areEnemiesNearby() {
+        if(!robotsSensed) senseRobots();
+        return enemiesNearby;
+    }
+    
+    
 
     public Robot senseAtLocation( MapLocation location, RobotLevel height)
     {
@@ -135,7 +163,6 @@ public class SensorHandler {
 
     private void senseRobots() {
         if(robotsSensed || robotsDeepSensed) return;
-        robotsSensed = true;
         numberOfSensableRobots = 0;
         boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
         
@@ -146,9 +173,14 @@ public class SensorHandler {
                     
                     sensableRobots[numberOfSensableRobots++] = sensableRobot;
                     sensableRobotsIdHash[id] = true;
+                    sensableRobotsSensorHash[id] = index;
+                }
+                if(sensableRobot.getTeam() == enemyTeam) {
+                    enemiesNearby = true;
                 }
             }
         }
+        robotsSensed = true;
     }
     
     public Robot[] getSensableRobots() {
@@ -167,14 +199,31 @@ public class SensorHandler {
     
     
     
-    public void deepSenseRobotInfo() {
+    
+    private void senseRobotInfo() {
+        if(robotInfosSensed) return;
+        if(!robotsSensed) senseRobots();
+        
+        try {
+            for(int index = 0; index < numberOfSensableRobots; index++) {
+                Robot sensableRobot = sensableRobots[index];
+                sensableRobotInfos[index] = mySCs[sensableRobotsSensorHash[sensableRobot.getID()]].senseRobotInfo(sensableRobot);
+            }
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+        }
+    }
+    
+    
+    
+    /*private void deepSenseRobotInfo() {
         
         if(robotsDeepSensed) return;
-        
+        if(!robotsSensed) senseRobots();
         
         try {
             
-            numberOfSensableRobots       = 0;
             numberOfSensableAlliedRobots = 0;
             numberOfSensableEnemyRobots  = 0;
             
@@ -183,6 +232,11 @@ public class SensorHandler {
                 numberOfSensableAlliedBuildings = 0;
                 numberOfSensableEnemyBuildings  = 0;
                 numberOfSensableDebris          = 0;
+            }
+            
+            for(int index = 0; index < numberOfSensableRobots; index++) {
+                Robot sensableRobot = sensableRobots[index];
+                
             }
             
             boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
@@ -197,6 +251,7 @@ public class SensorHandler {
                         
                         sensableRobots    [numberOfSensableRobots]   = sensableRobot;
                         sensableRobotInfos[numberOfSensableRobots++] = sensableRobotInfo;
+                        sensableRobotsIdHash[id] = true;
                         
                         if(blockersSensed) {
                             
@@ -210,6 +265,7 @@ public class SensorHandler {
                                         sensableAlliedRobotInfos[numberOfSensableAlliedRobots++] = sensableRobotInfo;
                                     }
                                     else {
+                                        enemiesNearby = true;
                                         sensableEnemyRobots     [numberOfSensableEnemyRobots]    = sensableRobot;
                                         sensableEnemyRobotInfos [numberOfSensableEnemyRobots++]  = sensableRobotInfo;
                                     }
@@ -259,15 +315,71 @@ public class SensorHandler {
                                 sensableDebrisInfos[numberOfSensableDebris++] = sensableRobotInfo;
                             }
                         }
-                        
-                        sensableRobots[numberOfSensableRobots++] = sensableRobot;
-                        sensableRobotsIdHash[id] = true;
                     }
                 }
             }
             robotsDeepSensed = true;
             blockersSensed = true;
         
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+        }
+    }*/
+    
+    
+    
+    private void senseBlockers() {
+        
+        if(blockersSensed) return;
+        if(!robotInfosSensed) senseRobotInfo();
+        
+        try {
+                
+            numberOfSensableAlliedBuildings = 0;
+            numberOfSensableEnemyBuildings  = 0;
+            numberOfSensableDebris          = 0;
+            
+            boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
+            
+            for(int index = 0; index < numberOfSensableRobots; index++) {
+                Robot sensableRobot = sensableRobots[index];
+                RobotInfo sensableRobotInfo = sensableRobotInfos[index];
+                            
+                Team sensableRobotTeam = sensableRobot.getTeam();
+                
+                if(sensableRobotTeam != Team.NEUTRAL) {
+                    
+                    if(sensableRobotInfo.chassis == Chassis.BUILDING) {
+                        
+                        MapLocation buildingLocation = sensableRobotInfo.location;
+                        terrainStatusHash[buildingLocation.x % LOCATION_HASH_SIZE][buildingLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
+                        
+                        if(sensableRobotTeam == myTeam) {
+                            sensableAlliedBuildings    [numberOfSensableAlliedBuildings]   = sensableRobot;
+                            sensableAlliedBuildingInfos[numberOfSensableAlliedBuildings++] = sensableRobotInfo;
+                        }
+                        else {
+                            sensableEnemyBuildings     [numberOfSensableEnemyBuildings]    = sensableRobot;
+                            sensableEnemyBuildingInfos [numberOfSensableEnemyBuildings++]  = sensableRobotInfo;
+                        }
+                    }
+                    
+                    else if(sensableRobotTeam != myTeam) {
+                        enemiesNearby = true;
+                    }
+                }
+                
+                else {
+                    
+                    MapLocation debrisLocation = sensableRobotInfo.location;
+                    terrainStatusHash[debrisLocation.x % LOCATION_HASH_SIZE][debrisLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
+                    
+                    sensableDebris     [numberOfSensableDebris]   = sensableRobot;
+                    sensableDebrisInfos[numberOfSensableDebris++] = sensableRobotInfo;
+                }
+            }
+            blockersSensed = true;
         }
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
@@ -281,15 +393,16 @@ public class SensorHandler {
         
         try {
             
+            numberOfSensableMines = 0;
             boolean[] sensableMinesIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
             
-            for(int index = 0; index < numberOfSensors; index ++) {
+            for(int index = 0; index < numberOfSensors; index++) {
                 SensorController mySC = mySCs[index];
                 for(Mine sensableMine : mySC.senseNearbyGameObjects(Mine.class)) {
                     int id = sensableMine.getID();
                     if(!sensableMinesIdHash[id]) {
-                        sensableMines    [numberOfSensableMines]   = sensableMine;
-                        sensableMineInfos[numberOfSensableMines++] = mySC.senseMineInfo(sensableMine);
+                        //sensableMineInfos[numberOfSensableMines] = mySC.senseMineInfo(sensableMine);
+                        sensableMines[numberOfSensableMines++] = sensableMine;
                         sensableMinesIdHash[id] = true;
                     }
                 }
@@ -299,6 +412,25 @@ public class SensorHandler {
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
         }
+    }
+    
+    private void senseEmptyMines() {
+        if(emptyMinesSensed) return;
+        
+        if(!minesSensed) senseMines();
+        if(!blockersSensed) senseBlockers();
+        
+        numberOfSensableEmptyMines = 0;
+        
+        for(int index = 0; index < numberOfSensableMines; index++) {
+            Mine sensableMine = sensableMines[index];
+            MapLocation mineLocation = sensableMine.getLocation();
+            if(terrainStatusHash[mineLocation.x % LOCATION_HASH_SIZE][mineLocation.y % LOCATION_HASH_SIZE] == TerrainStatus.LAND) {
+                sensableEmptyMines[numberOfSensableEmptyMines++] = sensableMine;
+            }
+        }
+        
+        emptyMinesSensed = true;
     }
     
     public Mine[] getSensableMines() {
@@ -314,7 +446,31 @@ public class SensorHandler {
         }
         return numberOfSensableMines;
     }
+    
+    public MapLocation getNearestEmptyMines() {
+        if(!emptyMinesSensed) {
+            senseEmptyMines();
+        }
+        
+        int nearestMineDistance = BIG_INT;
+        MapLocation nearestMineLocation = myLocation;
+        
+        for(int index = 0; index < numberOfSensableEmptyMines; index++) {
+            MapLocation mineLocation = sensableEmptyMines[index].getLocation();
+            
+            int distance = myLocation.distanceSquaredTo(mineLocation);
+            if(distance < nearestMineDistance) {
+                nearestMineDistance = distance;
+                nearestMineLocation = mineLocation;
+            }
+        }
+        
+        if(nearestMineLocation.equals(myLocation)) return null;
+        return nearestMineLocation;
+    }
 
+    
+    
     public void senseStartingLightPlayer ()
     {
         if(!robotsSensed) {
@@ -337,7 +493,7 @@ public class SensorHandler {
     
     
     public TerrainStatus getTerrainStatus(MapLocation location) {
-        if(!blockersSensed) deepSenseRobotInfo();
+        if(!blockersSensed) senseBlockers();
         int hashX = location.x % LOCATION_HASH_SIZE;
         int hashY = location.y % LOCATION_HASH_SIZE;
         TerrainStatus terrainStatus = terrainStatusHash[hashX][hashY];
@@ -377,7 +533,6 @@ public class SensorHandler {
     public Direction senseStartingLightConstructorSurroundings() {
         try {
             SensorController sensor      = mySCs[0];
-            MapLocation      myLocation  = myK.myLocation;
             Direction        myDirection = myK.myDirection;
               
             Robot[] sensedRobots = sensor.senseNearbyGameObjects(Robot.class);
@@ -386,7 +541,7 @@ public class SensorHandler {
                       usefulDirection1        = Direction.NONE,
                       usefulDirection2        = Direction.NONE;
             int       numberOfSensedRecyclers = 0,
-                      lowestRecyclerID        = QuantumConstants.BIG_INT;
+                      lowestRecyclerID        = BIG_INT;
             for(Robot sensedRobot : sensedRobots) {
                 if(sensedRobot.getTeam() != Team.NEUTRAL) { // We must check that it's not debris.
                     if(numberOfSensedRecyclers == 0) {
@@ -483,7 +638,7 @@ public class SensorHandler {
 
         for(int garbage = 0; garbage < 8; garbage++) {
             if(myMC.canMove(testDirection)) {
-                return myK.myLocation.add(testDirection);
+                return myLocation.add(testDirection);
             }
             testDirection = testDirection.rotateRight();
         }
@@ -500,11 +655,10 @@ public class SensorHandler {
     public Boolean amLowestIDRecycler() {
         try {
             SensorController sensor = mySCs[0];
-            int myID = myK.myRobotID;
             for (Robot robot : sensor.senseNearbyGameObjects(Robot.class)) {
                 RobotInfo robotInfo = sensor.senseRobotInfo(robot);
                 Team team = robot.getTeam();
-                if (team == myK.myTeam) {
+                if (team == myTeam) {
                     ComponentType[] compTypes = robotInfo.components;
                     switch (robotInfo.chassis) {
                         case BUILDING:

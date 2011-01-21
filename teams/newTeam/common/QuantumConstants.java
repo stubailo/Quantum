@@ -51,7 +51,7 @@ public final class QuantumConstants {
 	/** Max conceivable number of robots on the map */
 	public static final int MAX_TOTAL_NUMBER_OF_ROBOTS = 2000;
 	/** Max conceivable number of robots sensed */
-	public static final int MAX_NUMBER_OF_SENSED_THINGS = 400;
+	public static final int MAX_NUMBER_OF_SENSABLE_THINGS = 400;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;
