@@ -14,8 +14,8 @@ public class TangentBug implements Navigator {
     
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
     private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
-    private final int LOOP_BYTECODE_COST = 200;
-    private final int BYTECODE_BUFFER = 250;
+    private final int LOOP_BYTECODE_COST = 600;
+    private final int BYTECODE_BUFFER = 600;
     private final int MIN_BYTECODES = LOOP_BYTECODE_COST + BYTECODE_BUFFER;
     private final int RECHECK_BYTECODES = 4;
     
@@ -41,7 +41,10 @@ public class TangentBug implements Navigator {
     private         int                 secondaryPathWeight;
     private         int                 secondaryBugIndex;
     private         MapLocation         secondaryGoal;
+    private         Direction           secondaryGoalDirection;
     private         boolean             goingToSecondaryGoal;
+    private         boolean             resetNext;
+    private         MapLocation         tangentBugStart;
 //    private         boolean             bugging;
     
     /** variables relating to bug branching */
@@ -83,21 +86,56 @@ public class TangentBug implements Navigator {
     }
 
     public MovementAction getNextAction() {
+        Logger.debug_printHocho("Round num: " + Clock.getRoundNum() + ", location: " + myK.myLocation);
+        //stop navigating if you are at goal or the motor is active
+        if(reachedGoal()) {
+            return MovementAction.AT_GOAL;
+        }
+        
         MapLocation location = myK.myLocation;
         
-        // check if we have reached the secondary goal.
-        if(goingToSecondaryGoal && location.equals(secondaryGoal)) {
+        if(resetNext) {
             reset();
         }
         
         //calculate
         calculateVirtualBugs();
         
+//        myRC.setIndicatorString(2, "GTSG: " + goingToSecondaryGoal + currentVB.index +
+//                                   location + secondaryGoal + currentVB.getPathEndLocation());
+               
+        //don't move if motor is active.
+        boolean motorActive = myMC.isActive();
+//        if(myMC.isActive()) {
+//            return MovementAction.NONE;
+//        }
+        
+        // check if we have reached the secondary goal.
+        if(goingToSecondaryGoal && location.equals(secondaryGoal)) {
+            movementDirection = secondaryGoalDirection;
+            if(myK.myDirection != movementDirection && 
+               secondaryGoal.equals(tangentBugStart) &&
+               !motorActive) {
+                
+                resetNext = true;
+                return MovementAction.ROTATE;
+            } else {
+                reset();
+                calculateVirtualBugs();
+            }
+        }
+        
+        if(motorActive) {
+            return MovementAction.NONE;
+        }
+        
         // check whether to move up or down the virtual bug tree.
+        Logger.debug_printAntony("stepIndex: " + stepIndex + " nodeIndex: " + currNodeIndex + 
+                " onCVB? " + (movingBug == currentVB));
         if(!location.equals(prevLocation)) {
             if(stepIndex < currNodeIndex) {
                 stepIndex++;
-            } else if(stepIndex > currNodeIndex) {
+            } else if(stepIndex > currNodeIndex && movingBug != currentVB) {
                 stepIndex--;
             } else {
                 stepIndex++;
@@ -105,6 +143,19 @@ public class TangentBug implements Navigator {
             }
         }
         
+        Logger.debug_printAntony("stepIndex: " + stepIndex + " nodeIndex: " + currNodeIndex + 
+                " onCVB? " + (movingBug == currentVB));
+
+//        int m = movingBug.getMoveIndex();
+//        String s = "";
+//        for(int i = 0; i<m; i++) {
+//            s = s + myRC.senseTerrainTile(movingBug.getMove(i));
+//        }
+//        myRC.setIndicatorString(0, s);
+        
+//        myRC.setIndicatorString(2,"mb correct? " + (movingBug == currentVB) +
+//                                  "; " + currentVB.getMoveIndex() + "; " + 
+//                                  currentVB.getMove(stepIndex));
         // get the next move along the moving path.
         MapLocation move = movingBug.getMove(stepIndex);
         if(move == null) {
@@ -116,6 +167,9 @@ public class TangentBug implements Navigator {
         MovementAction action;
         if(currentPathWeight >= QuantumConstants.BIG_INT) {
             action = MovementAction.GOAL_INACCESSIBLE;
+        } else if(movementDirection == Direction.OMNI) {
+//            Logger.debug_printCustomErrorMessage("movementDirection was set to OMNI, TB:146", "Antony");
+            action = MovementAction.NONE;
         } else if(myMC.canMove(movementDirection)) {
             if(myK.myDirection == movementDirection) {
                 action = MovementAction.MOVE_FORWARD;
@@ -129,6 +183,7 @@ public class TangentBug implements Navigator {
             action = MovementAction.PATH_BLOCKED;
         }
 
+        prevLocation = location;
         return action;
     }
 
@@ -165,45 +220,61 @@ public class TangentBug implements Navigator {
             return;
         }
         
+//        myRC.yield();
         int remainingBytecodes = Clock.getBytecodesLeft();
         int count = 0;
-
+        boolean clone = false;
+        
+//        myRC.setIndicatorString(0, "bug: " + virtualBugIndex +
+//                                   " currPath: " + currentVB.getPathWeight() +
+//                                   " secIndex: " + secondaryBugIndex +
+//                                   " secPath: " + secondaryPathWeight + currentVB.getMove(0));
         VirtualBug branchBug;
         while(remainingBytecodes > MIN_BYTECODES) {
 
             //check if we need to branch bugs
-            if(currentVB.shouldBranch()) {
+            clone = currentVB.shouldBranch();
+            if(clone) {
+                Logger.debug_printHocho("cloning!");
                 branchBug = currentVB.clone();
                 branchBug.setOrientationClockwise(false);
                 branchBug.index = numberOfBugs;
                 myVBs[numberOfBugs] = branchBug;
                 pathWeights[numberOfBugs] = branchBug.getPathWeight();
-//                turnsAlongPath[numberOfBugs] = branchBug.getTurnsAlongPath();
-//                turnsToNodes[numberOfBugs] = turnsAlongPath[numberOfBugs];
                 branchIndices[numberOfBugs] = currentVB.getMoveIndex();
                 parents[numberOfBugs] = virtualBugIndex;
-//                branchDepths[virtualBugIndex]++;
-//                branchDepths[numberOfBugs]++;
                 if(numberOfBugs == 1) {
                     secondaryPathWeight = myVBs[1].getPathWeight();
                     secondaryBugIndex = 1;
                 }
                 numberOfBugs++;
+                remainingBytecodes = Clock.getBytecodesLeft();
             }
             
+//            if(clone) {
+//                myRC.setIndicatorString(0, String.valueOf(myVBs[0].getMoveIndex()) + 
+//                                           myVBs[1].getMoveIndex());
+//            } else
+//                myRC.setIndicatorString(0, ":p");
+            
             //calculate next step, and check if we need to explore a secondary goal.
-            MapLocation newGoal = currentVB.stepVirtualBug();
-            if(newGoal != null) {
-                secondaryGoal = newGoal;
+            Direction newGoalDirection = currentVB.stepVirtualBug();
+            if(newGoalDirection != null) {
+                secondaryGoal = currentVB.getPathEndLocation();
+                if(secondaryGoal == null) {
+                    secondaryGoal = myK.myLocation;
+                }
+                secondaryGoalDirection = newGoalDirection;
                 goingToSecondaryGoal = true;
                 break;
             }
-            
+
             currentPathWeight = currentVB.getPathWeight();
             pathWeights[virtualBugIndex] = currentPathWeight;
 //            turnsAlongPath[virtualBugIndex] = currentVB.getTurnsAlongPath();
             
             //Switch paths if necessary
+            Logger.debug_printHocho("weights: " + currentPathWeight + ", " + secondaryPathWeight);
             if(currentPathWeight > secondaryPathWeight) {
                 currentVB = myVBs[secondaryBugIndex];
                 currentPathWeight = pathWeights[secondaryBugIndex];
@@ -218,34 +289,47 @@ public class TangentBug implements Navigator {
                 for(int i = 0; i < numberOfBugs; i++) {
                     weight = pathWeights[i];
                     if(weight < secondaryPathWeight && 
-                            weight >= currentPathWeight && 
                             i != virtualBugIndex) {
                         
                         secondaryPathWeight = weight;
                         secondaryBugIndex = i;
                     }
-                }               
+                }  
+                Logger.debug_printHocho("loop number: " + String.valueOf(count) + ", secondaryBugIndex: " + String.valueOf(secondaryBugIndex));
             }
             
             //Go to the end of the current branch if we have too many bugs.
             if(numberOfBugs == MAX_BUGS) {
                 secondaryGoal = currentVB.getPathEndLocation();
+                if(secondaryGoal == null) {
+                    secondaryGoal = myK.myLocation;
+                }
+                secondaryGoalDirection = currentVB.getPathEndDirection();
                 goingToSecondaryGoal = true;
                 break;
             }
             
             //Periodically recheck remaining bytecodes
             count++;
-            if(count % RECHECK_BYTECODES == 0) {
+            if(count % RECHECK_BYTECODES == 0 && !clone) {
                 remainingBytecodes = Clock.getBytecodesLeft();
             } else {
                 remainingBytecodes -= LOOP_BYTECODE_COST;
             }
+            myRC.setIndicatorString(1, "loop: " + count);
+//            myRC.yield();
         }
+        Logger.debug_printHocho("loops: " + count + " stepIndex: " + stepIndex + 
+                                   " bugIndex: " + virtualBugIndex);
+        Logger.debug_printRemainingBytecodes();
+        myRC.setIndicatorString(1, "loops: " + count + " stepIndex: " + stepIndex + 
+                                   " bugIndex: " + virtualBugIndex);
+        myRC.setIndicatorString(2, "direction: " + secondaryGoalDirection);
     }
     
     private void reset() {
-        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
+        tangentBugStart = myK.myLocation;
+        currentVB = new VirtualBug(goal, myRC, tangentBugStart);
         currentVB.index = 0;
         movingBug = currentVB;
         myVBs = new VirtualBug [MAX_BUGS];
@@ -257,11 +341,15 @@ public class TangentBug implements Navigator {
         virtualBugIndex = 0;
         stepIndex = 0;
         goingToSecondaryGoal = false;
+        resetNext = false;
         numberOfBugs = 1;
         currNodeIndex = MAX_MOVES;
+        prevLocation = myK.myLocation;
         
         branchIndices = new int [MAX_BUGS];
         branchIndices[0] = 0;
+        parents = new int [MAX_BUGS];
+        parents[0] = 0;
 //      branchDepths = new int [MAX_BUGS];
 //      branchDepths[0] = 0;
     }

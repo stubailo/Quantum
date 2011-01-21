@@ -2,18 +2,7 @@ package newTeam.handler;
 
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
-<<<<<<< HEAD
-import newTeam.handler.navigation.NavigatorType;
-import newTeam.handler.navigation.BugNavigator;
-import newTeam.handler.navigation.TangentBug;
-import newTeam.handler.navigation.Navigator;
-import newTeam.handler.navigation.MoveForwardNavigator;
-import newTeam.handler.navigation.MoveBackwardNavigator;
-import newTeam.handler.navigation.MovementAction;
-import newTeam.handler.navigation.ZigZagNavigator;
-=======
 import newTeam.handler.navigation.*;
->>>>>>> 0197d909f12dd974f0ed6b79657c617cc451baab
 import battlecode.common.*;
 
 public class MovementHandler {
@@ -76,10 +65,12 @@ public class MovementHandler {
     
     public boolean step() {
         try {
-//            MovementAction nextAction = navigator.getNextAction();
+            MovementAction nextAction = navigator.getNextAction();
 //            Logger.debug_printHocho(nextAction.toString());
-//            switch(nextAction) {
-            switch(navigator.getNextAction()) {
+            myRC.setIndicatorString(2, nextAction.toString());
+
+            switch(nextAction) {
+//            switch(navigator.getNextAction()) {
             
             case MOVE_FORWARD:
                 myMC.moveForward();
@@ -113,6 +104,7 @@ public class MovementHandler {
             case GOAL_INACCESSIBLE:
                 //TODO
             }
+            
             return false;
         }
         catch(Exception e) {
@@ -153,8 +145,8 @@ public class MovementHandler {
 
     public void circle( MapLocation location )
     {
-        navigatorType = NavigatorType.CIRCLE;
-        navigator = new CircleNavigator(myRC, myMC, location);
+//        navigatorType = NavigatorType.CIRCLE;
+//        navigator = new CircleNavigator(myRC, myMC, location);
     }
 
 }
