@@ -2,7 +2,7 @@ package newTeam.handler.navigation;
 
 import battlecode.common.*;
 
-import team039.common.util.Logger;
+import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
 
 public class ZigZagNavigator implements Navigator {

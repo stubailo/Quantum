@@ -25,9 +25,10 @@ public class TangentBug implements Navigator {
     private final SensorHandler mySH;
     private final MapLocation goal;
     
+    private TrackChecker myTrack;
+    
     private         Direction           movementDirection;
     private         VirtualBug          movingBug;
-//    private         int                 movingBugIndex;
     private         int                 currNodeIndex;
     private         MapLocation         prevLocation;
     
@@ -50,9 +51,6 @@ public class TangentBug implements Navigator {
     /** variables relating to bug branching */
     private         int []              branchIndices;
     private         int []              parents;
-//    private         int []              branchDepths;
-//    private         int []              turnsAlongPath;
-//    private         int []              turnsToNodes;
     
     
     public TangentBug(RobotController rc, Knowledge k, MovementController mc, 
@@ -64,25 +62,6 @@ public class TangentBug implements Navigator {
         
         goal = newGoal;
         reset();
-//        currentVB = new VirtualBug(goal, myRC, myK.myLocation);
-//        currentVB.index = 0;
-//        movingBug = currentVB;
-//        myVBs = new VirtualBug [MAX_BUGS];
-//        myVBs[0] = currentVB;
-//        currentPathWeight = 0;
-//        pathWeights = new int [MAX_BUGS];
-//        pathWeights[0] = currentPathWeight;
-//        secondaryPathWeight = QuantumConstants.BIG_INT;
-//        virtualBugIndex = 0;
-//        stepIndex = 0;
-//        goingToSecondaryGoal = false;
-//        numberOfBugs = 1;
-//        currNodeIndex = MAX_MOVES;
-//        
-//        branchIndices = new int [MAX_BUGS];
-//        branchIndices[0] = 0;
-////        branchDepths = new int [MAX_BUGS];
-////        branchDepths[0] = 0;
     }
 
     public MovementAction getNextAction() {
@@ -100,15 +79,9 @@ public class TangentBug implements Navigator {
         
         //calculate
         calculateVirtualBugs();
-        
-//        myRC.setIndicatorString(2, "GTSG: " + goingToSecondaryGoal + currentVB.index +
-//                                   location + secondaryGoal + currentVB.getPathEndLocation());
                
         //don't move if motor is active.
         boolean motorActive = myMC.isActive();
-//        if(myMC.isActive()) {
-//            return MovementAction.NONE;
-//        }
         
         // check if we have reached the secondary goal.
         if(goingToSecondaryGoal && location.equals(secondaryGoal)) {
@@ -146,16 +119,6 @@ public class TangentBug implements Navigator {
         Logger.debug_printAntony("stepIndex: " + stepIndex + " nodeIndex: " + currNodeIndex + 
                 " onCVB? " + (movingBug == currentVB));
 
-//        int m = movingBug.getMoveIndex();
-//        String s = "";
-//        for(int i = 0; i<m; i++) {
-//            s = s + myRC.senseTerrainTile(movingBug.getMove(i));
-//        }
-//        myRC.setIndicatorString(0, s);
-        
-//        myRC.setIndicatorString(2,"mb correct? " + (movingBug == currentVB) +
-//                                  "; " + currentVB.getMoveIndex() + "; " + 
-//                                  currentVB.getMove(stepIndex));
         // get the next move along the moving path.
         MapLocation move = movingBug.getMove(stepIndex);
         if(move == null) {
@@ -329,7 +292,8 @@ public class TangentBug implements Navigator {
     
     private void reset() {
         tangentBugStart = myK.myLocation;
-        currentVB = new VirtualBug(goal, myRC, tangentBugStart);
+        myTrack = new TrackChecker();
+        currentVB = new VirtualBug(goal, myRC, tangentBugStart, myTrack);
         currentVB.index = 0;
         movingBug = currentVB;
         myVBs = new VirtualBug [MAX_BUGS];
@@ -350,8 +314,6 @@ public class TangentBug implements Navigator {
         branchIndices[0] = 0;
         parents = new int [MAX_BUGS];
         parents[0] = 0;
-//      branchDepths = new int [MAX_BUGS];
-//      branchDepths[0] = 0;
     }
   
     private int getBranchIndex(int ID1, int ID2) {

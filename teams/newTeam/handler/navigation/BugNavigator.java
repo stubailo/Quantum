@@ -14,6 +14,7 @@ public class BugNavigator implements Navigator {
     private final RobotController myRC;
     private final Knowledge myK;
     private final MovementController myMC;
+    private final TrackChecker myTrack;
     
     //TODO: Probably don't need to keep an array of memory...
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
@@ -67,6 +68,7 @@ public class BugNavigator implements Navigator {
         myRC = rc;
         myK = know;
         myMC = mc;
+        myTrack = new TrackChecker();
         
         goal = goalLocation;
         goingToAdjacent = navigatingToAdjacent;
@@ -130,8 +132,11 @@ public class BugNavigator implements Navigator {
     }
     
     public boolean reachedGoal() {
+        Logger.debug_printHocho("checking if reachedGoal when at: " + myK.myLocation + " and facing: " + myK.myDirection);
         if(goingToAdjacent) {
-            return goal.isAdjacentTo(myK.myLocation);
+            Logger.debug_printHocho("trying to go adjacent to: " + goal + " and facing: " + myK.myLocation.directionTo(goal));
+            MapLocation myLocation = myK.myLocation;
+            return goal.isAdjacentTo(myLocation) && myK.myDirection == myLocation.directionTo(goal);
         }
         else {
             return goal.equals(myK.myLocation);
@@ -470,12 +475,10 @@ public class BugNavigator implements Navigator {
             }
             
         } else if(distanceSquaredToGoal <= 2) {
-            navigating = false;
-            goingToAdjacent = false;
-            
             Direction directionToGoal = location.directionTo(goal);
             movementDirection = directionToGoal;
             if(directionToGoal == myK.myDirection || directionToGoal == Direction.OMNI) {
+                navigating = false;
                 return MovementAction.AT_GOAL;
             } else {
                 return MovementAction.ROTATE;

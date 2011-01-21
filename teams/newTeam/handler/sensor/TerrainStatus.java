@@ -5,7 +5,6 @@ public enum TerrainStatus {
     LAND,
     VOID,
     OFF_MAP,
-    BUILDING,
-    DEBRIS
+    BLOCKER  // Building or debris
 
 }

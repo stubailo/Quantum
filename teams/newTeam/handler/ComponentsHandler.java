@@ -65,6 +65,7 @@ public class ComponentsHandler {
                 case BUILDING_MOTOR:
                 case SMALL_MOTOR:
                 case MEDIUM_MOTOR:
+                case FLYING_MOTOR:
                     myMH.addMC((MovementController) newComp);
                     break;
 

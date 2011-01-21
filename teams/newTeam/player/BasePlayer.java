@@ -9,6 +9,7 @@ import newTeam.handler.ComponentsHandler;
 import newTeam.player.light.StartingLightConstructorPlayer;
 import newTeam.player.light.LightPlayer;
 import newTeam.player.medium.MediumPlayer;
+import newTeam.player.flying.FlyingPlayer;
 import newTeam.player.building.BuildingPlayer;
 import newTeam.player.building.recycler.StartingRecyclerPlayer;
 
@@ -76,9 +77,15 @@ public class BasePlayer {
             else {
                 return new BuildingPlayer(state);
             }
-            case MEDIUM:
+
+        case MEDIUM:
                 return new MediumPlayer(state);
+
+        case FLYING:
+                return new FlyingPlayer(state);
         }
+
+
         
         Logger.debug_printCustomErrorMessage("forgot to include case in BasePlayer's" +
         		                             "determineInitialSpecificPlayer", "Hocho");

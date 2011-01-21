@@ -18,14 +18,15 @@ public class VirtualBug {
     private final RobotController myRC;
     private final MapLocation goal;
     private final MapLocation startLocation;
+    private final TrackChecker myTrack;
     
     private        boolean              tracking;
     private        boolean              trackingCW;
     private        boolean              startTracking;
     private        Direction            trackingDirection;
-    private        Direction            prevTrackingDirection; //never used...
+    private        Direction            prevTrackingDirection; 
     private        Direction            prevDirectionToGoal;
-    private        MapLocation          prevLocation;          //never used...
+    private        MapLocation          prevLocation;          
     private        int                  turningNumber;
     private        Direction            movementDirection = Direction.NONE; //never used...
     /* moves lists the path to take in order, beginning with an index 0 corresponding to 
@@ -47,11 +48,13 @@ public class VirtualBug {
     private        boolean              goingToSecondaryGoal;
 //    private        MapLocation          counterClockwiseMove;
     
-    public VirtualBug(MapLocation g, RobotController rc, MapLocation start) {
+    public VirtualBug(MapLocation g, RobotController rc, MapLocation start,
+                      TrackChecker track) {
         goal = g;
         startLocation = start;
         virtualBugLocation = start;
         myRC = rc;
+        myTrack = track;
         moves = new MapLocation [MAX_MOVES];
         tracking = false;
         moveIndex = 0;
@@ -64,6 +67,7 @@ public class VirtualBug {
     public VirtualBug(MapLocation g,
                       RobotController rc,
                       MapLocation start,
+                      TrackChecker tc,
                       MapLocation bugLocation,
                       boolean track,
                       boolean trackCW,
@@ -81,6 +85,7 @@ public class VirtualBug {
         goal = g;
         myRC = rc;
         startLocation = start;
+        myTrack = tc;
         virtualBugLocation = bugLocation;
         tracking = track;
         startTracking = stTracking;
@@ -111,6 +116,7 @@ public class VirtualBug {
         return new VirtualBug(goal,
                               myRC,
                               startLocation,
+                              myTrack,
                               virtualBugLocation,
                               tracking,
                               trackingCW,
@@ -257,7 +263,17 @@ public class VirtualBug {
                     trackingDirection = testDir;
                     prevDirectionToGoal = directionToGoal;
                     addMove(nextLocation);
-                    turningNumber = turn;                 
+                    turningNumber = turn;
+                    
+//                    //check if tracking direction indicates that these bugs can't reach the goal.
+//                    if(myTrack.checkTrackingDirection(nextLocation, testDir, trackingCW)) {
+//                        turnsAlongPath += QuantumConstants.BIG_INT;
+//                    }
+//                    
+//                    // record tracking direction
+//                    if(myTrack.addTrackingDirection(virtualBugLocation, testDir, trackingCW)) {
+//                        turnsAlongPath += QuantumConstants.BIG_INT;
+//                    }
                 } else if(tile == TerrainTile.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
@@ -278,9 +294,8 @@ public class VirtualBug {
         } else {
             // update turning number if the direction to goal has changed.
             if(directionToGoal != prevDirectionToGoal) {
-                Logger.debug_printAntony("prevDir: " + prevDirectionToGoal + 
-                        " newDir: " + directionToGoal);
-                turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
+                turningNumber -= calculateTurningChange(prevDirectionToGoal, 
+                                                        directionToGoal, trackingCW);
             }
             
             //set the direction to start testing from depending on if the last move was diagonal
@@ -311,6 +326,18 @@ public class VirtualBug {
                     trackingDirection = testDir;
                     prevDirectionToGoal = directionToGoal;
                     turningNumber += turn;
+                    
+                    //check if tracking direction indicates that these bugs can't reach the goal.
+                    Logger.debug_printAntony("are any of these null? "+ nextLocation + testDir 
+                            + trackingCW + myTrack);
+                    if(myTrack.checkTrackingDirection(nextLocation, testDir, trackingCW)) {
+                        turnsAlongPath += QuantumConstants.BIG_INT;
+                    }
+                    
+                    //record tracking direction.
+                    if(myTrack.addTrackingDirection(virtualBugLocation, testDir, trackingCW)) {
+                        turnsAlongPath += QuantumConstants.BIG_INT;
+                    }
                 } else if(tile == TerrainTile.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
