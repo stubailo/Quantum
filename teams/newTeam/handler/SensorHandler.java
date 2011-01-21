@@ -340,8 +340,6 @@ public class SensorHandler {
             numberOfSensableEnemyBuildings  = 0;
             numberOfSensableDebris          = 0;
             
-            boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
-            
             for(int index = 0; index < numberOfSensableRobots; index++) {
                 Robot sensableRobot = sensableRobots[index];
                 RobotInfo sensableRobotInfo = sensableRobotInfos[index];
@@ -447,7 +445,7 @@ public class SensorHandler {
         return numberOfSensableMines;
     }
     
-    public MapLocation getNearestEmptyMines() {
+    public MapLocation getNearestEmptyMine() {
         if(!emptyMinesSensed) {
             senseEmptyMines();
         }
