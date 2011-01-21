@@ -302,17 +302,17 @@ public class BugNavigator implements Navigator {
                 action = getBugAction(trackingDirection);
             }
             
-            myRC.setIndicatorString(0, trackingDirection.toString() + " " + movementDirection.toString()
-                    + " " + directionToGoal.toString());
-            if(marker!=null && secondMarker != null) {
-            myRC.setIndicatorString(0,  "(" +location.x +"," +location.y +
-                                        "); (" + marker.x + "," + marker.y +
-                                        "); (" + secondMarker.x +","+secondMarker.y +")");
-            }
-            myRC.setIndicatorString(2, "Marker: " + String.valueOf(turnsBackToMarker + turnsMarkerToGoal) +
-                    " Bug: " + String.valueOf(turnsBugToGoal + calculateTurningAdjustment()) +
-                    " Penalties: " + penalties + " Turns: " + turningNumber
-                    + " Marker TN: " + markerTurningNumber);
+//            myRC.setIndicatorString(0, trackingDirection.toString() + " " + movementDirection.toString()
+//                    + " " + directionToGoal.toString());
+//            if(marker!=null && secondMarker != null) {
+//            myRC.setIndicatorString(0,  "(" +location.x +"," +location.y +
+//                                        "); (" + marker.x + "," + marker.y +
+//                                        "); (" + secondMarker.x +","+secondMarker.y +")");
+//            }
+//            myRC.setIndicatorString(2, "Marker: " + String.valueOf(turnsBackToMarker + turnsMarkerToGoal) +
+//                    " Bug: " + String.valueOf(turnsBugToGoal + calculateTurningAdjustment()) +
+//                    " Penalties: " + penalties + " Turns: " + turningNumber
+//                    + " Marker TN: " + markerTurningNumber);
 
         } else {
             //not tracking, so check if you can move towards the goal

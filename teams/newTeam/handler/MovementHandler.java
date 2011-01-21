@@ -10,14 +10,16 @@ public class MovementHandler {
     private final RobotController       myRC;
     private final Knowledge             myK;
     private       MovementController    myMC;
+    private       SensorHandler         mySH;
     private       Navigator             navigator;
     private       NavigatorType         navigatorType;
     
     private boolean pathBlocked = false;
     
-    public MovementHandler(RobotController rc, Knowledge know) {
+    public MovementHandler(RobotController rc, Knowledge know, SensorHandler sh) {
         myRC = rc;
         myK  = know;
+        mySH = sh;
     }
     
     
@@ -42,6 +44,10 @@ public class MovementHandler {
         case BUG:
             navigator = new BugNavigator(myRC, myK, myMC, goalLocation);
             break;
+            
+        case TANGENT_BUG:
+            navigator = new TangentBug(myRC, myK, myMC, mySH, goalLocation);
+            break;
             //TODO: add TANGENT_BUG
         }
     }
@@ -59,10 +65,12 @@ public class MovementHandler {
     
     public boolean step() {
         try {
-//            MovementAction nextAction = navigator.getNextAction();
+            MovementAction nextAction = navigator.getNextAction();
 //            Logger.debug_printHocho(nextAction.toString());
-//            switch(nextAction) {
-            switch(navigator.getNextAction()) {
+            myRC.setIndicatorString(2, nextAction.toString());
+
+            switch(nextAction) {
+//            switch(navigator.getNextAction()) {
             
             case MOVE_FORWARD:
                 myMC.moveForward();
@@ -96,6 +104,7 @@ public class MovementHandler {
             case GOAL_INACCESSIBLE:
                 //TODO
             }
+            
             return false;
         }
         catch(Exception e) {
@@ -149,6 +158,7 @@ public class MovementHandler {
     {
         navigatorType = NavigatorType.CIRCLE;
         navigator = new CircleNavigator(myRC, myMC, location, clockwise);
+
     }
 
 }

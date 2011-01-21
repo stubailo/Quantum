@@ -4,6 +4,7 @@ import newTeam.common.QuantumConstants;
 import newTeam.common.util.Logger;
 import battlecode.common.Chassis;
 import battlecode.common.Direction;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.TerrainTile;
@@ -45,7 +46,7 @@ public class VirtualBug {
 //    private        TerrainTile          testTile;               //never used...
     private        boolean              goingToSecondaryGoal;
 //    private        MapLocation          counterClockwiseMove;
-
+    
     public VirtualBug(MapLocation g, RobotController rc, MapLocation start) {
         goal = g;
         startLocation = start;
@@ -82,6 +83,7 @@ public class VirtualBug {
         startLocation = start;
         virtualBugLocation = bugLocation;
         tracking = track;
+        startTracking = stTracking;
         trackingCW = trackCW;
         trackingDirection = trackingDir;
         prevTrackingDirection = prevTrackingDir;
@@ -138,7 +140,20 @@ public class VirtualBug {
     }
     
     public MapLocation getPathEndLocation() {
-        return moves[moveIndex];
+        if(moveIndex == 0) {
+            return startLocation;
+        }
+        return moves[moveIndex - 1];
+    }
+    
+    public Direction getPathEndDirection() {
+        if(moveIndex == 0){
+            return directionToGoal;
+        } else if(moveIndex == 1) {
+            return startLocation.directionTo(moves[0]);
+        } else {
+            return moves[moveIndex - 2].directionTo(moves[moveIndex - 1]);
+        }
     }
     
     public int getPathWeight() {
@@ -150,7 +165,7 @@ public class VirtualBug {
     }
     
     public int getMoveIndex() {
-        return moveIndex;
+        return moveIndex - 1;
     }
     
 //    public MapLocation getCounterClockwiseMove() {
@@ -174,6 +189,9 @@ public class VirtualBug {
         // check if you can move in the direction of goal.
         MapLocation nextLocation = virtualBugLocation.add(directionToGoal);
         TerrainTile tile = myRC.senseTerrainTile(nextLocation);
+//        if(tile != null){
+//        myRC.setIndicatorString(0, nextLocation.toString() + tile);
+//        }
         
         if(tile == null) {
             goingToSecondaryGoal = true;
@@ -197,10 +215,10 @@ public class VirtualBug {
      * @return null if the step was successful, or MapLocation if you need to begin
      *         exploring a secondary goal.
      */
-    public MapLocation stepVirtualBug() {
+    public Direction stepVirtualBug() {
         // return the secondary goal if there is unexplored area.
         if(goingToSecondaryGoal) {
-            return moves[moveIndex];
+            return directionToGoal;
         }
         
         // already found move in shouldBranch() if you are not tracking.
@@ -210,7 +228,7 @@ public class VirtualBug {
         
         Direction testDir;
         TerrainTile tile;
-        MapLocation nextLocation;
+        MapLocation nextLocation = null;
         int turn;
         if(startTracking) {
             startTracking = false;
@@ -232,7 +250,7 @@ public class VirtualBug {
                 //set a secondary goal if you need to move toward an unexplored tile
                 if(tile == null) {
                     goingToSecondaryGoal = true;
-                    return moves[moveIndex];
+                    return testDir;
                 } else if(tile == TerrainTile.LAND) {
                     //add the next move 
                     searching = false;
@@ -243,7 +261,16 @@ public class VirtualBug {
                 } else if(tile == TerrainTile.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
+                    pathWeight = turnsAlongPath + turnsToGoal + calculateTurningAdjustment();
                 }
+            }
+            
+            if(turningNumber <= 0) {
+                tracking = false;
+            }
+            
+            if(nextLocation.equals(goal)) {
+                return testDir;
             }
             
             return null;
@@ -251,6 +278,8 @@ public class VirtualBug {
         } else {
             // update turning number if the direction to goal has changed.
             if(directionToGoal != prevDirectionToGoal) {
+                Logger.debug_printAntony("prevDir: " + prevDirectionToGoal + 
+                        " newDir: " + directionToGoal);
                 turningNumber -= calculateTurningChange(prevDirectionToGoal, directionToGoal, trackingCW);
             }
             
@@ -259,7 +288,7 @@ public class VirtualBug {
             testDir = trackingCW ? trackingDirection.rotateRight() : trackingDirection.rotateLeft();
             if(trackingDirection.ordinal() % 2 == 1) {
                 turn -= 1;
-                testDir = trackingCW ? trackingDirection.rotateRight() : trackingDirection.rotateLeft();
+                testDir = trackingCW ? testDir.rotateRight() : testDir.rotateLeft();
             }
             
             //find the next tile to move toward.
@@ -267,25 +296,38 @@ public class VirtualBug {
             while(searching) {
                 nextLocation = virtualBugLocation.add(testDir);
                 tile = myRC.senseTerrainTile(nextLocation);
+                Logger.debug_printAntony("bug #" + index + ": VBL: " + 
+                        virtualBugLocation + " testDir: " + testDir + "tile: " + tile + 
+                        " TN: " + turningNumber);
                 
                 //set a secondary goal if your move is to an unexplored tile.
                 if(tile == null) {
+                    Logger.debug_printHocho("Can't sense location " + nextLocation);
                     goingToSecondaryGoal = true;
-                    return moves[moveIndex];
+                    return testDir;
                 } else if(tile == TerrainTile.LAND) {
                     //add the next move.
                     searching = false;
                     trackingDirection = testDir;
                     prevDirectionToGoal = directionToGoal;
-                    addMove(nextLocation);
                     turningNumber += turn;
                 } else if(tile == TerrainTile.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
+                    pathWeight = turnsAlongPath + turnsToGoal + calculateTurningAdjustment();
                 }
                                 
                 turn++;
-                testDir = trackingCW ? trackingDirection.rotateLeft() : trackingDirection.rotateRight();
+                testDir = trackingCW ? testDir.rotateLeft() : testDir.rotateRight();
+            }
+            
+            if(turningNumber <= 0 ) {
+                tracking = false;
+            } else {
+                addMove(nextLocation);
+                if(nextLocation.equals(goal)) {
+                    return testDir;
+                }
             }
             
             return null;
@@ -300,12 +342,13 @@ public class VirtualBug {
     
     private void addMove(MapLocation move) {
         //TODO: deal with index going out of bounds.  
-        moveIndex++;
         if(moveIndex >= MAX_MOVES) {
             return;
-        }
-        
+        }        
         moves[moveIndex] = move;
+        Logger.debug_printAntony("adding " + move + " to bug #" + index + " at index " + moveIndex);
+        moveIndex++;
+
         prevLocation = virtualBugLocation;
         directionToGoal = move.directionTo(goal);
         if(virtualBugLocation.directionTo(move).ordinal() % 2 == 1) {
@@ -321,7 +364,7 @@ public class VirtualBug {
     }
     
     private int calculateTurningAdjustment() {
-        int i1 = (turningNumber/2) * 6;
+        int i1 = (turningNumber/2);
         int i2;
         switch(turningNumber) {
             case 0:
@@ -343,8 +386,12 @@ public class VirtualBug {
     
     private int goalWeight(MapLocation start, MapLocation end) {
         //May be more efficient way to do this besides Math.abs.
-        return delayRect*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
+        return goalWeight(start, end, delayRect);
 //        return delayRSq * start.distanceSquaredTo(end);
+    }
+    
+    private int goalWeight(MapLocation start, MapLocation end, int delay) {
+        return delay*(Math.abs(start.x - end.x) + Math.abs(start.y - end.y));
     }
     
     private int calculateTurningChange(Direction oldDir, Direction newDir, boolean CW) {
