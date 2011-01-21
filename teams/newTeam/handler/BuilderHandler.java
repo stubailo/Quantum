@@ -185,6 +185,11 @@ public class BuilderHandler {
 
     //networked building
 
+    /*
+     * Called from an upgraded Recycler base, it sends commands to the armory and factory to build the unit.
+     *
+     * Need to add abort/failsafe stuff
+     */
     public void networkBuildUnit( BuildInstructions instructions, MapLocation location, int factoryID, int armoryID )
     {
         switch ( whoBuildsChassis( instructions.getBaseChassis() ) )
@@ -204,6 +209,10 @@ public class BuilderHandler {
         }
     }
 
+    /*
+     * If this Robot isn't building the chassis, wait until a chassis appears in the
+     * designated location, then build on it.
+     */
     public void waitToBuild( BuildInstructions instructions, MapLocation location )
     {
         currentlyBuilding = true;
@@ -215,6 +224,9 @@ public class BuilderHandler {
         roundsWaited = 0;
     }
 
+    /*
+     * Am I the one who should build this chassis? (one-to-one correspondence)
+     */
     public boolean chassisBuiltByMe( Chassis chassis )
     {
         switch (myBC.type()) {
@@ -230,6 +242,9 @@ public class BuilderHandler {
         }
     }
 
+    /*
+     * Who should build this chassis? (one-to-one correspondence)
+     */
     public ComponentType whoBuildsChassis( Chassis chassis )
     {
         switch ( chassis ) {
@@ -247,6 +262,10 @@ public class BuilderHandler {
         }
     }
 
+    /*
+     * Generates a message that commands the building with builderID to build the unit
+     * specified by instructions.
+     */
     private Message genBuildCommandMessage( BuildInstructions instructions, MapLocation location, int builderID )
     {
         int[] ints = { builderID };
@@ -256,6 +275,10 @@ public class BuilderHandler {
         return MessageCoder.encodeMessage( MessageCoder.BUILD_UNIT_COMMAND, knowledge.myRobotID, knowledge.myLocation, Clock.getRoundNum(), false, strings, ints, locations);
     }
 
+    /*
+     * In case you need to build one component. Left over from a previous iteration
+     * of networked building.
+     */
     private boolean buildComponent( ComponentType component, MapLocation location, RobotLevel height )
     {
         try {
