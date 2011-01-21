@@ -8,6 +8,11 @@ import newTeam.common.*;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
 
+/*
+ * This state exists so that the recycler doesn't build something while the base is being upgraded.
+ * Otherwise, important squares could be blocked, impeding the build process.
+ */
+
 public class WaitingForBaseUpgrade extends BaseState {
 
     Robot constructor = null;
@@ -27,7 +32,7 @@ public class WaitingForBaseUpgrade extends BaseState {
 
         Message[] messages = myMSH.getMessages();
 
-
+        // receive status messages from the constructor
         for( Message message : messages )
         {
 

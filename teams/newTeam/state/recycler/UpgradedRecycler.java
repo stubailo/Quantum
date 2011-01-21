@@ -12,7 +12,6 @@ public class UpgradedRecycler extends BaseState {
 
     private boolean hasFactory;
     private boolean hasArmory;
-
     private MapLocation[] buildLocations;
 
     public UpgradedRecycler(BaseState oldState) {
@@ -38,27 +37,18 @@ public class UpgradedRecycler extends BaseState {
     @Override
     public BaseState execute() {
 
-        if( hasFactory && hasArmory && Clock.getRoundNum() == 600 && myRC.getTeamResources() > Prefab.flyingSoldier.getTotalCost() )
-        {
-            Direction testDirection = Direction.EAST;
-            MapLocation testLocation = null;
-            MapLocation location = null;
-            for( int i=0; i<8; i++ )
-            {
-                testLocation = myK.myLocation.add(testDirection);
-                if( myMH.canMove(testDirection) && testLocation.isAdjacentTo(myK.myRecyclerNode.factoryLocation) && testLocation.isAdjacentTo(myK.myRecyclerNode.armoryLocation) )
-                {
-                    location = testLocation;
-                    break;
-                } else {
-                    testDirection = testDirection.rotateRight();
-                }
+        if (hasFactory && hasArmory && Clock.getRoundNum() == 500 && myRC.getTeamResources() > Prefab.flyingSensor.getTotalCost()) {
+            MapLocation location = getEmptyIntersectLocation();
+
+            if (location != null) {
+                myBH.networkBuildUnit(Prefab.flyingSensor, location, myK.myRecyclerNode.factoryID, myK.myRecyclerNode.armoryID);
             }
+        } else if (hasFactory && hasArmory && Clock.getRoundNum() == 700 && myRC.getTeamResources() > Prefab.flyingConstructor.getTotalCost()) {
+            MapLocation location = getEmptyFlyingLocation();
 
-            //MapLocation location = myK.myLocation.add(myK.myLocation.directionTo( myK.myRecyclerNode.factoryLocation ).rotateRight());
-
-            if( myMH.canMove(myK.myLocation.directionTo(location)) )
-            myBH.networkBuildUnit(Prefab.flyingSoldier, location, myK.myRecyclerNode.factoryID, myK.myRecyclerNode.armoryID);
+            if (location != null) {
+                myBH.networkBuildUnit(Prefab.flyingConstructor, location, myK.myRecyclerNode.factoryID, myK.myRecyclerNode.armoryID);
+            }
         }
 
         myBH.step();
@@ -66,4 +56,46 @@ public class UpgradedRecycler extends BaseState {
         return this;
     }
 
+    private MapLocation getEmptyIntersectLocation() {
+        Direction testDirection = Direction.EAST;
+        MapLocation testLocation = null;
+        MapLocation location = null;
+        for (int i = 0; i < 8; i++) {
+            testLocation = myK.myLocation.add(testDirection);
+            if (myMH.canMove(testDirection) && testLocation.isAdjacentTo(myK.myRecyclerNode.factoryLocation) && testLocation.isAdjacentTo(myK.myRecyclerNode.armoryLocation)) {
+                location = testLocation;
+                break;
+            } else {
+                testDirection = testDirection.rotateRight();
+            }
+        }
+
+        return location;
+    }
+
+    private MapLocation getEmptyFlyingLocation() {
+        Direction testDirection = Direction.EAST;
+        MapLocation testLocation = null;
+        MapLocation location = null;
+        for (int i = 0; i < 8; i++) {
+
+            
+
+            testLocation = myK.myLocation.add(testDirection);
+            if (mySH.senseAtLocation(testLocation, RobotLevel.IN_AIR) == null && adjOrOn(testLocation,myK.myRecyclerNode.factoryLocation) && adjOrOn(testLocation, myK.myRecyclerNode.armoryLocation)) {
+                location = testLocation;
+                System.out.println( testDirection );
+                break;
+            } else {
+                testDirection = testDirection.rotateRight();
+            }
+        }
+
+        return location;
+    }
+
+    private boolean adjOrOn( MapLocation loc1, MapLocation loc2 )
+    {
+        return loc1.isAdjacentTo(loc2) || loc1.equals(loc2);
+    }
 }

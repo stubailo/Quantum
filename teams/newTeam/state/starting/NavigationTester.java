@@ -16,7 +16,8 @@ public class NavigationTester extends BaseState {
     @Override
     public BaseState execute() {
         if(myMH.step()) {
-            myMH.initializeNavigationTo(myK.myLocation.add(Direction.WEST, 30), NavigatorType.TANGENT_BUG);
+            myMH.initializeNavigationTo(myK.myLocation.add(Direction.WEST, 16).add(Direction.NORTH, 3), 
+                    NavigatorType.TANGENT_BUG);
         }
         return this;
     }
