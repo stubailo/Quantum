@@ -25,7 +25,7 @@ public class UpgradeBase extends BaseState {
     @Override
     public BaseState getNextState() {
 
-        if( myBH.finishedBuilding() )
+        if( myBH.finishedBuilding() ) //When the constructor gets built
         {
             builtConstructor = true;
 
@@ -43,9 +43,7 @@ public class UpgradeBase extends BaseState {
     @Override
     public BaseState execute() {
 
-
-
-        //add a sensor method that checks if the square is occupied
+        //Build a constructor that will then be commanded to build a Factory and Armory
         if( !builtConstructor && !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.lightConstructor.getTotalCost() + 100 )
         {
             MapLocation buildLocation = mySH.findEmptyLocationToBuild();
