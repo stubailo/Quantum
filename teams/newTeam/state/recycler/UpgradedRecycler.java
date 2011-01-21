@@ -46,7 +46,9 @@ public class UpgradedRecycler extends BaseState {
             for( int i=0; i<8; i++ )
             {
                 testLocation = myK.myLocation.add(testDirection);
-                if( myMH.canMove(testDirection) && testLocation.isAdjacentTo(myK.myRecyclerNode.factoryLocation) && testLocation.isAdjacentTo(myK.myRecyclerNode.armoryLocation) )
+                if( myMH.canMove(testDirection) && 
+                    testLocation.isAdjacentTo(myK.myRecyclerNode.factoryLocation) && 
+                    testLocation.isAdjacentTo(myK.myRecyclerNode.armoryLocation) )
                 {
                     location = testLocation;
                     break;

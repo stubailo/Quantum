@@ -14,6 +14,7 @@ public class BugNavigator implements Navigator {
     private final RobotController myRC;
     private final Knowledge myK;
     private final MovementController myMC;
+    private final TrackChecker myTrack;
     
     //TODO: Probably don't need to keep an array of memory...
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
@@ -67,6 +68,7 @@ public class BugNavigator implements Navigator {
         myRC = rc;
         myK = know;
         myMC = mc;
+        myTrack = new TrackChecker();
         
         goal = goalLocation;
         goingToAdjacent = navigatingToAdjacent;
