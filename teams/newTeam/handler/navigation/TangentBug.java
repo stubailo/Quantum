@@ -146,7 +146,13 @@ public class TangentBug implements Navigator {
             }
         } else {
             //TODO: probably will have to deal with this by bugging to the next move on the list.
-            action = MovementAction.PATH_BLOCKED;
+            if(myK.myDirection == movementDirection) {
+                action = MovementAction.PATH_BLOCKED;
+                reset();
+            } else {
+                action = MovementAction.ROTATE;
+            }
+//            action = MovementAction.PATH_BLOCKED;
         }
 
         prevLocation = location;
