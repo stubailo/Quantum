@@ -130,8 +130,11 @@ public class BugNavigator implements Navigator {
     }
     
     public boolean reachedGoal() {
+        Logger.debug_printHocho("checking if reachedGoal when at: " + myK.myLocation + " and facing: " + myK.myDirection);
         if(goingToAdjacent) {
-            return goal.isAdjacentTo(myK.myLocation);
+            Logger.debug_printHocho("trying to go adjacent to: " + goal + " and facing: " + myK.myLocation.directionTo(goal));
+            MapLocation myLocation = myK.myLocation;
+            return goal.isAdjacentTo(myLocation) && myK.myDirection == myLocation.directionTo(goal);
         }
         else {
             return goal.equals(myK.myLocation);
@@ -470,12 +473,10 @@ public class BugNavigator implements Navigator {
             }
             
         } else if(distanceSquaredToGoal <= 2) {
-            navigating = false;
-            goingToAdjacent = false;
-            
             Direction directionToGoal = location.directionTo(goal);
             movementDirection = directionToGoal;
             if(directionToGoal == myK.myDirection || directionToGoal == Direction.OMNI) {
+                navigating = false;
                 return MovementAction.AT_GOAL;
             } else {
                 return MovementAction.ROTATE;
