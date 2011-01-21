@@ -20,7 +20,7 @@ public class StartingLightConstructorPlayer extends LightConstructorPlayer {
         //return new MovingToBuildFactory(oldState);
 
         return new NavigationTester(oldState, 
-                myK.myLocation.add(Direction.NORTH, 3).add(Direction.EAST, 16));
+                myK.myLocation.add(Direction.NORTH, 15).add(Direction.EAST, 23));
 //        return new Wait( 3, oldState, new StartingLightConstructorScouting(oldState) );
 
     }
