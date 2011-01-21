@@ -423,7 +423,7 @@ public class SensorHandler {
         for(int index = 0; index < numberOfSensableMines; index++) {
             Mine sensableMine = sensableMines[index];
             MapLocation mineLocation = sensableMine.getLocation();
-            if(terrainStatusHash[mineLocation.x % LOCATION_HASH_SIZE][mineLocation.y % LOCATION_HASH_SIZE] == TerrainStatus.LAND) {
+            if(terrainStatusHash[mineLocation.x % LOCATION_HASH_SIZE][mineLocation.y % LOCATION_HASH_SIZE] != TerrainStatus.BLOCKER) {
                 sensableEmptyMines[numberOfSensableEmptyMines++] = sensableMine;
             }
         }
