@@ -65,23 +65,14 @@ public class BuilderHandler {
         try {
             myBC.build(instructions.getBaseChassis(), location);
 
-            currentlyBuilding = true;
-
-            if (IAmABuilding) {
-                buildTarget = mySH.senseAtLocation(location, instructions.getBaseChassis().level);
-            }
-
-            buildLocation = location;
-            buildHeight = instructions.getBaseChassis().level;
-            buildInstructions = instructions;
-            buildStep = 0;
+            buildComponents( instructions, location );
         } catch (Exception e) {
             Logger.debug_printExceptionMessage(e);
             abortBuilding();
         }
     }
 
-    public void buildComponents(BuildInstructions instructions, MapLocation location, RobotLevel height) {
+    public void buildComponents(BuildInstructions instructions, MapLocation location) {
         try {
             currentlyBuilding = true;
 
@@ -90,7 +81,7 @@ public class BuilderHandler {
             }
 
             buildLocation = location;
-            buildHeight = height;
+            buildHeight = instructions.getBaseChassis().level;
             buildInstructions = instructions;
             buildStep = 0;
         } catch (Exception e) {
@@ -173,7 +164,7 @@ public class BuilderHandler {
         builtSuccessfully = true;
     }
 
-    private void abortBuilding() {
+    public void abortBuilding() {
         currentlyBuilding = false;
         buildTarget = null;
 

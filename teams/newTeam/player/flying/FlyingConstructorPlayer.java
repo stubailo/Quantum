@@ -5,6 +5,7 @@ import battlecode.common.*;
 import newTeam.state.BaseState;
 import newTeam.player.BasePlayer;
 import newTeam.common.*;
+import newTeam.state.exploring.LookForSensorToFollow;
 
 public class FlyingConstructorPlayer extends BasePlayer {
 
@@ -15,7 +16,7 @@ public class FlyingConstructorPlayer extends BasePlayer {
 
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return oldState;
+        return new LookForSensorToFollow( oldState );
     }
 
     @Override

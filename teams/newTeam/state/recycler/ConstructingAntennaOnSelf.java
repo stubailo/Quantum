@@ -37,7 +37,7 @@ public class ConstructingAntennaOnSelf extends BaseState {
         if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getComponentCost() - ComponentType.RECYCLER.cost + 10 )
         {
             Logger.debug_printSashko("building antenna");
-            myBH.buildComponents( Prefab.commRecycler , myRC.getLocation(), RobotLevel.ON_GROUND);
+            myBH.buildComponents( Prefab.commRecycler , myRC.getLocation());
         }
 
         myBH.step();

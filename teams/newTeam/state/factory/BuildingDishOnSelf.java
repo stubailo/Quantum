@@ -38,7 +38,7 @@ public class BuildingDishOnSelf extends BaseState {
         if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > ComponentType.DISH.cost + 10 )
         {
             Logger.debug_printSashko("building dish");
-            myBH.buildComponents( Prefab.factory , myRC.getLocation(), RobotLevel.ON_GROUND);
+            myBH.buildComponents( Prefab.factory , myRC.getLocation());
         }
 
         myBH.step();

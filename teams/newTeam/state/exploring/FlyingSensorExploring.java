@@ -4,11 +4,14 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
-import newTeam.common.Prefab;
+import newTeam.common.*;
 import newTeam.common.util.Logger;
 import newTeam.state.idle.Idling;
+import newTeam.state.building.FlyingWaitingForConstructor;
 
 public class FlyingSensorExploring extends BaseState {
+
+    public boolean waitingForConstructor;
 
     public FlyingSensorExploring(BaseState oldState) {
         super(oldState);
@@ -18,6 +21,9 @@ public class FlyingSensorExploring extends BaseState {
 
     @Override
     public void senseAndUpdateKnowledge() {
+
+        
+
     }
 
     @Override
@@ -29,6 +35,19 @@ public class FlyingSensorExploring extends BaseState {
 
     @Override
     public BaseState execute() {
+
+        MapLocation nearestMine = mySH.getNearestEmptyMine();
+
+        if( nearestMine!=null )
+        {
+            int[] ints = {0 };
+            String[] strings = {null};
+            MapLocation[] locations = { nearestMine };
+
+            myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FLYER_FOUND_MINE , myRC.getRobot().getID(), myRC.getLocation(), Clock.getRoundNum(), false, strings, ints, locations) );
+
+            return new FlyingWaitingForConstructor( this, nearestMine );
+        }
 
         myMH.step();
 

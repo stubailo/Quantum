@@ -38,6 +38,13 @@ public abstract class MessageCoder {
 
     public static final String MAKE_FACTORY_PING = "mfp";
 
+    public static final String FLYING_SENSOR_PING = "fsp";
+    public static final String FLYER_FOUND_MINE = "ffm";
+    public static final String ABORT_BUILDING = "ab";
+    public static final String BUILT_RECYCLER = "br";
+
+    public static final String JOINING_SQUAD = "js";
+
     // encoding constants
     private static final int MULTIPLIER = 7;
     private static final int OFFSET = 22;

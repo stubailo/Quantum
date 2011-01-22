@@ -10,6 +10,9 @@ public class Knowledge {
     /*** Parent Recycler ***/
     public          RecyclerNode        myRecyclerNode;
     public          boolean             pinging;
+
+    /*** Squad Info ***/
+    public          int                 squadLeaderID;
     
     /*** Constants ***/
     public  final   Team                myTeam;
