@@ -2,6 +2,8 @@ package newTeam.handler.navigation;
 
 import newTeam.common.QuantumConstants;
 import newTeam.common.util.Logger;
+import newTeam.handler.SensorHandler;
+import newTeam.handler.sensor.TerrainStatus;
 import battlecode.common.Chassis;
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
@@ -16,6 +18,7 @@ public class VirtualBug {
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
 //    private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     private final RobotController myRC;
+    private final SensorHandler mySH;
     private final MapLocation goal;
     private final MapLocation startLocation;
     private final TrackChecker myTrack;
@@ -49,11 +52,12 @@ public class VirtualBug {
 //    private        MapLocation          counterClockwiseMove;
     
     public VirtualBug(MapLocation g, RobotController rc, MapLocation start,
-                      TrackChecker track) {
+                      TrackChecker track, SensorHandler sh) {
         goal = g;
         startLocation = start;
         virtualBugLocation = start;
         myRC = rc;
+        mySH = sh;
         myTrack = track;
         moves = new MapLocation [MAX_MOVES];
         tracking = false;
@@ -68,6 +72,7 @@ public class VirtualBug {
                       RobotController rc,
                       MapLocation start,
                       TrackChecker tc,
+                      SensorHandler sh,
                       MapLocation bugLocation,
                       boolean track,
                       boolean trackCW,
@@ -86,6 +91,7 @@ public class VirtualBug {
         myRC = rc;
         startLocation = start;
         myTrack = tc;
+        mySH = sh;
         virtualBugLocation = bugLocation;
         tracking = track;
         startTracking = stTracking;
@@ -117,6 +123,7 @@ public class VirtualBug {
                               myRC,
                               startLocation,
                               myTrack,
+                              mySH,
                               virtualBugLocation,
                               tracking,
                               trackingCW,
@@ -194,7 +201,9 @@ public class VirtualBug {
         
         // check if you can move in the direction of goal.
         MapLocation nextLocation = virtualBugLocation.add(directionToGoal);
-        TerrainTile tile = myRC.senseTerrainTile(nextLocation);
+        TerrainStatus tile = mySH.getTerrainStatus(nextLocation);
+        Logger.debug_printAntony("tile in direction of goal is " + nextLocation + " with status " + tile);
+//        TerrainTile tile = myRC.senseTerrainTile(nextLocation);
 //        if(tile != null){
 //        myRC.setIndicatorString(0, nextLocation.toString() + tile);
 //        }
@@ -202,11 +211,11 @@ public class VirtualBug {
         if(tile == null) {
             goingToSecondaryGoal = true;
             return false;
-        } else if(tile != TerrainTile.LAND) {
+        } else if(tile != TerrainStatus.LAND) {
             tracking = true;
             trackingCW = true;
             startTracking = true;
-            if(tile == TerrainTile.OFF_MAP) {
+            if(tile == TerrainStatus.OFF_MAP) {
                 turnsAlongPath += QuantumConstants.BIG_INT;
             }
             return true;
@@ -233,7 +242,7 @@ public class VirtualBug {
         }
         
         Direction testDir;
-        TerrainTile tile;
+        TerrainStatus tile;
         MapLocation nextLocation = null;
         int turn;
         if(startTracking) {
@@ -251,13 +260,16 @@ public class VirtualBug {
                     testDir = testDir.rotateRight();
                 }
                 nextLocation = virtualBugLocation.add(testDir);
-                tile = myRC.senseTerrainTile(nextLocation);
+                tile = mySH.getTerrainStatus(nextLocation);
+                Logger.debug_printAntony("VBL: " + virtualBugLocation + " going to: " +
+                        nextLocation + " tile: " + tile );
+//                tile = myRC.senseTerrainTile(nextLocation);
                 
                 //set a secondary goal if you need to move toward an unexplored tile
                 if(tile == null) {
                     goingToSecondaryGoal = true;
                     return testDir;
-                } else if(tile == TerrainTile.LAND) {
+                } else if(tile == TerrainStatus.LAND) {
                     //add the next move 
                     searching = false;
                     trackingDirection = testDir;
@@ -274,7 +286,7 @@ public class VirtualBug {
 //                    if(myTrack.addTrackingDirection(virtualBugLocation, testDir, trackingCW)) {
 //                        turnsAlongPath += QuantumConstants.BIG_INT;
 //                    }
-                } else if(tile == TerrainTile.OFF_MAP) {
+                } else if(tile == TerrainStatus.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
                     pathWeight = turnsAlongPath + turnsToGoal + calculateTurningAdjustment();
@@ -310,7 +322,8 @@ public class VirtualBug {
             boolean searching = true;
             while(searching) {
                 nextLocation = virtualBugLocation.add(testDir);
-                tile = myRC.senseTerrainTile(nextLocation);
+                tile = mySH.getTerrainStatus(nextLocation);
+//                tile = myRC.senseTerrainTile(nextLocation);
                 Logger.debug_printAntony("bug #" + index + ": VBL: " + 
                         virtualBugLocation + " testDir: " + testDir + "tile: " + tile + 
                         " TN: " + turningNumber);
@@ -320,7 +333,7 @@ public class VirtualBug {
                     Logger.debug_printHocho("Can't sense location " + nextLocation);
                     goingToSecondaryGoal = true;
                     return testDir;
-                } else if(tile == TerrainTile.LAND) {
+                } else if(tile == TerrainStatus.LAND) {
                     //add the next move.
                     searching = false;
                     trackingDirection = testDir;
@@ -338,7 +351,7 @@ public class VirtualBug {
                     if(myTrack.addTrackingDirection(virtualBugLocation, testDir, trackingCW)) {
                         turnsAlongPath += QuantumConstants.BIG_INT;
                     }
-                } else if(tile == TerrainTile.OFF_MAP) {
+                } else if(tile == TerrainStatus.OFF_MAP) {
                     searching = false;
                     turnsAlongPath += QuantumConstants.BIG_INT;
                     pathWeight = turnsAlongPath + turnsToGoal + calculateTurningAdjustment();

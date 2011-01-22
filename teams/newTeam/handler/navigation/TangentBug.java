@@ -15,7 +15,7 @@ public class TangentBug implements Navigator {
     private final int MAX_MOVES = QuantumConstants.TANGENT_BUG_PATH_LENGTH;
     private final int MAX_BUGS = QuantumConstants.NUMBER_OF_VIRTUAL_BUGS;
     private final int LOOP_BYTECODE_COST = 600;
-    private final int BYTECODE_BUFFER = 600;
+    private final int BYTECODE_BUFFER = 400;
     private final int MIN_BYTECODES = LOOP_BYTECODE_COST + BYTECODE_BUFFER;
     private final int RECHECK_BYTECODES = 4;
     
@@ -114,6 +114,8 @@ public class TangentBug implements Navigator {
                 stepIndex++;
                 movingBug = currentVB;
             }
+        } else if(stepIndex == 0 && movingBug != currentVB) {
+            movingBug = currentVB;
         }
         
         Logger.debug_printAntony("stepIndex: " + stepIndex + " nodeIndex: " + currNodeIndex + 
@@ -124,6 +126,7 @@ public class TangentBug implements Navigator {
         if(move == null) {
             return MovementAction.NONE;
         }
+        Logger.debug_printAntony("trying to move to " + move + " from " + location);
         
         // get the movement action associated with the next move.  
         movementDirection = location.directionTo(move);
@@ -143,7 +146,13 @@ public class TangentBug implements Navigator {
             }
         } else {
             //TODO: probably will have to deal with this by bugging to the next move on the list.
-            action = MovementAction.PATH_BLOCKED;
+            if(myK.myDirection == movementDirection) {
+                action = MovementAction.PATH_BLOCKED;
+                reset();
+            } else {
+                action = MovementAction.ROTATE;
+            }
+//            action = MovementAction.PATH_BLOCKED;
         }
 
         prevLocation = location;
@@ -293,7 +302,7 @@ public class TangentBug implements Navigator {
     private void reset() {
         tangentBugStart = myK.myLocation;
         myTrack = new TrackChecker();
-        currentVB = new VirtualBug(goal, myRC, tangentBugStart, myTrack);
+        currentVB = new VirtualBug(goal, myRC, tangentBugStart, myTrack, mySH);
         currentVB.index = 0;
         movingBug = currentVB;
         myVBs = new VirtualBug [MAX_BUGS];
