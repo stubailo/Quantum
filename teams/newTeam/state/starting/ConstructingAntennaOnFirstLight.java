@@ -40,7 +40,7 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
         
         if( !myBH.getCurrentlyBuilding() && myK.totalFlux > Prefab.startingConstructor.getComponentCost() )
         {
-            myBH.buildComponents( Prefab.startingConstructor , mySH.startingLightInfo.location, RobotLevel.ON_GROUND);
+            myBH.buildComponents( Prefab.startingConstructor , mySH.startingLightInfo.location);
         }
 
         myBH.step();

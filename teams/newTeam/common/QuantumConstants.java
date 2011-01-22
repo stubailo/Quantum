@@ -15,6 +15,8 @@ public final class QuantumConstants {
         public static final int TIME_WAIT_FOR_COMMAND = 10;
         /* How many rounds a factory/armory will wait for a chassis to show up before aborting build process */
         public static final int BUILD_TIMEOUT = 5;
+        /* How many rounds a flying sensor unit will wait when a mine becomes occupied */
+        public static final int BUILD_RECYCLER_TIMEOUT = 3;
 	/** Total flux needed to explore for more mines */
 	public static final int TOTAL_FLUX_EXPLORE = 120;
 	/** Number of locations to remember for bug navigation */
