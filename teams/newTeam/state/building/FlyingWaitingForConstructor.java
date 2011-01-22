@@ -55,6 +55,9 @@ public class FlyingWaitingForConstructor extends BaseState {
         if( mineOccupied && timeOut == 0 )
         {
             myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.ABORT_BUILDING , myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, null, null, null) );
+            
+            System.out.println("sending abort command");
+
             return new FlyingSensorExploring( this );
         }
 
