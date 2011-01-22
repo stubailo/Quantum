@@ -44,8 +44,12 @@ public class FlyingWaitingForConstructor extends BaseState {
 
         if( mySH.senseAtLocation(theMine, RobotLevel.ON_GROUND) != null )
         {
-            timeOut--;
             mineOccupied = true;
+        }
+
+        if( mineOccupied )
+        {
+            timeOut--;
         }
 
         if( mineOccupied && timeOut == 0 )

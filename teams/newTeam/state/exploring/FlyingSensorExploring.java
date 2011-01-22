@@ -52,6 +52,8 @@ public class FlyingSensorExploring extends BaseState {
 
         if( mySH.areEnemiesNearby() )
         {
+            myK.lastKnownEnemyLocation = mySH.getNearestEnemyLocation();
+            myK.enemyTimeStamp = Clock.getRoundNum();
             return new FlyingSensorFleeing( this );
         }
 

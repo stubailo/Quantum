@@ -36,6 +36,13 @@ public class FlyingSensorFleeing extends BaseState {
     @Override
     public BaseState execute() {
 
+        if( mySH.areEnemiesNearby() )
+        {
+            myK.lastKnownEnemyLocation = mySH.getNearestEnemyLocation();
+            myK.enemyTimeStamp = Clock.getRoundNum();
+            //add code to avoid newly seen enemy here
+        }
+
         if( myK.myLocation.distanceSquaredTo( myK.myRecyclerNode.myLocation ) < 9 )
         {
             myCH.myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FLYING_STATUS_REQUEST , myRC.getRobot().getID(), myRC.getLocation(), Clock.getRoundNum(), false, null, null, null) );
