@@ -8,12 +8,32 @@ import newTeam.state.BaseState;
 
 public class Attacking extends BaseState {
     
-    public Attacking(RobotController rc, Knowledge know, ComponentsHandler ch) {
-        super(rc, know, ch);
-    }
+    private RobotInfo[] enemyRobotInfos;
     
     public Attacking(BaseState state) {
         super(state);
+    }
+    
+    @Override
+    public void senseAndUpdateKnowledge() {
+        enemyRobotInfos = mySH.getEnemyRobotInfos();
+    }
+    
+    @Override
+    public BaseState getNextState() {
+        
+        if(enemyRobotInfos != null) return this;
+        
+        
+        
+        return this;
+    }
+    
+    public BaseState execute() {
+        
+        myWH.attack(enemyRobotInfos);
+        
+        return this;
     }
     
 }
