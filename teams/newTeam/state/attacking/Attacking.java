@@ -5,6 +5,7 @@ import battlecode.common.*;
 import newTeam.common.Knowledge;
 import newTeam.handler.ComponentsHandler;
 import newTeam.state.BaseState;
+import newTeam.state.exploring.SoldierExploring;
 
 public class Attacking extends BaseState {
     
@@ -24,9 +25,7 @@ public class Attacking extends BaseState {
         
         if(enemyRobotInfos != null) return this;
         
-        
-        
-        return this;
+        return new SoldierExploring(this);
     }
     
     public BaseState execute() {

@@ -2,20 +2,20 @@ package newTeam.player.medium;
 
 import battlecode.common.*;
 
-import newTeam.state.BaseState;
-import newTeam.state.exploring.SoldierExploring;
 import newTeam.player.BasePlayer;
+import newTeam.state.BaseState;
+import newTeam.state.idle.Idling;
 
-public class MediumPlayer extends BasePlayer {
-
-    public MediumPlayer(BaseState state) {
+public class MediumSoldierPlayer extends MediumPlayer {
+    
+    public MediumSoldierPlayer(BaseState state) {
 
         super(state);
     }
 
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new SoldierExploring( oldState );
+        return new Idling( oldState );
     }
 
     @Override
@@ -31,15 +31,6 @@ public class MediumPlayer extends BasePlayer {
     @Override
     public BasePlayer determineSpecificPlayerGivenNewComponent(ComponentType compType,
                                                                BaseState state) {
-
-        switch(compType) {
-        
-        case BLASTER:
-        case RAILGUN:
-            return new MediumSoldierPlayer(state);
-        }
-        
         return this;
     }
-
 }
