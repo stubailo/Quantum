@@ -7,7 +7,7 @@ import newTeam.player.BasePlayer;
 import newTeam.common.*;
 import newTeam.state.exploring.LookForSensorToFollow;
 
-public class FlyingConstructorPlayer extends BasePlayer {
+public class FlyingConstructorPlayer extends FlyingPlayer {
 
     public FlyingConstructorPlayer(BaseState state) {
 

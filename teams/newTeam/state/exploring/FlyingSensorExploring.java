@@ -49,6 +49,11 @@ public class FlyingSensorExploring extends BaseState {
             return new FlyingWaitingForConstructor( this, nearestMine );
         }
 
+        if( mySH.areEnemiesNearby() )
+        {
+            return new FlyingSensorFleeing( this );
+        }
+
         myMH.step();
 
         return this;
