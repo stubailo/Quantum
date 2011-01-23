@@ -14,6 +14,10 @@ public class Knowledge {
 
     /*** Squad Info ***/
     public          int                 squadLeaderID;
+
+    /*** Enemy Info ***/
+    public int                          enemyTimeStamp;
+    public MapLocation                  lastKnownEnemyLocation;
     
     /*** Constants ***/
     public  final   Team                myTeam;

@@ -36,7 +36,7 @@ public class FlyingSensorPlayer extends FlyingPlayer {
         {
             int[] ints = { myK.squadLeaderID };
             String[] strings = {null};
-            MapLocation[] locations = { null };
+            MapLocation[] locations = { myK.lastKnownEnemyLocation };
 
             myCH.myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FLYING_SENSOR_PING , myRC.getRobot().getID(), myRC.getLocation(), Clock.getRoundNum(), false, strings, ints, locations) );
         }
