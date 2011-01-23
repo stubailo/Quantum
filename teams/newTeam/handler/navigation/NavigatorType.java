@@ -6,7 +6,6 @@ public enum NavigatorType {
     TANGENT_BUG,
     MOVE_FORWARD,
     MOVE_BACKWARD,
-    MOVE_TOWARD,
     CIRCLE,
     ZIG_ZAG
 

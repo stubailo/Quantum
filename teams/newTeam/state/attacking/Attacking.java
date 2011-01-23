@@ -4,16 +4,20 @@ import battlecode.common.*;
 
 import newTeam.common.Knowledge;
 import newTeam.handler.ComponentsHandler;
+import newTeam.handler.navigation.NavigatorType;
 import newTeam.state.BaseState;
 import newTeam.state.exploring.SoldierExploring;
 
 public class Attacking extends BaseState {
     
     private static final int NEAR_ENEMY_DISTANCE = 8;
+    private static final int MOVE_AWAY_DISTANCE  = 1;
     
     private RobotInfo[] enemyRobotInfos;
     private int         numberOfEnemies;
-    private MapLocation nearestEnemyLocation;
+    private MapLocation nearestEnemyLocation = myK.myLocation;
+    private boolean     nearestEnemyMoved;
+    private boolean     moving = false;
     
     public Attacking(BaseState state) {
         super(state);
@@ -24,7 +28,15 @@ public class Attacking extends BaseState {
     public void senseAndUpdateKnowledge() {
         enemyRobotInfos      = mySH.getEnemyRobotInfos();
         numberOfEnemies      = mySH.getNumberOfSensableEnemyRobots();
-        nearestEnemyLocation = mySH.getNearestEnemyLocation();
+        
+        MapLocation newNearestEnemyLocation = mySH.getNearestEnemyLocation();
+        if(newNearestEnemyLocation != null && !newNearestEnemyLocation.equals(nearestEnemyLocation)) {
+            nearestEnemyLocation = newNearestEnemyLocation;
+            nearestEnemyMoved = true;
+        }
+        else {
+            nearestEnemyMoved = false;
+        }
     }
     
     @Override
@@ -33,20 +45,27 @@ public class Attacking extends BaseState {
         if(enemyRobotInfos == null) return new SoldierExploring(this);
         
         
-        return null;
+        return this;
     }
     
     public BaseState execute() {
         
-        int distanceToNearestEnemy = myK.myLocation.distanceSquaredTo(nearestEnemyLocation);
+        if(nearestEnemyMoved) {
         
-        if(distanceToNearestEnemy > myWH.range) {
+            int distanceToNearestEnemy = myK.myLocation.distanceSquaredTo(nearestEnemyLocation);
+            Direction directionToNearestEnemy = myK.myLocation.directionTo(nearestEnemyLocation);
             
-        }
-        else if(distanceToNearestEnemy < NEAR_ENEMY_DISTANCE) {
-            
+            if(distanceToNearestEnemy > myWH.range) {
+                myMH.initializeNavigationTo(nearestEnemyLocation, NavigatorType.BUG);
+                moving = true;
+            }
+            else if(distanceToNearestEnemy < NEAR_ENEMY_DISTANCE) {
+                myMH.initializeNavigationTo(myK.myLocation.add(directionToNearestEnemy.opposite(), MOVE_AWAY_DISTANCE), NavigatorType.BUG);
+                moving = true;
+            }
         }
         
+        if(moving) myMH.step();
         myWH.attack(enemyRobotInfos, numberOfEnemies);
         
         return this;
