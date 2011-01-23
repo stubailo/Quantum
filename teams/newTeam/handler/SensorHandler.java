@@ -128,13 +128,13 @@ public class SensorHandler {
         switch(sc.type()) {
         
         case SIGHT:
-            horizontalSightRange = 2;
-            forwardSightRange    = 3;
+            if(horizontalSightRange < 2) horizontalSightRange = 2;
+            if(forwardSightRange    < 3) forwardSightRange    = 3;
             break;
             
         case RADAR:
-            horizontalSightRange = 6;
-            forwardSightRange    = 6;
+            if(horizontalSightRange < 6) horizontalSightRange = 6;
+            if(forwardSightRange    < 6) forwardSightRange    = 6;
             break;
             
         case SATELLITE:
