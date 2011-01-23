@@ -44,6 +44,8 @@ public abstract class MessageCoder {
     public static final String BUILT_RECYCLER = "br";
 
     public static final String JOINING_SQUAD = "js";
+    public static final String FLYING_STATUS_REQUEST = "fs";
+    public static final String STATUS_RESPONSE = "sr";
 
     // encoding constants
     private static final int MULTIPLIER = 7;
