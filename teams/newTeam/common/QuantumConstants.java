@@ -15,6 +15,10 @@ public final class QuantumConstants {
         public static final int TIME_WAIT_FOR_COMMAND = 10;
         /* How many rounds a factory/armory will wait for a chassis to show up before aborting build process */
         public static final int BUILD_TIMEOUT = 5;
+        /* How many rounds a flying sensor unit will wait when a mine becomes occupied */
+        public static final int BUILD_RECYCLER_TIMEOUT = 3;
+        /* How many rounds a flying sensor unit will wait when a mine becomes occupied */
+        public static final int STATUS_TIMEOUT = 3;
 	/** Total flux needed to explore for more mines */
 	public static final int TOTAL_FLUX_EXPLORE = 120;
 	/** Number of locations to remember for bug navigation */
@@ -52,6 +56,10 @@ public final class QuantumConstants {
 	public static final int MAX_TOTAL_NUMBER_OF_ROBOTS = 2000;
 	/** Max conceivable number of robots sensed */
 	public static final int MAX_NUMBER_OF_SENSABLE_THINGS = 400;
+	
+	/** Cut-off for delta flux for building soldiers*/
+	public static final double HIGHER_DELTA_FLUX_CUTOFF = 3;
+	public static final double LOWER_DELTA_FLUX_CUTOFF  = 0.2;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

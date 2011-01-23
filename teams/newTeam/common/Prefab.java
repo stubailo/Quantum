@@ -36,14 +36,14 @@ public abstract class Prefab {
     public static BuildInstructions flyingSensor = new BuildInstructions( "fs", Chassis.FLYING, flyingSensorComponents);
     public static BuildInstructions flyingConstructor = new BuildInstructions( "fc", Chassis.FLYING, flyingConstructorComponents);
 
-    private static final ComponentType[] mediumSoldierComponents = { ComponentType.DISH, ComponentType.RADAR, ComponentType.BLASTER };
+    private static final ComponentType[] mediumSoldierComponents = { ComponentType.RADAR, ComponentType.RAILGUN, ComponentType.BLASTER, ComponentType.SHIELD, ComponentType.ANTENNA};
 
     public static BuildInstructions mediumSoldier = new BuildInstructions( "ms", Chassis.MEDIUM, mediumSoldierComponents);
 
     /*
      * IMPORTANT ADD NETWORKED BUILD UNITS TO THIS ARRAY
      */
-    private static BuildInstructions[] networkBuildList = { flyingSensor, flyingConstructor };
+    private static BuildInstructions[] networkBuildList = { flyingSensor, flyingConstructor, mediumSoldier };
 
     public static BuildInstructions getInstructionsFromID ( String id )
     {

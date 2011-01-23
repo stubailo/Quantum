@@ -9,12 +9,35 @@ public class WeaponHandler {
     private final Knowledge          myK;
     private final WeaponController[] myWCs           = new WeaponController[20];
     private       int                numberOfWeapons = 0;
+    public        int                range           = 0;
     
     public WeaponHandler(Knowledge know) {
         myK = know;
     }
     
     public void addWC(WeaponController wc) {
+        
+        switch(wc.type()) {
+        
+        case RAILGUN:
+            range = 25;
+            break;
+            
+        case SMG:
+            if(range == 0) range = 36;
+            break;
+            
+        case BLASTER:
+            if(range < 16) range = 16;
+            break;
+            
+        case HAMMER:
+            if(range < 4) range = 4;
+            break;
+            
+        // TODO: deal with break
+        }
+        
         boolean replacing = false;
         WeaponController myWC1 = null, myWC2;
         for(int index = 0; index < numberOfWeapons; index++) {
@@ -40,6 +63,26 @@ public class WeaponHandler {
         
         debug_printWeaponTypes();
         
+    }
+    
+    public void attack(RobotInfo[] robotInfos, int length) {
+        attack(robotInfos, length, new int[robotInfos.length]);
+    }
+    
+    public void attack(RobotInfo[] robotInfos, int length, int[] priorities) {
+        
+        MapLocation[] mapLocations = new MapLocation[length];
+        RobotLevel[]  levels       = new RobotLevel [length];
+        double[]      hps          = new double     [length];
+        
+        for(int index = 0; index < length; index++) {
+            RobotInfo robotInfo = robotInfos[index];
+            mapLocations[index] = robotInfo.location;
+            levels[index] = robotInfo.chassis == Chassis.FLYING ? RobotLevel.IN_AIR : RobotLevel.ON_GROUND;
+            hps[index] = robotInfo.hitpoints;
+        }
+        
+        recursiveAttackAlgorithm(mapLocations, levels, hps, priorities, 0);
     }
     
     public void attack(MapLocation[] mapLocations, RobotLevel[] levels, double[] hps) {

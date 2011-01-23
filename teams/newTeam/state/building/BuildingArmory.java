@@ -38,6 +38,8 @@ public class BuildingArmory extends BaseState {
 
             myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.ARMORY_BUILT, myK.myRobotID, myK.myLocation, Clock.getRoundNum(), false, strings, ints, locations) );
 
+            myBCH.broadcastFromQueue();
+            myRC.suicide();
             return new Idling( this );
         }
 

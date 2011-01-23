@@ -1,5 +1,6 @@
 package newTeam.common;
 
+import newTeam.common.util.Logger;
 import battlecode.common.*;
 
 public class Knowledge {
@@ -10,6 +11,13 @@ public class Knowledge {
     /*** Parent Recycler ***/
     public          RecyclerNode        myRecyclerNode;
     public          boolean             pinging;
+
+    /*** Squad Info ***/
+    public          int                 squadLeaderID;
+
+    /*** Enemy Info ***/
+    public int                          enemyTimeStamp;
+    public MapLocation                  lastKnownEnemyLocation;
     
     /*** Constants ***/
     public  final   Team                myTeam;
@@ -17,6 +25,10 @@ public class Knowledge {
     public  final   MapLocation         myStartLocation;
     public  final   int                 myRobotID;
     public  final   Robot               myRobot;
+    public  final   int                 startRound;
+    
+    private static final int DELTA_FLUX_MEMORY_LENGTH = 10;
+    private static final int BIG_INT = QuantumConstants.BIG_INT;
     
     
     /*** Round constants ***/
@@ -27,9 +39,14 @@ public class Knowledge {
     public          Direction           myPreviousDirection;
     public          boolean             justMoved;
     public          boolean             justTurned;
-    public          double              previousFlux;
-    public          double              deltaFlux;
+    private         double              previousFlux;
+    private         double              deltaFlux;
     public          double              totalFlux;
+    private         double              deltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
+    public          double              averageDeltaFlux = BIG_INT;
+    private         double              alternativeDeltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
+    private         int                 majorDeltaFluxShifting = 0;
+    private         double              totalDeltaFlux = 0;
     
     /*** SpecificPlayer-specific ***/
     
@@ -50,12 +67,13 @@ public class Knowledge {
         myTeam          = myRC.getTeam();
         enemyTeam       = myTeam.opponent();
         myStartLocation = myRC.getLocation();
+        startRound      = Clock.getRoundNum();
         myRobot         = myRC.getRobot();
         myRobotID       = myRobot.getID();
         myLocation      = myStartLocation;
         
-        previousFlux = 0;
-        myLocation = myRC.getLocation();
+        previousFlux    = myRC.getTeamResources();
+        myLocation      = myRC.getLocation();
 
         pinging = false;
     }
@@ -72,9 +90,40 @@ public class Knowledge {
         // TODO: recognize delta-delta flux that signifies loss of unit, creation of unit,
         //            creation of mine, etc.
         totalFlux = myRC.getTeamResources();
+//        Logger.debug_printHocho("previousFlux: " + previousFlux + ", currentFlux: " + totalFlux);
         deltaFlux = totalFlux - previousFlux;
         previousFlux = totalFlux;
+//        Logger.debug_printHocho("deltaFlux: " + deltaFlux);
         
+        if(Clock.getRoundNum() - startRound >= DELTA_FLUX_MEMORY_LENGTH + GameConstants.EQUIP_WAKE_DELAY) {
+            int mod = Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH;
+            if(averageDeltaFlux - deltaFlux < 3) {
+                majorDeltaFluxShifting = 0;
+                totalDeltaFlux -= deltaFluxes[mod];
+                deltaFluxes[mod] = deltaFlux;
+                totalDeltaFlux += deltaFlux;
+                averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+            }
+            else {
+                deltaFluxes[mod] = averageDeltaFlux;
+                alternativeDeltaFluxes[mod] = deltaFlux;
+                if(++majorDeltaFluxShifting == DELTA_FLUX_MEMORY_LENGTH) {
+                    Logger.debug_printHocho("major delta flux shift!");
+                    deltaFluxes = alternativeDeltaFluxes;
+                    totalDeltaFlux = 0;
+                    for(double dFlux : deltaFluxes) {
+                        totalDeltaFlux += dFlux;
+                    }
+                    averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+                }
+            }
+        }
+        else if(Clock.getRoundNum() - startRound >= GameConstants.EQUIP_WAKE_DELAY) {
+            deltaFluxes[Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH] = deltaFlux;
+            totalDeltaFlux += deltaFlux;
+            averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+        }
+//        Logger.debug_printHocho("averageDeltaFlux: " + averageDeltaFlux);
         
         MapLocation myNewLocation = myRC.getLocation();
         if(myNewLocation != myLocation) {

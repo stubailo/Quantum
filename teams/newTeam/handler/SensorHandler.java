@@ -22,6 +22,7 @@ public class SensorHandler {
     private final Team               myTeam;
     private final Team               enemyTeam;
     private final int                myID;
+    private final Robot              myRobot;
     
     /*** Round Constants ***/
     private       MapLocation        myLocation;
@@ -41,9 +42,12 @@ public class SensorHandler {
     private boolean         robotsSensed            = false;
     private boolean         robotInfosSensed        = false;
     private boolean         robotsDeepSensed        = false;
+    private boolean         gottenNearestEnemy      = false;
     private boolean         minesSensed             = false;
     private boolean         blockersSensed          = false;
     private boolean         emptyMinesSensed        = false;
+    private boolean         gottenNearestEmptyMine  = false;
+    private boolean         ownIncomeSensed         = false;
     //private final boolean[] sensableRobotsIdHash    = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
     
     /***
@@ -51,9 +55,13 @@ public class SensorHandler {
      * 
      * 
      */
+    private         int                 horizontalSightRange            = 0,
+                                        forwardSightRange               = 0;
+    
     private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   int[]               sensableRobotsSensorHash        = new int[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   RobotInfo[]         sensableRobotInfos              = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   Team[]              sensableRobotTeams              = new Team[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableRobots          = 0;
     private final   Robot[]             sensableAlliedRobots            = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   RobotInfo[]         sensableAlliedRobotInfos        = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
@@ -71,14 +79,17 @@ public class SensorHandler {
     private final   RobotInfo[]         sensableDebrisInfos             = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableDebris          = 0;
     private final   Mine[]              sensableMines                   = new Mine[MAX_NUMBER_OF_SENSABLE_THINGS];
-//    private final   MineInfo[]          sensableMineInfos               = new MineInfo[MAX_NUMBER_OF_SENSED_THINGS];
     private         int                 numberOfSensableMines           = 0;
     private final   Mine[]              sensableEmptyMines              = new Mine[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableEmptyMines      = 0;
     
     private final   TerrainStatus[][]   terrainStatusHash           = new TerrainStatus[LOCATION_HASH_SIZE][LOCATION_HASH_SIZE];
     
+    private         MapLocation         nearestEmptyMineLocation;
     private         boolean             enemiesNearby;
+    private         MapLocation         nearestEnemyLocation;
+    
+    private         double              ownIncome;
     
     public          MapLocation         startingTurnedOnRecyclerLocation,
                                         startingFirstMineToBeBuiltLocation,
@@ -100,9 +111,10 @@ public class SensorHandler {
         myK  = know;
         myMC = (MovementController) myRC.components()[0];
         
-        myTeam = myK.myTeam;
+        myTeam    = myK.myTeam;
         enemyTeam = myTeam.opponent();
-        myID   = myK.myRobotID;
+        myID      = myK.myRobotID;
+        myRobot   = myK.myRobot;
     }
     
     
@@ -112,6 +124,25 @@ public class SensorHandler {
      * @param sc    SensorController to be added
      */
     public void addSC(SensorController sc) {
+        
+        switch(sc.type()) {
+        
+        case SIGHT:
+            if(horizontalSightRange < 2) horizontalSightRange = 2;
+            if(forwardSightRange    < 3) forwardSightRange    = 3;
+            break;
+            
+        case RADAR:
+            if(horizontalSightRange < 6) horizontalSightRange = 6;
+            if(forwardSightRange    < 6) forwardSightRange    = 6;
+            break;
+            
+        case SATELLITE:
+            horizontalSightRange = 10;
+            forwardSightRange    = 10;
+            break;
+        }
+        
         mySCs[numberOfSensors] = sc;
         numberOfSensors++;
     }
@@ -121,25 +152,29 @@ public class SensorHandler {
      */
     public void refresh() {
         if(lastRoundRefreshed == Clock.getRoundNum()) return;
-        lastRoundRefreshed = Clock.getRoundNum();
         
-        robotsSensed = false;
+        robotsSensed     = false;
         robotInfosSensed = false;
         robotsDeepSensed = false;
-        enemiesNearby = false;
+        enemiesNearby    = false;
+        ownIncomeSensed  = false;
+        
         myLocation = myK.myLocation;
         //if(myK.justMoved || myK.justTurned) {
         if(myK.justMoved || myK.justTurned) {
-            minesSensed = false;
-            emptyMinesSensed = false;
-            blockersSensed = false;
+            minesSensed            = false;
+            emptyMinesSensed       = false;
+            gottenNearestEmptyMine = false;
+            blockersSensed         = false;
         }
+        
+        lastRoundRefreshed = Clock.getRoundNum();
     }
     
     
     
     public boolean areEnemiesNearby() {
-        if(!robotsSensed) senseRobots();
+        senseRobots();
         return enemiesNearby;
     }
     
@@ -162,7 +197,8 @@ public class SensorHandler {
     }
 
     private void senseRobots() {
-        if(robotsSensed || robotsDeepSensed) return;
+        if(robotsSensed) return;
+        
         numberOfSensableRobots = 0;
         boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
         
@@ -174,9 +210,13 @@ public class SensorHandler {
                     sensableRobots[numberOfSensableRobots++] = sensableRobot;
                     sensableRobotsIdHash[id] = true;
                     sensableRobotsSensorHash[id] = index;
-                }
-                if(sensableRobot.getTeam() == enemyTeam) {
-                    enemiesNearby = true;
+                    
+                    Team sensableRobotTeam = sensableRobot.getTeam();
+                    sensableRobotTeams[id] = sensableRobotTeam;
+                    
+                    if(sensableRobotTeam == enemyTeam) {
+                        enemiesNearby = true;
+                    }
                 }
             }
         }
@@ -184,25 +224,21 @@ public class SensorHandler {
     }
     
     public Robot[] getSensableRobots() {
-        if(!(robotsSensed || robotsDeepSensed)) {
-            senseRobots();
-        }
+        senseRobots();
         return sensableRobots;
     }
     
     public int getNumberOfSensableRobots() {
-        if(!robotsSensed) {
-            senseRobots();
-        }
+        senseRobots();
         return numberOfSensableRobots;
     }
     
     
     
     
-    private void senseRobotInfo() {
+    private void senseRobotInfos() {
         if(robotInfosSensed) return;
-        if(!robotsSensed) senseRobots();
+        senseRobots();
         
         try {
             for(int index = 0; index < numberOfSensableRobots; index++) {
@@ -217,10 +253,10 @@ public class SensorHandler {
     
     
     
-    /*private void deepSenseRobotInfo() {
+    private void deepSenseRobotInfo() {
         
         if(robotsDeepSensed) return;
-        if(!robotsSensed) senseRobots();
+        senseRobotInfos();
         
         try {
             
@@ -234,90 +270,80 @@ public class SensorHandler {
                 numberOfSensableDebris          = 0;
             }
             
-            for(int index = 0; index < numberOfSensableRobots; index++) {
-                Robot sensableRobot = sensableRobots[index];
+            if(blockersSensed) {
+            
+                for(int index = 0; index < numberOfSensableRobots; index++) {
+                    Robot sensableRobot = sensableRobots[index];
+                    RobotInfo sensableRobotInfo = sensableRobotInfos[index]; 
                 
-            }
-            
-            boolean[] sensableRobotsIdHash = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
-            
-            for(int index = 0; index < numberOfSensors; index ++) {
-                SensorController mySC = mySCs[index];
-                for(Robot sensableRobot : mySC.senseNearbyGameObjects(Robot.class)) {
-                    int id = sensableRobot.getID();
-                    if(!sensableRobotsIdHash[id]) {
+                    Team sensableRobotTeam = sensableRobot.getTeam();
+                    
+                    if(sensableRobotTeam != Team.NEUTRAL) {
                         
-                        RobotInfo sensableRobotInfo = mySC.senseRobotInfo(sensableRobot);
-                        
-                        sensableRobots    [numberOfSensableRobots]   = sensableRobot;
-                        sensableRobotInfos[numberOfSensableRobots++] = sensableRobotInfo;
-                        sensableRobotsIdHash[id] = true;
-                        
-                        if(blockersSensed) {
-                            
-                            Team sensableRobotTeam = sensableRobot.getTeam();
-                            
-                            if(sensableRobotTeam != Team.NEUTRAL) {
-                                
-                                if(sensableRobotInfo.chassis != Chassis.BUILDING) {
-                                    if(sensableRobotTeam == myTeam) {
-                                        sensableAlliedRobots    [numberOfSensableAlliedRobots]   = sensableRobot;
-                                        sensableAlliedRobotInfos[numberOfSensableAlliedRobots++] = sensableRobotInfo;
-                                    }
-                                    else {
-                                        enemiesNearby = true;
-                                        sensableEnemyRobots     [numberOfSensableEnemyRobots]    = sensableRobot;
-                                        sensableEnemyRobotInfos [numberOfSensableEnemyRobots++]  = sensableRobotInfo;
-                                    }
-                                }
+                        if(sensableRobotInfo.chassis != Chassis.BUILDING) {
+                            if(sensableRobotTeam == myTeam) {
+                                sensableAlliedRobots    [numberOfSensableAlliedRobots]   = sensableRobot;
+                                sensableAlliedRobotInfos[numberOfSensableAlliedRobots++] = sensableRobotInfo;
                             }
-                        }
-                        
-                        else {
-                            
-                            Team sensableRobotTeam = sensableRobot.getTeam();
-                            
-                            if(sensableRobotTeam != Team.NEUTRAL) {
-                                
-                                if(sensableRobotInfo.chassis == Chassis.BUILDING) {
-                                    
-                                    MapLocation buildingLocation = sensableRobotInfo.location;
-                                    terrainStatusHash[buildingLocation.x % LOCATION_HASH_SIZE][buildingLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
-                                    
-                                    if(sensableRobotTeam == myTeam) {
-                                        sensableAlliedBuildings    [numberOfSensableAlliedBuildings]   = sensableRobot;
-                                        sensableAlliedBuildingInfos[numberOfSensableAlliedBuildings++] = sensableRobotInfo;
-                                    }
-                                    else {
-                                        sensableEnemyBuildings     [numberOfSensableEnemyBuildings]    = sensableRobot;
-                                        sensableEnemyBuildingInfos [numberOfSensableEnemyBuildings++]  = sensableRobotInfo;
-                                    }
-                                }
-                                
-                                else {
-                                    if(sensableRobotTeam == myTeam) {
-                                        sensableAlliedRobots    [numberOfSensableAlliedRobots]   = sensableRobot;
-                                        sensableAlliedRobotInfos[numberOfSensableAlliedRobots++] = sensableRobotInfo;
-                                    }
-                                    else {
-                                        sensableEnemyRobots     [numberOfSensableEnemyRobots]    = sensableRobot;
-                                        sensableEnemyRobotInfos [numberOfSensableEnemyRobots++]  = sensableRobotInfo;
-                                    }
-                                }
-                            }
-                            
                             else {
-                                
-                                MapLocation debrisLocation = sensableRobotInfo.location;
-                                terrainStatusHash[debrisLocation.x % LOCATION_HASH_SIZE][debrisLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
-                                
-                                sensableDebris     [numberOfSensableDebris]   = sensableRobot;
-                                sensableDebrisInfos[numberOfSensableDebris++] = sensableRobotInfo;
+                                enemiesNearby = true;
+                                sensableEnemyRobots     [numberOfSensableEnemyRobots]    = sensableRobot;
+                                sensableEnemyRobotInfos [numberOfSensableEnemyRobots++]  = sensableRobotInfo;
                             }
                         }
                     }
                 }
             }
+                
+            else {
+                
+                for(int index = 0; index < numberOfSensableRobots; index++) {
+                    Robot sensableRobot = sensableRobots[index];
+                    RobotInfo sensableRobotInfo = sensableRobotInfos[index];
+                    
+                    Team sensableRobotTeam = sensableRobot.getTeam();
+                    
+                    if(sensableRobotTeam != Team.NEUTRAL) {
+                        
+                        if(sensableRobotInfo.chassis == Chassis.BUILDING) {
+                            
+                            MapLocation buildingLocation = sensableRobotInfo.location;
+                            terrainStatusHash[buildingLocation.x % LOCATION_HASH_SIZE][buildingLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
+                            
+                            if(sensableRobotTeam == myTeam) {
+                                sensableAlliedBuildings    [numberOfSensableAlliedBuildings]   = sensableRobot;
+                                sensableAlliedBuildingInfos[numberOfSensableAlliedBuildings++] = sensableRobotInfo;
+                            }
+                            else {
+                                sensableEnemyBuildings     [numberOfSensableEnemyBuildings]    = sensableRobot;
+                                sensableEnemyBuildingInfos [numberOfSensableEnemyBuildings++]  = sensableRobotInfo;
+                            }
+                        }
+                        
+                        else {
+                            if(sensableRobotTeam == myTeam) {
+                                sensableAlliedRobots    [numberOfSensableAlliedRobots]   = sensableRobot;
+                                sensableAlliedRobotInfos[numberOfSensableAlliedRobots++] = sensableRobotInfo;
+                            }
+                            else {
+                                sensableEnemyRobots     [numberOfSensableEnemyRobots]    = sensableRobot;
+                                sensableEnemyRobotInfos [numberOfSensableEnemyRobots++]  = sensableRobotInfo;
+                            }
+                        }
+                    }
+                    
+                    else {
+                        
+                        MapLocation debrisLocation = sensableRobotInfo.location;
+                        terrainStatusHash[debrisLocation.x % LOCATION_HASH_SIZE][debrisLocation.y % LOCATION_HASH_SIZE] = TerrainStatus.BLOCKER;
+                        
+                        sensableDebris     [numberOfSensableDebris]   = sensableRobot;
+                        sensableDebrisInfos[numberOfSensableDebris++] = sensableRobotInfo;
+                    }
+                }
+            }
+            
+            
             robotsDeepSensed = true;
             blockersSensed = true;
         
@@ -325,14 +351,69 @@ public class SensorHandler {
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
         }
-    }*/
+    }
     
+    public RobotInfo[] getEnemyRobotInfos() {
+        deepSenseRobotInfo();
+        if(numberOfSensableEnemyRobots == 0) {
+            if(numberOfSensableEnemyBuildings == 0) {
+                return null;
+            }
+            return sensableEnemyBuildingInfos;
+        }
+        return sensableEnemyRobotInfos;
+    }
+    
+    public int getNumberOfSensableEnemyRobots() {
+        deepSenseRobotInfo();
+        if(numberOfSensableEnemyRobots == 0) {
+            return numberOfSensableEnemyBuildings;
+        }
+        return numberOfSensableEnemyRobots;
+    }
+    
+    public MapLocation getNearestEnemyLocation() {
+        if(gottenNearestEnemy) return nearestEnemyLocation;
+        deepSenseRobotInfo();
+        
+        int nearestEnemyDistance = BIG_INT;
+        nearestEnemyLocation = null;
+        
+        for(int index = 0; index < numberOfSensableEnemyRobots; index++) {
+            MapLocation enemyLocation = sensableEnemyRobotInfos[index].location;
+            
+            int distance = myLocation.distanceSquaredTo(enemyLocation);
+            if(distance < nearestEnemyDistance) {
+                nearestEnemyDistance = distance;
+                nearestEnemyLocation = enemyLocation;
+            }
+        }
+        
+        for(int index = 0; index < numberOfSensableEnemyBuildings; index++) {
+            MapLocation enemyLocation = sensableEnemyBuildingInfos[index].location;
+            
+            int distance = myLocation.distanceSquaredTo(enemyLocation);
+            if(distance < nearestEnemyDistance) {
+                nearestEnemyDistance = distance;
+                nearestEnemyLocation = enemyLocation;
+            }
+        }
+        
+        gottenNearestEmptyMine = true;
+        
+        return nearestEnemyLocation;
+    }
+    
+    public int getNumberOfSensableAlliedRobots() {
+        deepSenseRobotInfo();
+        return numberOfSensableAlliedRobots;
+    }
     
     
     private void senseBlockers() {
         
         if(blockersSensed) return;
-        if(!robotInfosSensed) senseRobotInfo();
+        senseRobotInfos();
         
         try {
                 
@@ -415,8 +496,8 @@ public class SensorHandler {
     private void senseEmptyMines() {
         if(emptyMinesSensed) return;
         
-        if(!minesSensed) senseMines();
-        if(!blockersSensed) senseBlockers();
+        senseMines();
+        senseBlockers();
         
         numberOfSensableEmptyMines = 0;
         
@@ -432,53 +513,47 @@ public class SensorHandler {
     }
     
     public Mine[] getSensableMines() {
-        if(!minesSensed) {
-            senseMines();
-        }
+        senseMines();
         return sensableMines;
     }
     
     public int getNumberOfSensableMines() {
-        if(!minesSensed) {
-            senseMines();
-        }
+        senseMines();
         return numberOfSensableMines;
     }
     
     public MapLocation getNearestEmptyMine() {
-        if(!emptyMinesSensed) {
-            senseEmptyMines();
-        }
+        if(gottenNearestEmptyMine) return nearestEmptyMineLocation;
+        senseEmptyMines();
         
-        int nearestMineDistance = BIG_INT;
-        MapLocation nearestMineLocation = myLocation;
+        int nearestEmptyMineDistance = BIG_INT;
+        nearestEmptyMineLocation = null;
         
         for(int index = 0; index < numberOfSensableEmptyMines; index++) {
             MapLocation mineLocation = sensableEmptyMines[index].getLocation();
             
             int distance = myLocation.distanceSquaredTo(mineLocation);
-            if(distance < nearestMineDistance) {
-                nearestMineDistance = distance;
-                nearestMineLocation = mineLocation;
+            if(distance < nearestEmptyMineDistance) {
+                nearestEmptyMineDistance = distance;
+                nearestEmptyMineLocation = mineLocation;
             }
         }
         
-        if(nearestMineLocation.equals(myLocation)) return null;
-        return nearestMineLocation;
+        gottenNearestEmptyMine = true;
+        return nearestEmptyMineLocation;
     }
 
     
     
+    
     public void senseStartingLightPlayer ()
     {
-        if(!robotsSensed) {
-            senseRobots();
-        }
+        senseRobots();
 
         for(int index = 0; index < numberOfSensableRobots; index ++) {
             try {
                 RobotInfo info = mySCs[0].senseRobotInfo(sensableRobots[index]);
-                if( info.chassis.equals(Chassis.LIGHT) ) {
+                if( info.chassis == Chassis.LIGHT ) {
                     startingLightInfo = info;
                     break;
                 }
@@ -491,7 +566,7 @@ public class SensorHandler {
     
     
     public TerrainStatus getTerrainStatus(MapLocation location) {
-        if(!blockersSensed) senseBlockers();
+        senseBlockers();
         int hashX = location.x % LOCATION_HASH_SIZE;
         int hashY = location.y % LOCATION_HASH_SIZE;
         TerrainStatus terrainStatus = terrainStatusHash[hashX][hashY];
@@ -521,6 +596,23 @@ public class SensorHandler {
             return null;
         }
     }
+    
+    
+    
+    public double getOwnIncome() {
+        if(ownIncomeSensed) return ownIncome;
+        
+        ownIncomeSensed = true;
+        
+        try {
+            return mySCs[0].senseIncome(myRobot);
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+            return 0;
+        }
+    }
+    
     
     
     /**
@@ -653,21 +745,25 @@ public class SensorHandler {
     public Boolean amLowestIDRecycler() {
         try {
             SensorController sensor = mySCs[0];
+            
             for (Robot robot : sensor.senseNearbyGameObjects(Robot.class)) {
                 RobotInfo robotInfo = sensor.senseRobotInfo(robot);
                 Team team = robot.getTeam();
+                
                 if (team == myTeam) {
                     ComponentType[] compTypes = robotInfo.components;
+                    
                     switch (robotInfo.chassis) {
-                        case BUILDING:
-                            for (ComponentType compType : compTypes) {
-                                if (compType == ComponentType.RECYCLER) {
-                                    if (robot.getID() < myID) {
-                                        return false;
-                                    }
-                                    break;
+                    
+                    case BUILDING:
+                        for (ComponentType compType : compTypes) {
+                            if (compType == ComponentType.RECYCLER) {
+                                if (robot.getID() < myID) {
+                                    return false;
                                 }
+                                break;
                             }
+                        }
                     }
                 }
             }
