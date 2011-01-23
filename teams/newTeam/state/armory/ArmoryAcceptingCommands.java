@@ -23,6 +23,10 @@ public class ArmoryAcceptingCommands extends BaseState {
 
         for( Message message : messages )
         {
+//            if(Clock.getRoundNum() == 501) {
+//                Logger.debug_printHocho("got message");
+//                Logger.debug_printHocho("currentBuilding? " + myBH.getCurrentlyBuilding() + " messageType? " + MessageCoder.getMessageType(message).equals(MessageCoder.BUILD_UNIT_COMMAND) + " myId? " + (MessageCoder.getIntFromBody(message, 0) == myK.myRobotID) + " isValid? " + MessageCoder.isValid(message));
+//            }
             if( !myBH.getCurrentlyBuilding() && MessageCoder.getMessageType(message).equals(MessageCoder.BUILD_UNIT_COMMAND) && MessageCoder.getIntFromBody(message, 0) == myK.myRobotID && MessageCoder.isValid(message) )
             {
                 BuildInstructions instructions = Prefab.getInstructionsFromID( MessageCoder.getStringFromBody(message, 0) );

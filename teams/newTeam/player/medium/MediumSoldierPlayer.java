@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 import newTeam.player.BasePlayer;
 import newTeam.state.BaseState;
-import newTeam.state.idle.Idling;
+import newTeam.state.exploring.SoldierExploring;
 
 public class MediumSoldierPlayer extends MediumPlayer {
     
@@ -15,7 +15,7 @@ public class MediumSoldierPlayer extends MediumPlayer {
 
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new Idling( oldState );
+        return new SoldierExploring( oldState );
     }
 
     @Override

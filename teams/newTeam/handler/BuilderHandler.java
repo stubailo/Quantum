@@ -63,6 +63,7 @@ public class BuilderHandler {
 
     public void buildUnit(BuildInstructions instructions, MapLocation location) {
         try {
+            Logger.debug_printHocho("trying to build unit...");
             myBC.build(instructions.getBaseChassis(), location);
 
             buildComponents( instructions, location );
@@ -189,14 +190,17 @@ public class BuilderHandler {
                 buildUnit( instructions, location );
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, factoryID ) );
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, armoryID ) );
+                break;
             case FACTORY:
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, factoryID ) );
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, armoryID ) );
                 waitToBuild( instructions, location );
+                break;
             case ARMORY:
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, armoryID ) );
                 myBCH.addToQueue( genBuildCommandMessage( instructions, location, factoryID ) );
                 waitToBuild( instructions, location );
+                break;
         }
     }
 

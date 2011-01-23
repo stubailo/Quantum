@@ -22,6 +22,7 @@ public class SensorHandler {
     private final Team               myTeam;
     private final Team               enemyTeam;
     private final int                myID;
+    private final Robot              myRobot;
     
     /*** Round Constants ***/
     private       MapLocation        myLocation;
@@ -44,6 +45,7 @@ public class SensorHandler {
     private boolean         minesSensed             = false;
     private boolean         blockersSensed          = false;
     private boolean         emptyMinesSensed        = false;
+    private boolean         ownIncomeSensed         = false;
     //private final boolean[] sensableRobotsIdHash    = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
     
     /***
@@ -80,6 +82,8 @@ public class SensorHandler {
     
     private         boolean             enemiesNearby;
     
+    private         double              ownIncome;
+    
     public          MapLocation         startingTurnedOnRecyclerLocation,
                                         startingFirstMineToBeBuiltLocation,
                                             startingSecondMineToBeBuiltLocation,
@@ -100,9 +104,10 @@ public class SensorHandler {
         myK  = know;
         myMC = (MovementController) myRC.components()[0];
         
-        myTeam = myK.myTeam;
+        myTeam    = myK.myTeam;
         enemyTeam = myTeam.opponent();
-        myID   = myK.myRobotID;
+        myID      = myK.myRobotID;
+        myRobot   = myK.myRobot;
     }
     
     
@@ -122,10 +127,12 @@ public class SensorHandler {
     public void refresh() {
         if(lastRoundRefreshed == Clock.getRoundNum()) return;
         
-        robotsSensed = false;
+        robotsSensed     = false;
         robotInfosSensed = false;
         robotsDeepSensed = false;
-        enemiesNearby = false;
+        enemiesNearby    = false;
+        ownIncomeSensed  = false;
+        
         myLocation = myK.myLocation;
         //if(myK.justMoved || myK.justTurned) {
         if(myK.justMoved || myK.justTurned) {
@@ -526,6 +533,23 @@ public class SensorHandler {
             return null;
         }
     }
+    
+    
+    
+    public double getOwnIncome() {
+        if(ownIncomeSensed) return ownIncome;
+        
+        ownIncomeSensed = true;
+        
+        try {
+            return mySCs[0].senseIncome(myRobot);
+        }
+        catch(Exception e) {
+            Logger.debug_printExceptionMessage(e);
+            return 0;
+        }
+    }
+    
     
     
     /**

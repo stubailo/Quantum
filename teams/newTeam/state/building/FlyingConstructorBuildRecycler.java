@@ -59,8 +59,10 @@ public class FlyingConstructorBuildRecycler extends BaseState {
 
         if( !builtRecycler && myMH.reachedGoal() )
         {
-            myBH.buildUnit( Prefab.commRecycler , theMine);
-            builtRecycler = true;
+            if(myK.totalFlux > Prefab.commRecycler.getTotalCost()) {
+                myBH.buildUnit( Prefab.commRecycler , theMine);
+                builtRecycler = true;
+            }
         }
 
         myMH.step();

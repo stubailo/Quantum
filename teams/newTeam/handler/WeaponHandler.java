@@ -42,13 +42,11 @@ public class WeaponHandler {
         
     }
     
-    public void attack(RobotInfo[] robotInfos) {
-        attack(robotInfos, new int[robotInfos.length]);
+    public void attack(RobotInfo[] robotInfos, int length) {
+        attack(robotInfos, length, new int[robotInfos.length]);
     }
     
-    public void attack(RobotInfo[] robotInfos, int[] priorities) {
-        
-        int length = robotInfos.length;
+    public void attack(RobotInfo[] robotInfos, int length, int[] priorities) {
         
         MapLocation[] mapLocations = new MapLocation[length];
         RobotLevel[]  levels       = new RobotLevel [length];

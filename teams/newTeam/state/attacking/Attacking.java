@@ -10,6 +10,7 @@ import newTeam.state.exploring.SoldierExploring;
 public class Attacking extends BaseState {
     
     private RobotInfo[] enemyRobotInfos;
+    private int         numberOfEnemies;
     
     public Attacking(BaseState state) {
         super(state);
@@ -18,6 +19,7 @@ public class Attacking extends BaseState {
     @Override
     public void senseAndUpdateKnowledge() {
         enemyRobotInfos = mySH.getEnemyRobotInfos();
+        numberOfEnemies = mySH.getNumberOfSensableEnemyRobots();
     }
     
     @Override
@@ -30,7 +32,7 @@ public class Attacking extends BaseState {
     
     public BaseState execute() {
         
-        myWH.attack(enemyRobotInfos);
+        myWH.attack(enemyRobotInfos, numberOfEnemies);
         
         return this;
     }
