@@ -8,7 +8,7 @@ import newTeam.state.exploring.FlyingSensorExploring;
 import newTeam.player.BasePlayer;
 import newTeam.common.*;
 
-public class FlyingSensorPlayer extends BasePlayer {
+public class FlyingSensorPlayer extends FlyingPlayer {
 
     public FlyingSensorPlayer(BaseState state) {
         super(state);

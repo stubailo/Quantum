@@ -1,5 +1,6 @@
 package newTeam.state.exploring;
 
+import newTeam.state.fleeing.FlyingSensorFleeing;
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
@@ -47,6 +48,11 @@ public class FlyingSensorExploring extends BaseState {
             myBCH.addToQueue( MessageCoder.encodeMessage( MessageCoder.FLYER_FOUND_MINE , myRC.getRobot().getID(), myRC.getLocation(), Clock.getRoundNum(), false, strings, ints, locations) );
 
             return new FlyingWaitingForConstructor( this, nearestMine );
+        }
+
+        if( mySH.areEnemiesNearby() )
+        {
+            return new FlyingSensorFleeing( this );
         }
 
         myMH.step();
