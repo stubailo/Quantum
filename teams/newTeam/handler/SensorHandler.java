@@ -344,6 +344,9 @@ public class SensorHandler {
     
     public int getNumberOfSensableEnemyRobots() {
         deepSenseRobotInfo();
+        if(numberOfSensableEnemyRobots == 0) {
+            return numberOfSensableEnemyBuildings;
+        }
         return numberOfSensableEnemyRobots;
     }
     
