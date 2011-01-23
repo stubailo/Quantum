@@ -49,6 +49,10 @@ public class MovementHandler {
             navigator = new TangentBug(myRC, myK, myMC, mySH, goalLocation);
             break;
             //TODO: add TANGENT_BUG
+            
+        case BUG_BACKWARD:
+            navigator = new BugBackwardNavigator(myRC, myK, myMC, goalLocation);
+            break;
         }
     }
     
@@ -111,6 +115,10 @@ public class MovementHandler {
             Logger.debug_printExceptionMessage(e);
             return false;
         }
+    }
+    
+    public boolean explore() {
+        return false;
     }
     
     public boolean reachedGoal() {
