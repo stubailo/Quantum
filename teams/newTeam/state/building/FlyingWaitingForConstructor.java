@@ -38,6 +38,8 @@ public class FlyingWaitingForConstructor extends BaseState {
         {
             if( MessageCoder.getMessageType(message).equals(MessageCoder.BUILT_RECYCLER) && MessageCoder.getIntFromBody(message, 0) == myK.myRobotID )
             {
+                mySH.thoroughRefresh();
+                Logger.debug_printHocho("MINE built!");
                 return new FlyingSensorExploring( this );
             }
         }
@@ -58,6 +60,7 @@ public class FlyingWaitingForConstructor extends BaseState {
             
             System.out.println("sending abort command");
 
+            mySH.thoroughRefresh();
             return new FlyingSensorExploring( this );
         }
 

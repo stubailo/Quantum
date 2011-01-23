@@ -55,7 +55,7 @@ public class SensorHandler {
      * 
      * 
      */
-    private         int                 horizontalSightRange            = 0,
+    public          int                 horizontalSightRange            = 0,
                                         forwardSightRange               = 0;
     
     private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
@@ -153,11 +153,12 @@ public class SensorHandler {
     public void refresh() {
         if(lastRoundRefreshed == Clock.getRoundNum()) return;
         
-        robotsSensed     = false;
-        robotInfosSensed = false;
-        robotsDeepSensed = false;
-        enemiesNearby    = false;
-        ownIncomeSensed  = false;
+        robotsSensed        = false;
+        robotInfosSensed    = false;
+        robotsDeepSensed    = false;
+        enemiesNearby       = false;
+        gottenNearestEnemy  = false;
+        ownIncomeSensed     = false;
         
         myLocation = myK.myLocation;
         //if(myK.justMoved || myK.justTurned) {
@@ -167,6 +168,24 @@ public class SensorHandler {
             gottenNearestEmptyMine = false;
             blockersSensed         = false;
         }
+        
+        lastRoundRefreshed = Clock.getRoundNum();
+    }
+    
+    public void thoroughRefresh() {
+        robotsSensed        = false;
+        robotInfosSensed    = false;
+        robotsDeepSensed    = false;
+        enemiesNearby       = false;
+        gottenNearestEnemy  = false;
+        ownIncomeSensed     = false;
+        
+        myLocation = myK.myLocation;
+        
+        minesSensed            = false;
+        emptyMinesSensed       = false;
+        gottenNearestEmptyMine = false;
+        blockersSensed         = false;
         
         lastRoundRefreshed = Clock.getRoundNum();
     }
@@ -523,8 +542,12 @@ public class SensorHandler {
     }
     
     public MapLocation getNearestEmptyMine() {
+        Logger.debug_printHocho("getting nearest empty mine");
+        
         if(gottenNearestEmptyMine) return nearestEmptyMineLocation;
         senseEmptyMines();
+        
+        Logger.debug_printHocho("re-calculating");
         
         int nearestEmptyMineDistance = BIG_INT;
         nearestEmptyMineLocation = null;
@@ -540,6 +563,7 @@ public class SensorHandler {
         }
         
         gottenNearestEmptyMine = true;
+        Logger.debug_printHocho("nearestEmptyMineLocation: " + nearestEmptyMineLocation);
         return nearestEmptyMineLocation;
     }
 
