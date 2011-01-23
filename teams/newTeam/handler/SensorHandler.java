@@ -55,6 +55,9 @@ public class SensorHandler {
      * 
      * 
      */
+    private         int                 horizontalSightRange            = 0,
+                                        forwardSightRange               = 0;
+    
     private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   int[]               sensableRobotsSensorHash        = new int[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   RobotInfo[]         sensableRobotInfos              = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
@@ -121,6 +124,25 @@ public class SensorHandler {
      * @param sc    SensorController to be added
      */
     public void addSC(SensorController sc) {
+        
+        switch(sc.type()) {
+        
+        case SIGHT:
+            horizontalSightRange = 2;
+            forwardSightRange    = 3;
+            break;
+            
+        case RADAR:
+            horizontalSightRange = 6;
+            forwardSightRange    = 6;
+            break;
+            
+        case SATELLITE:
+            horizontalSightRange = 10;
+            forwardSightRange    = 10;
+            break;
+        }
+        
         mySCs[numberOfSensors] = sc;
         numberOfSensors++;
     }
