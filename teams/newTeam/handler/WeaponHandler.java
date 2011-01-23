@@ -42,6 +42,28 @@ public class WeaponHandler {
         
     }
     
+    public void attack(RobotInfo[] robotInfos) {
+        attack(robotInfos, new int[robotInfos.length]);
+    }
+    
+    public void attack(RobotInfo[] robotInfos, int[] priorities) {
+        
+        int length = robotInfos.length;
+        
+        MapLocation[] mapLocations = new MapLocation[length];
+        RobotLevel[]  levels       = new RobotLevel [length];
+        double[]      hps          = new double     [length];
+        
+        for(int index = 0; index < length; index++) {
+            RobotInfo robotInfo = robotInfos[index];
+            mapLocations[index] = robotInfo.location;
+            levels[index] = robotInfo.chassis == Chassis.FLYING ? RobotLevel.IN_AIR : RobotLevel.ON_GROUND;
+            hps[index] = robotInfo.hitpoints;
+        }
+        
+        recursiveAttackAlgorithm(mapLocations, levels, hps, priorities, 0);
+    }
+    
     public void attack(MapLocation[] mapLocations, RobotLevel[] levels, double[] hps) {
         attack(mapLocations, levels, hps, new int[mapLocations.length]);
     }
