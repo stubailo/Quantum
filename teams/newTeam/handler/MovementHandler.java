@@ -149,6 +149,12 @@ public class MovementHandler {
         navigator = new MoveBackwardNavigator(myRC, myMC);
     }
     
+    public void moveToward(MapLocation location) {
+        navigatorType = NavigatorType.MOVE_TOWARD;
+        navigator = new MoveTowardNavigator(myRC, myMC, location);
+        step();
+    }
+    
     public void zigZag() {
         navigatorType = NavigatorType.ZIG_ZAG;
         navigator = new ZigZagNavigator(myMC, myK);

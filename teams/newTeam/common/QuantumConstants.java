@@ -58,7 +58,8 @@ public final class QuantumConstants {
 	public static final int MAX_NUMBER_OF_SENSABLE_THINGS = 400;
 	
 	/** Cut-off for delta flux for building soldiers*/
-	public static final int DELTA_FLUX_CUTOFF = 3;
+	public static final double HIGHER_DELTA_FLUX_CUTOFF = 3;
+	public static final double LOWER_DELTA_FLUX_CUTOFF  = 0.2;
 	
 	/** Planck's constant */
 	public static final double H = 6.626069E-34;

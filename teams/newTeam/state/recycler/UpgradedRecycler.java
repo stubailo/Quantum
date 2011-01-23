@@ -10,8 +10,9 @@ import newTeam.common.QuantumConstants;
 
 public class UpgradedRecycler extends BaseState {
     
-    private static final int DELTA_FLUX_CUTOFF = QuantumConstants.DELTA_FLUX_CUTOFF;
-    private static final int BUILD_BUFFER      = 150;
+    private static final double HIGHER_DELTA_FLUX_CUTOFF = QuantumConstants.HIGHER_DELTA_FLUX_CUTOFF;
+    private static final double LOWER_DELTA_FLUX_CUTOFF  = QuantumConstants.LOWER_DELTA_FLUX_CUTOFF;
+    private static final int    BUILD_BUFFER             = 150;
 
     private final MapLocation[]   buildLocations;
     
@@ -76,7 +77,7 @@ public class UpgradedRecycler extends BaseState {
                     }
                 }
             }
-            else if((mineBuilt || myK.deltaFlux > DELTA_FLUX_CUTOFF || justBuiltConstructor) && hasMadeFirstConstructor) {
+            else if((mineBuilt || myK.averageDeltaFlux > HIGHER_DELTA_FLUX_CUTOFF || justBuiltConstructor) && hasMadeFirstConstructor && myK.averageDeltaFlux > LOWER_DELTA_FLUX_CUTOFF) {
                 if(myK.totalFlux > Prefab.mediumSoldier.getTotalCost() + BUILD_BUFFER) {
                     MapLocation location = getEmptyIntersectLocation();
                     

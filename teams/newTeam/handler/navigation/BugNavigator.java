@@ -132,9 +132,9 @@ public class BugNavigator implements Navigator {
     }
     
     public boolean reachedGoal() {
-        Logger.debug_printHocho("checking if reachedGoal when at: " + myK.myLocation + " and facing: " + myK.myDirection);
+//        Logger.debug_printHocho("checking if reachedGoal when at: " + myK.myLocation + " and facing: " + myK.myDirection);
         if(goingToAdjacent) {
-            Logger.debug_printHocho("trying to go adjacent to: " + goal + " and facing: " + myK.myLocation.directionTo(goal));
+//            Logger.debug_printHocho("trying to go adjacent to: " + goal + " and facing: " + myK.myLocation.directionTo(goal));
             MapLocation myLocation = myK.myLocation;
             return goal.isAdjacentTo(myLocation) && myK.myDirection == myLocation.directionTo(goal);
         }

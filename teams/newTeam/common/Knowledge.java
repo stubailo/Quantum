@@ -35,14 +35,14 @@ public class Knowledge {
     public          Direction           myPreviousDirection;
     public          boolean             justMoved;
     public          boolean             justTurned;
-    public          double              previousFlux;
-    public          double              deltaFlux;
+    private         double              previousFlux;
+    private         double              deltaFlux;
     public          double              totalFlux;
-    public          double              deltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
+    private         double              deltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
     public          double              averageDeltaFlux = BIG_INT;
-    public          double              alternativeDeltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
-    public          int                 majorDeltaFluxShifting = 0;
-    public          double              totalDeltaFlux = 0;
+    private         double              alternativeDeltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
+    private         int                 majorDeltaFluxShifting = 0;
+    private         double              totalDeltaFlux = 0;
     
     /*** SpecificPlayer-specific ***/
     

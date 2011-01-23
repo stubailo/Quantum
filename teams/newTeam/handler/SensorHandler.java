@@ -42,9 +42,11 @@ public class SensorHandler {
     private boolean         robotsSensed            = false;
     private boolean         robotInfosSensed        = false;
     private boolean         robotsDeepSensed        = false;
+    private boolean         gottenNearestEnemy      = false;
     private boolean         minesSensed             = false;
     private boolean         blockersSensed          = false;
     private boolean         emptyMinesSensed        = false;
+    private boolean         gottenNearestEmptyMine  = false;
     private boolean         ownIncomeSensed         = false;
     //private final boolean[] sensableRobotsIdHash    = new boolean[MAX_TOTAL_NUMBER_OF_ROBOTS];
     
@@ -80,7 +82,9 @@ public class SensorHandler {
     
     private final   TerrainStatus[][]   terrainStatusHash           = new TerrainStatus[LOCATION_HASH_SIZE][LOCATION_HASH_SIZE];
     
+    private         MapLocation         nearestEmptyMineLocation;
     private         boolean             enemiesNearby;
+    private         MapLocation         nearestEnemyLocation;
     
     private         double              ownIncome;
     
@@ -136,9 +140,10 @@ public class SensorHandler {
         myLocation = myK.myLocation;
         //if(myK.justMoved || myK.justTurned) {
         if(myK.justMoved || myK.justTurned) {
-            minesSensed = false;
-            emptyMinesSensed = false;
-            blockersSensed = false;
+            minesSensed            = false;
+            emptyMinesSensed       = false;
+            gottenNearestEmptyMine = false;
+            blockersSensed         = false;
         }
         
         lastRoundRefreshed = Clock.getRoundNum();
@@ -342,6 +347,38 @@ public class SensorHandler {
         return numberOfSensableEnemyRobots;
     }
     
+    public MapLocation getNearestEnemyLocation() {
+        if(gottenNearestEnemy) return nearestEnemyLocation;
+        deepSenseRobotInfo();
+        
+        int nearestEnemyDistance = BIG_INT;
+        nearestEnemyLocation = null;
+        
+        for(int index = 0; index < numberOfSensableEnemyRobots; index++) {
+            MapLocation enemyLocation = sensableEnemyRobotInfos[index].location;
+            
+            int distance = myLocation.distanceSquaredTo(enemyLocation);
+            if(distance < nearestEnemyDistance) {
+                nearestEnemyDistance = distance;
+                nearestEnemyLocation = enemyLocation;
+            }
+        }
+        
+        for(int index = 0; index < numberOfSensableEnemyBuildings; index++) {
+            MapLocation enemyLocation = sensableEnemyBuildingInfos[index].location;
+            
+            int distance = myLocation.distanceSquaredTo(enemyLocation);
+            if(distance < nearestEnemyDistance) {
+                nearestEnemyDistance = distance;
+                nearestEnemyLocation = enemyLocation;
+            }
+        }
+        
+        gottenNearestEmptyMine = true;
+        
+        return nearestEnemyLocation;
+    }
+    
     public int getNumberOfSensableAlliedRobots() {
         deepSenseRobotInfo();
         return numberOfSensableAlliedRobots;
@@ -461,23 +498,24 @@ public class SensorHandler {
     }
     
     public MapLocation getNearestEmptyMine() {
+        if(gottenNearestEmptyMine) return nearestEmptyMineLocation;
         senseEmptyMines();
         
-        int nearestMineDistance = BIG_INT;
-        MapLocation nearestMineLocation = myLocation;
+        int nearestEmptyMineDistance = BIG_INT;
+        nearestEmptyMineLocation = null;
         
         for(int index = 0; index < numberOfSensableEmptyMines; index++) {
             MapLocation mineLocation = sensableEmptyMines[index].getLocation();
             
             int distance = myLocation.distanceSquaredTo(mineLocation);
-            if(distance < nearestMineDistance) {
-                nearestMineDistance = distance;
-                nearestMineLocation = mineLocation;
+            if(distance < nearestEmptyMineDistance) {
+                nearestEmptyMineDistance = distance;
+                nearestEmptyMineLocation = mineLocation;
             }
         }
         
-        if(nearestMineLocation.equals(myLocation)) return null;
-        return nearestMineLocation;
+        gottenNearestEmptyMine = true;
+        return nearestEmptyMineLocation;
     }
 
     

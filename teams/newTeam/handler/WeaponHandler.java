@@ -9,12 +9,35 @@ public class WeaponHandler {
     private final Knowledge          myK;
     private final WeaponController[] myWCs           = new WeaponController[20];
     private       int                numberOfWeapons = 0;
+    public        int                range           = 0;
     
     public WeaponHandler(Knowledge know) {
         myK = know;
     }
     
     public void addWC(WeaponController wc) {
+        
+        switch(wc.type()) {
+        
+        case RAILGUN:
+            range = 25;
+            break;
+            
+        case SMG:
+            if(range == 0) range = 36;
+            break;
+            
+        case BLASTER:
+            if(range < 16) range = 16;
+            break;
+            
+        case HAMMER:
+            if(range < 4) range = 4;
+            break;
+            
+        // TODO: deal with break
+        }
+        
         boolean replacing = false;
         WeaponController myWC1 = null, myWC2;
         for(int index = 0; index < numberOfWeapons; index++) {
