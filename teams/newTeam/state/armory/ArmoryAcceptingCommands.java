@@ -33,7 +33,7 @@ public class ArmoryAcceptingCommands extends BaseState {
                 MapLocation buildLocation = MessageCoder.getLocationFromBody(message, 0);
                 RobotLevel height = instructions.getBaseChassis().level;
 
-                System.out.println( "got command to build" );
+                Logger.debug_printSashko( "got command to build" );
 
                 if( myBH.chassisBuiltByMe(instructions.getBaseChassis()) )
                 {

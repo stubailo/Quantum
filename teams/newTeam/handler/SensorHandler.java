@@ -59,9 +59,9 @@ public class SensorHandler {
                                         forwardSightRange               = 0;
     
     private final   Robot[]             sensableRobots                  = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
-    private final   int[]               sensableRobotsSensorHash        = new int[MAX_NUMBER_OF_SENSABLE_THINGS];
+    private final   int[]               sensableRobotsSensorHash        = new int[MAX_TOTAL_NUMBER_OF_ROBOTS];
     private final   RobotInfo[]         sensableRobotInfos              = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
-    private final   Team[]              sensableRobotTeams              = new Team[MAX_NUMBER_OF_SENSABLE_THINGS];
+    //private final   Team[]              sensableRobotTeams              = new Team[MAX_TOTAL_NUMBER_OF_ROBOTS];
     private         int                 numberOfSensableRobots          = 0;
     private final   Robot[]             sensableAlliedRobots            = new Robot[MAX_NUMBER_OF_SENSABLE_THINGS];
     private final   RobotInfo[]         sensableAlliedRobotInfos        = new RobotInfo[MAX_NUMBER_OF_SENSABLE_THINGS];
@@ -224,16 +224,17 @@ public class SensorHandler {
         for(int index = 0; index < numberOfSensors; index ++) {
             for(Robot sensableRobot : mySCs[index].senseNearbyGameObjects(Robot.class)) {
                 int id = sensableRobot.getID();
+//                Logger.debug_printHocho("id: " + id);
                 if(!sensableRobotsIdHash[id]) {
                     
                     sensableRobots[numberOfSensableRobots++] = sensableRobot;
                     sensableRobotsIdHash[id] = true;
-                    sensableRobotsSensorHash[id] = index;
+//                    sensableRobotsSensorHash[id] = index;
                     
-                    Team sensableRobotTeam = sensableRobot.getTeam();
-                    sensableRobotTeams[id] = sensableRobotTeam;
+//                    Team sensableRobotTeam = sensableRobot.getTeam();
+//                    sensableRobotTeams[id] = sensableRobotTeam;
                     
-                    if(sensableRobotTeam == enemyTeam) {
+                    if(sensableRobot.getTeam() == enemyTeam) {
                         enemiesNearby = true;
                     }
                 }
@@ -398,23 +399,29 @@ public class SensorHandler {
         int nearestEnemyDistance = BIG_INT;
         nearestEnemyLocation = null;
         
-        for(int index = 0; index < numberOfSensableEnemyRobots; index++) {
-            MapLocation enemyLocation = sensableEnemyRobotInfos[index].location;
-            
-            int distance = myLocation.distanceSquaredTo(enemyLocation);
-            if(distance < nearestEnemyDistance) {
-                nearestEnemyDistance = distance;
-                nearestEnemyLocation = enemyLocation;
+        if(numberOfSensableEnemyRobots > 0) {
+        
+            for(int index = 0; index < numberOfSensableEnemyRobots; index++) {
+                MapLocation enemyLocation = sensableEnemyRobotInfos[index].location;
+                
+                int distance = myLocation.distanceSquaredTo(enemyLocation);
+                if(distance < nearestEnemyDistance) {
+                    nearestEnemyDistance = distance;
+                    nearestEnemyLocation = enemyLocation;
+                }
             }
         }
         
-        for(int index = 0; index < numberOfSensableEnemyBuildings; index++) {
-            MapLocation enemyLocation = sensableEnemyBuildingInfos[index].location;
-            
-            int distance = myLocation.distanceSquaredTo(enemyLocation);
-            if(distance < nearestEnemyDistance) {
-                nearestEnemyDistance = distance;
-                nearestEnemyLocation = enemyLocation;
+        else {
+        
+            for(int index = 0; index < numberOfSensableEnemyBuildings; index++) {
+                MapLocation enemyLocation = sensableEnemyBuildingInfos[index].location;
+                
+                int distance = myLocation.distanceSquaredTo(enemyLocation);
+                if(distance < nearestEnemyDistance) {
+                    nearestEnemyDistance = distance;
+                    nearestEnemyLocation = enemyLocation;
+                }
             }
         }
         
@@ -542,13 +549,10 @@ public class SensorHandler {
     }
     
     public MapLocation getNearestEmptyMine() {
-        Logger.debug_printHocho("getting nearest empty mine");
         
         if(gottenNearestEmptyMine) return nearestEmptyMineLocation;
         senseEmptyMines();
-        
-        Logger.debug_printHocho("re-calculating");
-        
+                
         int nearestEmptyMineDistance = BIG_INT;
         nearestEmptyMineLocation = null;
         
@@ -563,7 +567,6 @@ public class SensorHandler {
         }
         
         gottenNearestEmptyMine = true;
-        Logger.debug_printHocho("nearestEmptyMineLocation: " + nearestEmptyMineLocation);
         return nearestEmptyMineLocation;
     }
 

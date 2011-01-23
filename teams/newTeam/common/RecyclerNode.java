@@ -24,6 +24,11 @@ public class RecyclerNode {
 
     public int armoryID;
     public MapLocation armoryLocation;
+    
+    private MapLocation[]   buildLocations                  = new MapLocation[9];
+    private boolean         buildLocationsDetermined        = false;
+    private int             numberOfLandBuildLocations      = 0;
+    private int             numberOfFlyingBuildLocations    = 0;
 
     public RecyclerNode()
     {
@@ -36,50 +41,70 @@ public class RecyclerNode {
         myLocation = i_myLocation;
     }
 
-    public MapLocation[] genBuildLocations ()
+    private boolean genBuildLocations ()
     {
-        if( factoryLocation==null )
-        {
-            MapLocation[] output = { myLocation };
-            return output;
-        }
+        if(factoryLocation == null || armoryLocation == null) return false;
+        if(buildLocationsDetermined) return true;
+        buildLocationsDetermined = true;
 
-        MapLocation[] adjacentLocations = new MapLocation[4];
+        MapLocation[] adjacentLocations = new MapLocation[6];
 
         MapLocation[] outputLocations = new MapLocation[4];
 
         Direction primaryDir = factoryLocation.directionTo(myLocation);
+        
+        int numberOfPotentialLandLocations = 0;
 
         if( primaryDir.isDiagonal() )
         {
             adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
             adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
+            numberOfPotentialLandLocations = 2;
         } else {
             adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
             adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
             adjacentLocations[2] = factoryLocation.add(primaryDir.rotateLeft().rotateLeft());
             adjacentLocations[3] = factoryLocation.add(primaryDir.rotateRight().rotateRight());
+            numberOfPotentialLandLocations = 4;
         }
 
-        if( armoryLocation == null )
+        for(int index = 0; index < numberOfPotentialLandLocations; index++)
         {
-            return adjacentLocations;
-        }
-
-        int outputi = 0;
-
-        for( MapLocation location : adjacentLocations )
-        {
-            if( location == null )
-            {
-                break;
-            } else if ( location.isAdjacentTo( armoryLocation ) ) {
-                outputLocations [outputi] = location;
-                outputi++;
+            MapLocation potentialBuildLocation = adjacentLocations[index];
+            if(potentialBuildLocation.isAdjacentTo(armoryLocation)) {
+                buildLocations[numberOfLandBuildLocations++] = potentialBuildLocation;
             }
         }
-
-        return outputLocations;
+        
+        numberOfFlyingBuildLocations = numberOfLandBuildLocations;
+        
+        if(myLocation.isAdjacentTo(factoryLocation) && myLocation.isAdjacentTo(armoryLocation)) {
+            buildLocations[numberOfFlyingBuildLocations++] = myLocation;
+        }
+        
+        if(factoryLocation.isAdjacentTo(myLocation) && factoryLocation.isAdjacentTo(armoryLocation)) {
+            buildLocations[numberOfFlyingBuildLocations++] = factoryLocation;
+        }
+        
+        if(armoryLocation.isAdjacentTo(factoryLocation) && armoryLocation.isAdjacentTo(myLocation)) {
+            buildLocations[numberOfFlyingBuildLocations++] = armoryLocation;
+        }
+        return true;
+    }
+    
+    public MapLocation[] getBuildLocations() {
+        if(!genBuildLocations()) return null;
+        return buildLocations;
+    }
+    
+    public int getNumberOfLandBuildLocations() {
+        if(!genBuildLocations()) return -1;
+        return numberOfLandBuildLocations;
+    }
+    
+    public int getNumberOfFlyingBuildLocations() {
+        if(!genBuildLocations()) return -1;
+        return numberOfFlyingBuildLocations;
     }
 
     @Override

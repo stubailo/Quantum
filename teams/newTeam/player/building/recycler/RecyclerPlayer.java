@@ -50,7 +50,7 @@ public class RecyclerPlayer extends BuildingPlayer {
             {
                 
                 myK.myRecyclerNode.armoryID = MessageCoder.getIntFromBody(message, 0);
-                System.out.println( "found armory! " + myK.myRecyclerNode.armoryID );
+                Logger.debug_printSashko( "found armory! " + myK.myRecyclerNode.armoryID );
             }
         }
 

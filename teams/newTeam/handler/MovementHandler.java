@@ -136,14 +136,17 @@ public class MovementHandler {
         }
     }
     
-    public void setDirection(Direction direction) {
+    public boolean setDirection(Direction direction) {
         try {
             if(!myMC.isActive()) {
                 myMC.setDirection(direction);
+                return true;
             }
+            return false;
         }
         catch(Exception e) {
             Logger.debug_printExceptionMessage(e);
+            return false;
         }
     }
     

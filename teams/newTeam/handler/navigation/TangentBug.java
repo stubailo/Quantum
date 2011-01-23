@@ -65,7 +65,6 @@ public class TangentBug implements Navigator {
     }
 
     public MovementAction getNextAction() {
-        Logger.debug_printHocho("Round num: " + Clock.getRoundNum() + ", location: " + myK.myLocation);
         //stop navigating if you are at goal or the motor is active
         if(reachedGoal()) {
             return MovementAction.AT_GOAL;
@@ -207,7 +206,6 @@ public class TangentBug implements Navigator {
             //check if we need to branch bugs
             clone = currentVB.shouldBranch();
             if(clone) {
-                Logger.debug_printHocho("cloning!");
                 branchBug = currentVB.clone();
                 branchBug.setOrientationClockwise(false);
                 branchBug.index = numberOfBugs;
@@ -246,7 +244,6 @@ public class TangentBug implements Navigator {
 //            turnsAlongPath[virtualBugIndex] = currentVB.getTurnsAlongPath();
             
             //Switch paths if necessary
-            Logger.debug_printHocho("weights: " + currentPathWeight + ", " + secondaryPathWeight);
             if(currentPathWeight > secondaryPathWeight) {
                 currentVB = myVBs[secondaryBugIndex];
                 currentPathWeight = pathWeights[secondaryBugIndex];
@@ -267,7 +264,6 @@ public class TangentBug implements Navigator {
                         secondaryBugIndex = i;
                     }
                 }  
-                Logger.debug_printHocho("loop number: " + String.valueOf(count) + ", secondaryBugIndex: " + String.valueOf(secondaryBugIndex));
             }
             
             //Go to the end of the current branch if we have too many bugs.
@@ -291,9 +287,6 @@ public class TangentBug implements Navigator {
             myRC.setIndicatorString(1, "loop: " + count);
 //            myRC.yield();
         }
-        Logger.debug_printHocho("loops: " + count + " stepIndex: " + stepIndex + 
-                                   " bugIndex: " + virtualBugIndex);
-        Logger.debug_printRemainingBytecodes();
         myRC.setIndicatorString(1, "loops: " + count + " stepIndex: " + stepIndex + 
                                    " bugIndex: " + virtualBugIndex);
         myRC.setIndicatorString(2, "direction: " + secondaryGoalDirection);

@@ -11,7 +11,7 @@ public class StartingLightConstructorScouting extends BaseState {
     
     public StartingLightConstructorScouting(BaseState oldState) {
         super(oldState);
-        Logger.debug_printHocho("Reached SLCS state");
+//        Logger.debug_printHocho("Reached SLCS state");
     }
     
     @Override
@@ -42,12 +42,7 @@ public class StartingLightConstructorScouting extends BaseState {
     
     @Override
     public StartingLightConstructorScouting execute() {
-        if(resultOfScoutingDirection == null) {
-            Logger.debug_printHocho("null");
-        }
-        else {
-            Logger.debug_printHocho(resultOfScoutingDirection.toString());
-        }
+        
         myMH.setDirection(resultOfScoutingDirection);
         return this;
     }

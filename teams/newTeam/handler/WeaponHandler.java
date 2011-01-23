@@ -7,9 +7,10 @@ import battlecode.common.*;
 public class WeaponHandler {
     
     private final Knowledge          myK;
-    private final WeaponController[] myWCs           = new WeaponController[20];
-    private       int                numberOfWeapons = 0;
-    public        int                range           = 0;
+    private final WeaponController[] myWCs            = new WeaponController[20];
+    private       int                numberOfWeapons  = 0;
+    public        int                range            = 0;
+    public        int                moveAwayDistance = 0;
     
     public WeaponHandler(Knowledge know) {
         myK = know;
@@ -21,21 +22,31 @@ public class WeaponHandler {
         
         case RAILGUN:
             range = 25;
+            moveAwayDistance = 16;
             break;
             
         case SMG:
-            if(range == 0) range = 36;
+            if(range == 0) {
+                moveAwayDistance = 25;
+                range = 36;
+            }
             break;
             
         case BLASTER:
-            if(range < 16) range = 16;
+            if(range < 16) {
+                moveAwayDistance = 4;
+                range = 16;
+            }
             break;
             
         case HAMMER:
-            if(range < 4) range = 4;
+            if(range < 4) {
+                moveAwayDistance = 0;
+                range = 4;
+            }
             break;
             
-        // TODO: deal with break
+        // TODO: deal with beam
         }
         
         boolean replacing = false;
@@ -237,6 +248,5 @@ public class WeaponHandler {
             WeaponController myWC = myWCs[index];
             testString += myWC.type().toString() + " ";
         }
-        Logger.debug_printHocho(testString);
     }
 }

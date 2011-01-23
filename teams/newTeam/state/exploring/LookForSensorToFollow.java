@@ -47,7 +47,7 @@ public class LookForSensorToFollow extends BaseState {
 
                 myK.squadLeaderID = MessageCoder.getBroadcasterID(message);
 
-                System.out.println( "found sensor!id: " + myK.squadLeaderID );
+                Logger.debug_printSashko( "found sensor!id: " + myK.squadLeaderID );
 
                 int[] ints = { myK.squadLeaderID };
                 String[] strings = { null };

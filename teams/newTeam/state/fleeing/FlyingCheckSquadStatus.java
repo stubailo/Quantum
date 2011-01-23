@@ -51,7 +51,7 @@ public class FlyingCheckSquadStatus extends BaseState {
 
         if( roundCounter == QuantumConstants.STATUS_TIMEOUT )
         {
-            System.out.println( "crisis mode" );
+            Logger.debug_printSashko( "crisis mode" );
         }
 
         return this;

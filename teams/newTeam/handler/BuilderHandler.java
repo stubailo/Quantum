@@ -63,7 +63,6 @@ public class BuilderHandler {
 
     public void buildUnit(BuildInstructions instructions, MapLocation location) {
         try {
-            Logger.debug_printHocho("trying to build unit...");
             myBC.build(instructions.getBaseChassis(), location);
 
             buildComponents( instructions, location );
@@ -105,7 +104,7 @@ public class BuilderHandler {
             buildTarget = mySH.senseAtLocation(buildLocation, buildHeight);
             if( buildTarget != null )
             {
-                System.out.println( "sensed something.." );
+                Logger.debug_printSashko( "sensed something.." );
                 waitingToBuild = false;
             } else if( roundsWaited < QuantumConstants.BUILD_TIMEOUT ) {
                 roundsWaited++;

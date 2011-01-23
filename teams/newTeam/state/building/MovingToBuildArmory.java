@@ -51,7 +51,7 @@ public class MovingToBuildArmory extends BaseState {
 
         if( strategyNum == 0 && myMH.getPathBlocked() )
         {
-            System.out.println( "path blocked yo");
+            Logger.debug_printSashko( "path blocked yo");
             Direction tempDir = myK.myRecyclerNode.myLocation.directionTo(facLoc).rotateRight();
 
             strategyNum = 1;

@@ -15,11 +15,11 @@ public class BuildingSecondRecycler extends BaseState {
     
     public BuildingSecondRecycler(BaseState oldState, MapLocation givenToBuildLocation) {
         super(oldState);
-        Logger.debug_printHocho(myK.myLocation.toString());
-        Logger.debug_printHocho(givenToBuildLocation.toString());
+//        Logger.debug_printHocho(myK.myLocation.toString());
+//        Logger.debug_printHocho(givenToBuildLocation.toString());
         toBuildLocation = givenToBuildLocation;
         if(myK.myLocation.equals(toBuildLocation)) {
-            Logger.debug_printHocho("initializing navigation");
+//            Logger.debug_printHocho("initializing navigation");
             myMH.initializeNavigationToAdjacent(toBuildLocation, NavigatorType.BUG);
         }
     }
@@ -43,7 +43,7 @@ public class BuildingSecondRecycler extends BaseState {
     public BaseState execute() {
 
         if(myK.myLocation.isAdjacentTo(toBuildLocation)) {
-            Logger.debug_printHocho("working on building");
+//            Logger.debug_printHocho("working on building");
             if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 10 )
             {
                 myBH.buildUnit( Prefab.commRecycler , toBuildLocation);
@@ -52,7 +52,7 @@ public class BuildingSecondRecycler extends BaseState {
             myBH.step();
         }
         else {
-            Logger.debug_printHocho("working on moving");
+//            Logger.debug_printHocho("working on moving");
             myMH.step();
         }
 

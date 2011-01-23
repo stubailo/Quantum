@@ -27,7 +27,8 @@ public class Knowledge {
     public  final   Robot               myRobot;
     public  final   int                 startRound;
     
-    private static final int DELTA_FLUX_MEMORY_LENGTH = 10;
+    private static final int DELTA_FLUX_MEMORY_LENGTH = 20;
+    private static final int RATIONAL_DELTA_FLUX_LOWER_BOUND = -20;
     private static final int BIG_INT = QuantumConstants.BIG_INT;
     
     
@@ -43,7 +44,7 @@ public class Knowledge {
     private         double              deltaFlux;
     public          double              totalFlux;
     private         double              deltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
-    public          double              averageDeltaFlux = BIG_INT;
+    public          double              averageDeltaFlux = 0;
     private         double              alternativeDeltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
     private         int                 majorDeltaFluxShifting = 0;
     private         double              totalDeltaFlux = 0;
@@ -98,6 +99,7 @@ public class Knowledge {
         if(Clock.getRoundNum() - startRound >= DELTA_FLUX_MEMORY_LENGTH + GameConstants.EQUIP_WAKE_DELAY) {
             int mod = Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH;
             if(averageDeltaFlux - deltaFlux < 3) {
+//                Logger.debug_printHocho("deltaFlux normal at " + deltaFlux + ", averageDeltaFlux: " + averageDeltaFlux);
                 majorDeltaFluxShifting = 0;
                 totalDeltaFlux -= deltaFluxes[mod];
                 deltaFluxes[mod] = deltaFlux;
@@ -105,7 +107,11 @@ public class Knowledge {
                 averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
             }
             else {
+//                Logger.debug_printHocho("deltaFlux abnormal at " + deltaFlux + ", averageDeltaFlux: " + averageDeltaFlux);
+                totalDeltaFlux -= deltaFluxes[mod];
                 deltaFluxes[mod] = averageDeltaFlux;
+                totalDeltaFlux += averageDeltaFlux;
+                averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
                 alternativeDeltaFluxes[mod] = deltaFlux;
                 if(++majorDeltaFluxShifting == DELTA_FLUX_MEMORY_LENGTH) {
                     Logger.debug_printHocho("major delta flux shift!");
@@ -114,14 +120,25 @@ public class Knowledge {
                     for(double dFlux : deltaFluxes) {
                         totalDeltaFlux += dFlux;
                     }
+                    Logger.debug_printHocho("old average deltaFlux: " + averageDeltaFlux + ", new average deltaFlux: " + totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH);
                     averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
                 }
             }
         }
         else if(Clock.getRoundNum() - startRound >= GameConstants.EQUIP_WAKE_DELAY) {
-            deltaFluxes[Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH] = deltaFlux;
-            totalDeltaFlux += deltaFlux;
-            averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+            if(deltaFlux >= RATIONAL_DELTA_FLUX_LOWER_BOUND) {
+//                Logger.debug_printHocho("early deltaFlux normal at " + deltaFlux);
+                deltaFluxes[Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH] = deltaFlux;
+                totalDeltaFlux += deltaFlux;
+                averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+            }
+            else {
+//                Logger.debug_printHocho("early deltaFlux abnormal at " + deltaFlux);
+                double idealDeltaFlux = averageDeltaFlux  * DELTA_FLUX_MEMORY_LENGTH / (Clock.getRoundNum() - startRound - 1);
+                deltaFluxes[Clock.getRoundNum() % DELTA_FLUX_MEMORY_LENGTH] = idealDeltaFlux;
+                totalDeltaFlux += idealDeltaFlux;
+                averageDeltaFlux = totalDeltaFlux / DELTA_FLUX_MEMORY_LENGTH;
+            }
         }
 //        Logger.debug_printHocho("averageDeltaFlux: " + averageDeltaFlux);
         

@@ -330,7 +330,6 @@ public class VirtualBug {
                 
                 //set a secondary goal if your move is to an unexplored tile.
                 if(tile == null) {
-                    Logger.debug_printHocho("Can't sense location " + nextLocation);
                     goingToSecondaryGoal = true;
                     return testDir;
                 } else if(tile == TerrainStatus.LAND) {

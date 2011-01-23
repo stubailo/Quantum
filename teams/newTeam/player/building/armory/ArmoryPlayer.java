@@ -42,7 +42,7 @@ public class ArmoryPlayer extends BuildingPlayer {
             {
                 myK.myRecyclerNode = RecyclerNode.getFromPing(message);
                 hasRecycler = true;
-                System.out.println("synced with recycler ID: " + myK.myRecyclerNode.myRobotID);
+                Logger.debug_printSashko("synced with recycler ID: " + myK.myRecyclerNode.myRobotID);
             }
         }
 

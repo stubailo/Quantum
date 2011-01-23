@@ -3,17 +3,17 @@ package newTeam.player.flying;
 import battlecode.common.*;
 
 import newTeam.state.BaseState;
-import newTeam.state.idle.*;
-import newTeam.state.exploring.FlyingSensorExploring;
-import newTeam.player.BasePlayer;
-import newTeam.common.*;
+import newTeam.common.util.Logger;
+import newTeam.state.idle.WaitingForConstructor;
+import newTeam.common.QuantumConstants;
+import newTeam.common.MessageCoder;
 
 public class FlyingSensorPlayer extends FlyingPlayer {
 
     public FlyingSensorPlayer(BaseState state) {
         super(state);
 
-        System.out.println( "I'm a flying sensor!" );
+        Logger.debug_printSashko( "I'm a flying sensor!" );
 
         myK.squadLeaderID = 0; //here used to refer to number of squad members
     }
