@@ -11,7 +11,7 @@ import newTeam.state.exploring.SoldierExploring;
 
 public class Attacking extends BaseState {
     
-    private static final int NEAR_ENEMY_DISTANCE = 8;
+    private static final int MOVE_AWAY_THRESHOLD = 8;
     private static final int MOVE_AWAY_DISTANCE  = 1;
     
     private RobotInfo[] enemyRobotInfos;
@@ -52,7 +52,9 @@ public class Attacking extends BaseState {
     
     public BaseState execute() {
         
-        if(nearestEnemyMoved) {
+//        if(nearestEnemyMoved) {
+        
+        moving = false;
         
             int distanceToNearestEnemy = myK.myLocation.distanceSquaredTo(nearestEnemyLocation);
             Direction directionToNearestEnemy = myK.myLocation.directionTo(nearestEnemyLocation);
@@ -61,17 +63,17 @@ public class Attacking extends BaseState {
                 myMH.initializeNavigationTo(nearestEnemyLocation, NavigatorType.BUG);
                 moving = true;
             }
-            else if(distanceToNearestEnemy < NEAR_ENEMY_DISTANCE) {
+            else if(distanceToNearestEnemy < MOVE_AWAY_THRESHOLD) {
                 myMH.initializeNavigationTo(myK.myLocation.add(directionToNearestEnemy.opposite(), MOVE_AWAY_DISTANCE), NavigatorType.BUG);
                 moving = true;
             }
             else if(directionToNearestEnemy != myK.myDirection) {
                 myMH.setDirection(directionToNearestEnemy);
             }
-        }
+//        }
         
-        if(moving) myMH.step();
         myWH.attack(enemyRobotInfos, numberOfEnemies);
+        if(moving) myMH.step();
         
         return this;
     }
