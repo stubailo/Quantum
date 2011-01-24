@@ -16,12 +16,6 @@ public class Idling extends BaseState {
     @Override
     public BaseState getNextState() {
         
-        BaseState newStateFromIdleState = getNewStateFromIdleState();
-        newStateFromIdleState.senseAndUpdateKnowledge();
-        return newStateFromIdleState.getNextState();
-    }
-    
-    public BaseState getNewStateFromIdleState() {
-        return new Exploring(myRC, myK, myCH);
+        return this;
     }
 }

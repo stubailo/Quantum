@@ -25,7 +25,6 @@ public class CircleNavigator implements Navigator {
 
     @Override
     public int distanceSquaredToGoal(MapLocation fromHere) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -36,7 +35,6 @@ public class CircleNavigator implements Navigator {
 
     @Override
     public MovementAction getNextAction() {
-        // TODO Auto-generated method stub
         if(myMC.isActive()) {
             return MovementAction.NONE;
         }
@@ -97,19 +95,16 @@ public class CircleNavigator implements Navigator {
 
     @Override
     public void pauseNavigation() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean reachedGoal() {
-        // TODO Auto-generated method stub
         return reachedGoal;
     }
 
     @Override
     public void setGoingToAdjacent(boolean b) {
-        // TODO Auto-generated method stub
 
     }
 

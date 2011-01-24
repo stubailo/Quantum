@@ -1,13 +1,15 @@
 package newTeam.player.building.recycler;
 
 import battlecode.common.*;
-import newTeam.common.*;
 import newTeam.common.util.Logger;
+import newTeam.common.MessageCoder;
+import newTeam.common.RecyclerNode;
 import newTeam.player.BasePlayer;
 import newTeam.player.building.recycler.RecyclerCommPlayer;
 import newTeam.player.building.BuildingPlayer;
 import newTeam.state.BaseState;
 import newTeam.state.idle.Idling;
+import newTeam.state.recycler.ConstructingAntennaOnSelf;
 
 public class RecyclerPlayer extends BuildingPlayer {
     
@@ -23,18 +25,17 @@ public class RecyclerPlayer extends BuildingPlayer {
     
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
-        return new Idling( oldState );
+        if(!myCH.mySH.amLowestIDRecycler()) {
+            return new ConstructingAntennaOnSelf( oldState );
+        }
+        else {
+            return new Idling(oldState);
+        }
     }
     
     @Override
     public void initialize() {
-        if(!myCH.mySH.amLowestIDRecycler()) {
-            myRC.setIndicatorString(0, "turning off...");
-            Logger.debug_printHocho("turning off...");
-            myRC.turnOff();
-        }
-
-        myK.pinging = true;
+        
     }
     
     @Override
@@ -54,10 +55,6 @@ public class RecyclerPlayer extends BuildingPlayer {
             }
         }
 
-        if( myK.pinging && Clock.getRoundNum() > 5 && Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0 && myCH.myBCH.canBroadcast() )
-        {
-                myCH.myBCH.addToQueue( myRN.generatePing() );
-        }
     }
     
     @Override

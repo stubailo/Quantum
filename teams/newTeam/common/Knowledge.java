@@ -25,7 +25,7 @@ public class Knowledge {
     public  final   MapLocation         myStartLocation;
     public  final   int                 myRobotID;
     public  final   Robot               myRobot;
-    public  final   int                 startRound;
+    public          int                 startRound;
     
     private static final int DELTA_FLUX_MEMORY_LENGTH = 20;
     private static final int RATIONAL_DELTA_FLUX_LOWER_BOUND = -20;
@@ -48,6 +48,11 @@ public class Knowledge {
     private         double              alternativeDeltaFluxes[] = new double[DELTA_FLUX_MEMORY_LENGTH];
     private         int                 majorDeltaFluxShifting = 0;
     private         double              totalDeltaFlux = 0;
+    
+    
+    /*** TURN OFF? ***/
+    public          boolean             turnOff = false;
+    public          boolean             turnedOn = false;
     
     /*** SpecificPlayer-specific ***/
     
@@ -86,10 +91,18 @@ public class Knowledge {
      * information that is needed irrespective of state.
      */
     public void doStatelessUpdate() {
-        // Determine delta flux
-        // TODO: ignore delta's associated with building, etc.
-        // TODO: recognize delta-delta flux that signifies loss of unit, creation of unit,
-        //            creation of mine, etc.
+        
+        turnedOn = false;
+        
+        if(turnOff) {
+            myRC.setIndicatorString(0, "turning off...");
+            Logger.debug_printHocho("turning off...");
+            myRC.turnOff();
+            turnOff = false;
+            turnedOn = true;
+            startRound = Clock.getRoundNum();
+        }
+        
         totalFlux = myRC.getTeamResources();
 //        Logger.debug_printHocho("previousFlux: " + previousFlux + ", currentFlux: " + totalFlux);
         deltaFlux = totalFlux - previousFlux;

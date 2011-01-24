@@ -26,7 +26,7 @@ public class ConstructingAntennaOnFirstLight extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            BaseState result = new ConstructingAntennaOnSelf( this );
+            BaseState result = new Idling( this );
             return result;
         }
 

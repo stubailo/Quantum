@@ -29,6 +29,11 @@ public class RecyclerCommPlayer extends RecyclerPlayer {
     @Override
     public void doSpecificPlayerStatelessActions() {
         super.doSpecificPlayerStatelessActions();
+        
+        if( Clock.getRoundNum() % QuantumConstants.PING_CYCLE_LENGTH == 0)
+        {
+                myBCH.addToQueue( myRN.generatePing() );
+        }
     }
     
     @Override

@@ -4,68 +4,52 @@ import battlecode.common.*;
 
 import newTeam.state.BaseState;
 import newTeam.handler.navigation.NavigatorType;
-import newTeam.common.util.Logger;
 
 public class StartingMovingToBuild extends BaseState {
     
-    private final boolean     needToCheck;
+    private final MapLocation factoryLocation;
+    private final MapLocation armoryLocation;
     private       boolean     reachedGoal;
-    private       boolean     switchBuildOrder = false;
+    private       int         roundUntilWhichToWait;
     
-    public StartingMovingToBuild(BaseState oldState, boolean toAdjacent) {
+    public StartingMovingToBuild(BaseState oldState, MapLocation givenFactoryLocation, MapLocation givenArmoryLocation, int givenRoundUntilWhichToWait) {
         super(oldState);
-        //mineToBeBuiltLocation = startingMineToBeBuiltLocation;
-        needToCheck = toAdjacent;
-        if(toAdjacent) {
-//            Logger.debug_printHocho("whoops");
-            myMH.initializeNavigationToAdjacent(mySH.startingFirstMineToBeBuiltLocation, NavigatorType.BUG);
-        }
-        else {
-//            Logger.debug_printHocho("trying to move to " + mySH.startingSecondMineToBeBuiltLocation.toString() + " from " + myK.myLocation.toString());
-            myMH.initializeNavigationTo(mySH.startingSecondMineToBeBuiltLocation, NavigatorType.BUG);
-        }
+        factoryLocation       = givenFactoryLocation;
+        armoryLocation        = givenArmoryLocation;
+        roundUntilWhichToWait = givenRoundUntilWhichToWait;
+        
+        myMH.initializeNavigationToAdjacent(factoryLocation, NavigatorType.BUG);
     }
     
-    @Override
-    public void senseAndUpdateKnowledge() {
+    public StartingMovingToBuild(BaseState oldState, MapLocation givenArmoryLocation) {
+        super(oldState);
+        factoryLocation = null;
+        armoryLocation  = givenArmoryLocation;
+        
+        myMH.initializeNavigationToAdjacent(armoryLocation, NavigatorType.BUG);
     }
     
     @Override
     public BaseState getNextState() {
-
-        BaseState result = this;
-        
-        if(reachedGoal) {
-            if(needToCheck) {
-                MapLocation myLocation = myK.myLocation;
-                if(myLocation.distanceSquaredTo(mySH.startingFirstMineToBeBuiltLocation) <= 2 &&
-                   myLocation.distanceSquaredTo(mySH.startingSecondMineToBeBuiltLocation) <= 2) {
-                    
-                    result = new BuildingFirstRecycler(this, switchBuildOrder);
-                }
-                else {
-                    myMH.moveForward();
-                    switchBuildOrder = true;
-                    reachedGoal = false;
-                }
+        if(reachedGoal && Clock.getRoundNum() >= roundUntilWhichToWait) {
+            BaseState result = null;
+            if(factoryLocation == null) {
+                result = new BuildingFirstArmory(this, armoryLocation);
             }
             else {
-                result = new BuildingFirstRecycler(this, switchBuildOrder);
+                result = new BuildingFirstFactory(this, factoryLocation, armoryLocation);
             }
-            
             result.senseAndUpdateKnowledge();
             return result.getNextState();
         }
-
-        return result;
+        return this;
     }
     
     @Override
     public BaseState execute() {
-//        if(myRC.getLocation().distanceSquaredTo(idealBuildingLocation) > 0)
-//        {
+        if(!reachedGoal) {
             reachedGoal = myMH.step();
-//        }
+        }
         return this;
     }
 

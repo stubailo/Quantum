@@ -18,6 +18,7 @@ public class BuildingFirstRecycler extends BaseState {
 
     @Override
     public void senseAndUpdateKnowledge() {
+        mySH.senseEdges();
 
     }
 
@@ -44,7 +45,7 @@ public class BuildingFirstRecycler extends BaseState {
     public BaseState execute() {
 
         //add a sensor method that checks if the square is occupied
-        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 10 )
+        if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost())
         {
             if(switchBuildOrder) {
                 myBH.buildUnit( Prefab.commRecycler , mySH.startingSecondMineToBeBuiltLocation);

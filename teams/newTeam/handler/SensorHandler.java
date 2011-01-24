@@ -83,7 +83,10 @@ public class SensorHandler {
     private final   Mine[]              sensableEmptyMines              = new Mine[MAX_NUMBER_OF_SENSABLE_THINGS];
     private         int                 numberOfSensableEmptyMines      = 0;
     
-    private final   TerrainStatus[][]   terrainStatusHash           = new TerrainStatus[LOCATION_HASH_SIZE][LOCATION_HASH_SIZE];
+    private final   TerrainStatus[][]   terrainStatusHash               = new TerrainStatus[LOCATION_HASH_SIZE][LOCATION_HASH_SIZE];
+    
+    private final   int[]               edgeCoordinates                 = new int[4];
+    private final   boolean[]           edgesFound                      = new boolean[4];
     
     private         MapLocation         nearestEmptyMineLocation;
     private         boolean             enemiesNearby;
@@ -92,9 +95,11 @@ public class SensorHandler {
     private         double              ownIncome;
     
     public          MapLocation         startingTurnedOnRecyclerLocation,
+                                        startingMine1Location,
+                                        startingMine2Location,
                                         startingFirstMineToBeBuiltLocation,
-                                            startingSecondMineToBeBuiltLocation,
-                                                startingIdealBuildingLocation;
+                                        startingSecondMineToBeBuiltLocation,
+                                        startingIdealBuildingLocation;
     public          boolean             standardWayClear;
     
     
@@ -188,6 +193,259 @@ public class SensorHandler {
         blockersSensed         = false;
         
         lastRoundRefreshed = Clock.getRoundNum();
+    }
+    
+    
+    
+    public void senseEdges() {
+        
+        if(myK.justMoved) {
+        
+            Direction myDirection = myK.myDirection;
+            
+            if(myDirection.ordinal() % 2 == 1) {//diagonal
+                Direction   dir1      = myDirection.rotateLeft(),
+                            dir2      = myDirection.rotateRight();
+                int         dir1Num   = dir1.ordinal()/2;
+                int         dir2Num   = dir2.ordinal()/2;
+                if(!edgesFound[dir1Num]) {
+                    edgesFound[dir1Num] = senseEdgeJustMoved(myLocation, dir1);
+                } 
+                if(!edgesFound[dir2Num]) {
+                    edgesFound[dir2Num] = senseEdgeJustMoved(myLocation, dir2);
+                }
+            }
+            else {
+                
+                int         myDirNum  = myDirection.ordinal()/2;
+                
+                if(!edgesFound[myDirNum]) {
+                    edgesFound[myDirNum] = senseEdgeJustMoved(myLocation, myDirection);
+                }
+            }
+        }
+        
+        else if(myK.justMoved) {
+            Direction myDirection = myK.myDirection;
+            
+            if(myDirection.ordinal() % 2 == 1) {//diagonal
+                
+                Direction   dir1      = myDirection.rotateLeft(),
+                            dir2      = myDirection.rotateRight();
+                int         dir1Num   = dir1.ordinal()/2;
+                int         dir2Num   = dir2.ordinal()/2;
+                
+                if(!edgesFound[dir1Num]) {
+                    edgesFound[dir1Num] = senseEdgeJustTurned(myLocation, dir1);
+                } 
+                if(!edgesFound[dir2Num]) {
+                    edgesFound[dir2Num] = senseEdgeJustTurned(myLocation, dir2);
+                }
+            }
+            else {
+                
+                int         myDirNum  = myDirection.ordinal()/2;
+                
+                if(!edgesFound[myDirNum]) {
+                    edgesFound[myDirNum] = senseEdgeJustTurned(myLocation, myDirection);
+                    Logger.debug_printHocho("direction: " + myDirection.toString() + ", found? " + edgesFound[myDirNum]);
+                }
+            }
+        }
+    }
+    
+    
+    
+    private boolean senseEdgeJustMoved(MapLocation myLocation, Direction dir) {
+        
+        MapLocation senseLocation = null;
+        
+        switch(dir) {
+        
+        case NORTH:
+            senseLocation = new MapLocation(myLocation.x, myLocation.y - forwardSightRange);
+            break;
+        case EAST:
+            senseLocation = new MapLocation(myLocation.x + forwardSightRange, myLocation.y);
+            break;
+        case SOUTH:
+            senseLocation = new MapLocation(myLocation.x, myLocation.y + forwardSightRange);
+            break;
+        case WEST:
+            senseLocation = new MapLocation(myLocation.x - forwardSightRange, myLocation.y);
+            break;
+        }
+        
+        TerrainTile senseTile = myRC.senseTerrainTile(senseLocation);
+        
+        if(senseTile == TerrainTile.OFF_MAP) {
+            
+            switch(dir) {
+            
+            case NORTH:
+                edgeCoordinates[0] = senseLocation.y;
+                return true;
+            case EAST:
+                edgeCoordinates[1] = senseLocation.x;
+                return true;
+            case SOUTH:
+                edgeCoordinates[2] = senseLocation.y;
+                return true;
+            case WEST:
+                edgeCoordinates[3] = senseLocation.x;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean senseEdgeJustTurned(MapLocation myLocation, Direction dir) {
+
+        MapLocation senseLocation = null;
+        Direction   addDirection  = dir.opposite();
+        
+        switch(dir) {
+        
+        case NORTH:
+            senseLocation = new MapLocation(myLocation.x, myLocation.y - forwardSightRange);
+            break;
+        case EAST:
+            senseLocation = new MapLocation(myLocation.x + forwardSightRange, myLocation.y);
+            break;
+        case SOUTH:
+            senseLocation = new MapLocation(myLocation.x, myLocation.y + forwardSightRange);
+            break;
+        case WEST:
+            senseLocation = new MapLocation(myLocation.x - forwardSightRange, myLocation.y);
+            break;
+        }
+        
+        for(int garbage = 0; garbage < forwardSightRange; garbage++) {
+            
+            if(myRC.senseTerrainTile(senseLocation) == TerrainTile.OFF_MAP) {
+                
+                switch(dir) {
+                
+                case NORTH:
+                    edgeCoordinates[0] = senseLocation.y;
+                    return true;
+                case EAST:
+                    edgeCoordinates[1] = senseLocation.x;
+                    return true;
+                case SOUTH:
+                    edgeCoordinates[2] = senseLocation.y;
+                    return true;
+                case WEST:
+                    edgeCoordinates[3] = senseLocation.x;
+                    return true;
+                }
+            }
+            
+            senseLocation = senseLocation.add(addDirection);
+        }
+        return false;
+    }
+    
+    
+    
+    public Direction getDirectionTowardUndiscoveredBoundaries() {
+        if(edgesFound[0]) {
+            if(edgesFound[1]) {
+                if(edgesFound[2]) {
+                    if(edgesFound[3]) {
+                        return Direction.OMNI;
+                    }
+                    else {
+                        return Direction.WEST;
+                    }
+                }
+                else {
+                    if(edgesFound[3]) {
+                        return Direction.SOUTH;
+                    }
+                    else {
+                        return Direction.SOUTH_WEST;
+                    }
+                }
+            }
+            else {
+                if(edgesFound[2]) {
+                    if(edgesFound[3]) {
+                        return Direction.EAST;
+                    }
+                    else {
+                        if(myK.myRobotID % 2 == 0) {
+                            return Direction.WEST;
+                        }
+                        else {
+                            return Direction.EAST;
+                        }
+                    }
+                }
+                else {
+                    if(edgesFound[3]) {
+                        return Direction.SOUTH_EAST;
+                    }
+                    else {
+                        return Direction.SOUTH;
+                    }
+                }
+            }
+        }
+        else {
+            if(edgesFound[1]) {
+                if(edgesFound[2]) {
+                    if(edgesFound[3]) {
+                        return Direction.NORTH;
+                    }
+                    else {
+                        return Direction.NORTH_WEST;
+                    }
+                }
+                else {
+                    if(edgesFound[3]) {
+                        if(myK.myRobotID % 2 == 0) {
+                            return Direction.NORTH;
+                        }
+                        else {
+                            return Direction.SOUTH;
+                        }
+                    }
+                    else {
+                        return Direction.WEST;
+                    }
+                }
+            }
+            else {
+                if(edgesFound[2]) {
+                    if(edgesFound[3]) {
+                        return Direction.NORTH_EAST;
+                    }
+                    else {
+                        return Direction.NORTH;
+                    }
+                }
+                else {
+                    if(edgesFound[3]) {
+                        return Direction.EAST;
+                    }
+                    else {
+                        switch(myK.myRobotID % 4) {
+                        case 0:
+                            return Direction.NORTH;
+                        case 1:
+                            return Direction.EAST;
+                        case 2:
+                            return Direction.SOUTH;
+                        case 3:
+                            return Direction.WEST;
+                        }
+                    }
+                }
+            }
+        }
+        Logger.debug_printCustomErrorMessage("should return a direction earlier", "Hocho");
+        return Direction.NONE;
     }
     
     
@@ -701,12 +959,16 @@ public class SensorHandler {
             if(myDirection.ordinal() % 2 == 1) { // myDirection is diagonal
                 if(numberOfSensedRecyclers == 1) {
                     standardWayDirection                = myDirection;
+                    startingMine1Location               = myLocation.add(usefulDirection1);
+                    startingMine2Location               = myLocation.add(usefulDirection2);
                     startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection1, 2);
                     startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
                     startingIdealBuildingLocation       = myLocation.add(usefulDirection1, 3);
                 }
                 else {
                     standardWayDirection                = usefulDirection2; 
+                    startingMine1Location               = myLocation.add(otherDirection);
+                    startingMine2Location               = myLocation.add(myDirection);
                     startingSecondMineToBeBuiltLocation = myLocation.add(otherDirection, 2);
                     startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
                     startingIdealBuildingLocation       = myLocation.add(otherDirection, 3);
@@ -715,12 +977,16 @@ public class SensorHandler {
             else { // myDirection is not diagonal
                 if(numberOfSensedRecyclers == 1) {
                     standardWayDirection                = otherIsRight ? usefulDirection2.rotateRight() : usefulDirection2.rotateLeft();
+                    startingMine1Location               = myLocation.add(usefulDirection2);
+                    startingMine2Location               = myLocation.add(usefulDirection1);
                     startingSecondMineToBeBuiltLocation = myLocation.add(usefulDirection2, 2);
                     startingFirstMineToBeBuiltLocation  = myLocation.add(usefulDirection1).add(usefulDirection2);
                     startingIdealBuildingLocation       = myLocation.add(usefulDirection2, 3);
                 }
                 else {
                     standardWayDirection                = otherIsRight ? myDirection.rotateLeft() : myDirection.rotateRight();
+                    startingMine1Location               = myLocation.add(myDirection);
+                    startingMine2Location               = myLocation.add(otherDirection);
                     startingSecondMineToBeBuiltLocation = myLocation.add(myDirection, 2);
                     startingFirstMineToBeBuiltLocation  = myLocation.add(otherDirection).add(myDirection);
                     startingIdealBuildingLocation       = myLocation.add(myDirection, 3);
@@ -765,11 +1031,66 @@ public class SensorHandler {
     
     
     /**
+     * Gets recycler location to turn on.
+     */
+    public MapLocation[] getRecyclerLocationToTurnOn(MapLocation justBuilt) {
+        
+        MapLocation[]       result                          = new MapLocation[2];
+        Direction           directionToJustBuiltRecycler    = myLocation.directionTo(justBuilt);
+        Direction           testDirection                   = myK.myDirection.rotateLeft();
+        MovementController  motor                           = (MovementController) myRC.components()[0];
+        
+        if(motor.canMove(testDirection)) {
+            result[0] = justBuilt;
+            result[1] = myLocation.add(testDirection);
+            return result;
+        }
+        
+        testDirection = testDirection.rotateRight().rotateRight();
+        
+        if(motor.canMove(testDirection)) {
+             result[0] = justBuilt;
+             result[1] = myLocation.add(testDirection);
+             return result;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Gets orthogonally adjacent of the original four mines
+     */
+    public MapLocation getOrthogonallyAdjacentStartingRecycler(MapLocation location) {
+        MapLocation[] startingRecyclers = {startingMine1Location, startingMine2Location, startingFirstMineToBeBuiltLocation, startingSecondMineToBeBuiltLocation};
+        for(MapLocation startingRecycler : startingRecyclers) {
+            if(location.distanceSquaredTo(startingRecycler) == 1) {
+                return startingRecycler;
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    public MapLocation turnOnRecyclerLocation(MapLocation factoryLocation) {
+        MapLocation result = getOrthogonallyAdjacentStartingRecycler(factoryLocation);
+        if(result != null) return result;
+        MapLocation[] startingRecyclers   = {startingMine1Location, startingMine2Location, startingFirstMineToBeBuiltLocation, startingSecondMineToBeBuiltLocation};
+        for(int index = 0; index < 4; index++) {
+            MapLocation startingRecycler = startingRecyclers[index];
+            if(startingRecycler.isAdjacentTo(factoryLocation)) return startingRecycler;
+        }
+        return null;
+    }
+    
+    
+    
+    /**
      * Designed by first-round use of recycler, finds lowest ID adjacent recycler.
      * 
      * (So that it can turn itself off if it's not the lowest)
      */
-    public Boolean amLowestIDRecycler() {
+    public boolean amLowestIDRecycler() {
         try {
             SensorController sensor = mySCs[0];
             

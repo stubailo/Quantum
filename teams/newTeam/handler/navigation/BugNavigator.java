@@ -3,6 +3,8 @@ package newTeam.handler.navigation;
 import newTeam.common.QuantumConstants;
 import newTeam.common.util.Logger;
 import newTeam.common.Knowledge;
+import newTeam.handler.SensorHandler;
+import newTeam.handler.sensor.TerrainStatus;
 import battlecode.common.Chassis;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -15,6 +17,7 @@ public class BugNavigator implements Navigator {
     private final Knowledge myK;
     private final MovementController myMC;
     private final TrackChecker myTrack;
+    private final SensorHandler mySH;
     
     //TODO: Probably don't need to keep an array of memory...
     private final int MEMORY_LENGTH = QuantumConstants.BUG_MEMORY_LENGTH;
@@ -63,9 +66,10 @@ public class BugNavigator implements Navigator {
     private        int                  delayRSq;
     private        int                  delayDSq;
     
-    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+    public BugNavigator(RobotController rc, SensorHandler sh, Knowledge know, MovementController mc,
                         MapLocation goalLocation, boolean navigatingToAdjacent) {
         myRC = rc;
+        mySH = sh;
         myK = know;
         myMC = mc;
         myTrack = new TrackChecker();
@@ -81,9 +85,9 @@ public class BugNavigator implements Navigator {
         delayDSq = delayDiag * delayDiag;
     }
     
-    public BugNavigator(RobotController rc, Knowledge know, MovementController mc,
+    public BugNavigator(RobotController rc, SensorHandler sh, Knowledge know, MovementController mc,
                         MapLocation goalLocation) {
-        this(rc, know, mc, goalLocation, false);
+        this(rc, sh, know, mc, goalLocation, false);
     }
     
     private void reset() {
@@ -160,6 +164,30 @@ public class BugNavigator implements Navigator {
     private MovementAction navigateBug() {
         MapLocation location = myK.myLocation;
         Direction directionToGoal = location.directionTo(goal);
+        
+//        Logger.debug_printHocho("bugging from " + location + " to " + goal);
+        
+        if(location.isAdjacentTo(goal)) {
+//            Logger.debug_printHocho("adjacent!");
+            if(myK.myDirection == directionToGoal) {
+//                Logger.debug_printHocho("facing the right way");
+                TerrainStatus goalStatus = mySH.getTerrainStatus(goal);
+                if(goalStatus != null) {
+                    if(goalStatus == TerrainStatus.LAND) {
+                        return MovementAction.MOVE_FORWARD;
+                    }
+                    else {
+                        return MovementAction.GOAL_INACCESSIBLE;
+                    }
+                }
+            }
+            else {
+//                Logger.debug_printHocho("need to rotate to " + directionToGoal + " from " + myK.myDirection);
+                movementDirection = directionToGoal;
+                return MovementAction.ROTATE;
+            }
+        }
+        
         int bugPos = bugStep % MEMORY_LENGTH;
         MovementAction action;  //this variable is returned at the end.
         

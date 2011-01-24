@@ -5,6 +5,7 @@ import newTeam.player.BasePlayer;
 import newTeam.state.BaseState;
 import battlecode.common.ComponentType;
 import newTeam.state.starting.ConstructingAntennaOnFirstLight;
+import newTeam.state.recycler.ConstructingAntennaOnSelf;
 
 public class StartingRecyclerPlayer extends RecyclerPlayer {
     
@@ -15,12 +16,17 @@ public class StartingRecyclerPlayer extends RecyclerPlayer {
     @Override
     public BaseState determineNewStateBasedOnNewSpecificPlayer(BaseState oldState) {
         
-        return new ConstructingAntennaOnFirstLight( oldState );
+        if(!myCH.mySH.amLowestIDRecycler()) {
+            return new ConstructingAntennaOnSelf(oldState);
+        }
+        else {
+            return new ConstructingAntennaOnFirstLight( oldState );
+        }
     }
     
     @Override
     public void initialize() {
-        super.initialize();
+        // If code after this point is read then the constructor has turned this back on
     }
     
     @Override

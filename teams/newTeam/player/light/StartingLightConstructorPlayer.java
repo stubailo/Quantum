@@ -3,7 +3,8 @@ package newTeam.player.light;
 import battlecode.common.*;
 
 import newTeam.player.BasePlayer;
-import newTeam.state.*;
+import newTeam.state.BaseState;
+import newTeam.state.Wait;
 import newTeam.state.starting.NavigationTester;
 import newTeam.state.starting.StartingLightConstructorScouting;
 import newTeam.state.building.MovingToBuildFactory;

@@ -42,7 +42,7 @@ public class MovementHandler {
         
         switch(givenNavigatorType) {
         case BUG:
-            navigator = new BugNavigator(myRC, myK, myMC, goalLocation);
+            navigator = new BugNavigator(myRC, mySH, myK, myMC, goalLocation);
             break;
             
         case TANGENT_BUG:
@@ -60,14 +60,14 @@ public class MovementHandler {
                                                NavigatorType navigatorType) {
         switch(navigatorType) {
         case BUG:
-            navigator = new BugNavigator(myRC, myK, myMC, goalLocation, true);
+            navigator = new BugNavigator(myRC, mySH, myK, myMC, goalLocation, true);
             break;
         case TANGENT_BUG:
             Logger.debug_printCustomErrorMessage("TangentBug can't navigate to adjacent", "Hocho");
         }
     }
     
-    public boolean step() {
+    public Boolean step() {
         try {
             MovementAction nextAction = navigator.getNextAction();
 //            Logger.debug_printHocho(nextAction.toString());
@@ -106,7 +106,7 @@ public class MovementHandler {
                 }
                 
             case GOAL_INACCESSIBLE:
-                //TODO
+                return null;
             }
             
             return false;

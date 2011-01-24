@@ -26,6 +26,7 @@ public class BuildingSecondRecycler extends BaseState {
 
     @Override
     public void senseAndUpdateKnowledge() {
+        mySH.senseEdges();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class BuildingSecondRecycler extends BaseState {
 
         if( myBH.finishedBuilding() )
         {
-            return new Idling( this );
+            return new DeterminingFactoryAndArmoryLocations(this);
         }
 
         return this;
@@ -44,7 +45,7 @@ public class BuildingSecondRecycler extends BaseState {
 
         if(myK.myLocation.isAdjacentTo(toBuildLocation)) {
 //            Logger.debug_printHocho("working on building");
-            if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost() + 10 )
+            if( !myBH.getCurrentlyBuilding() && myRC.getTeamResources() > Prefab.commRecycler.getTotalCost())
             {
                 myBH.buildUnit( Prefab.commRecycler , toBuildLocation);
             }

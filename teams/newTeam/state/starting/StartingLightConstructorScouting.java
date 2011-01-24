@@ -17,7 +17,7 @@ public class StartingLightConstructorScouting extends BaseState {
     @Override
     public void senseAndUpdateKnowledge() {
         resultOfScoutingDirection = mySH.senseStartingLightConstructorSurroundings();
-        
+        mySH.senseEdges();
     }
     
     @Override
@@ -27,10 +27,10 @@ public class StartingLightConstructorScouting extends BaseState {
             
             BaseState result = null;
             if(mySH.standardWayClear) {
-                result = new StartingMovingToBuild(this, false);
+                result = new StartingMovingToBuildRecycler(this, false);
             }
             else {
-                result = new StartingMovingToBuild(this, true);
+                result = new StartingMovingToBuildRecycler(this, true);
             }
             
             result.senseAndUpdateKnowledge();

@@ -15,16 +15,14 @@ import newTeam.state.idle.Idling;
 
 public class WaitingForBaseUpgrade extends BaseState {
 
-    Robot constructor = null;
+    private boolean hasFactory = false;
+    private boolean hasArmory = false;
 
-    boolean hasFactory = false;
-    boolean hasArmory = false;
-
-    boolean upgradeComplete = false;
+    private boolean upgradeComplete = false;
+    private int     roundUntilWhichToWait;
 
     public WaitingForBaseUpgrade(BaseState oldState) {
         super(oldState);
-
     }
 
     @Override
@@ -66,6 +64,9 @@ public class WaitingForBaseUpgrade extends BaseState {
 
         if( hasFactory && hasArmory )
         {
+            if(!upgradeComplete) {
+                roundUntilWhichToWait = Clock.getRoundNum() + GameConstants.EQUIP_WAKE_DELAY;
+            }
             upgradeComplete = true;
         }
 
@@ -74,7 +75,7 @@ public class WaitingForBaseUpgrade extends BaseState {
     @Override
     public BaseState getNextState() {
 
-        if( upgradeComplete == true )
+        if( upgradeComplete == true && Clock.getRoundNum() > roundUntilWhichToWait)
         {
             int[] ints = { myK.myRecyclerNode.factoryID };
             String strings[] = { null };

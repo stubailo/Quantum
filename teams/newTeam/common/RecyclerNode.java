@@ -47,33 +47,15 @@ public class RecyclerNode {
         if(buildLocationsDetermined) return true;
         buildLocationsDetermined = true;
 
-        MapLocation[] adjacentLocations = new MapLocation[6];
+        Direction testDirection = Direction.EAST;
 
-        MapLocation[] outputLocations = new MapLocation[4];
-
-        Direction primaryDir = factoryLocation.directionTo(myLocation);
-        
-        int numberOfPotentialLandLocations = 0;
-
-        if( primaryDir.isDiagonal() )
+        for(int index = 0; index < 8; index++)
         {
-            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
-            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
-            numberOfPotentialLandLocations = 2;
-        } else {
-            adjacentLocations[0] = factoryLocation.add(primaryDir.rotateLeft());
-            adjacentLocations[1] = factoryLocation.add(primaryDir.rotateRight());
-            adjacentLocations[2] = factoryLocation.add(primaryDir.rotateLeft().rotateLeft());
-            adjacentLocations[3] = factoryLocation.add(primaryDir.rotateRight().rotateRight());
-            numberOfPotentialLandLocations = 4;
-        }
-
-        for(int index = 0; index < numberOfPotentialLandLocations; index++)
-        {
-            MapLocation potentialBuildLocation = adjacentLocations[index];
-            if(potentialBuildLocation.isAdjacentTo(armoryLocation)) {
+            MapLocation potentialBuildLocation = myLocation.add(testDirection);
+            if(potentialBuildLocation.isAdjacentTo(armoryLocation) && potentialBuildLocation.isAdjacentTo(factoryLocation)) {
                 buildLocations[numberOfLandBuildLocations++] = potentialBuildLocation;
             }
+            testDirection = testDirection.rotateLeft();
         }
         
         numberOfFlyingBuildLocations = numberOfLandBuildLocations;
